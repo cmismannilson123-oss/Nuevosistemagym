@@ -3525,6 +3525,207 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
 }
 .cupm-dia:first-child{ margin-top:2px; }
 @media (prefers-reduced-motion: reduce){ .cupc-item.nuevo{ animation:none; } }
+
+/* ==========================================================================
+   v57 — PANEL: encabezado, filtros y tarjetas de socio
+   Un color por estado, usado igual en la franja de la tarjeta, su insignia,
+   el filtro y la barra:  activo #10b981 · deuda #f5b83d · vencido #f43f5e ·
+   bloqueado #ef4444 · agotado #a78bfa.  Cifras y nombres en la letra de la
+   marca (Barlow Condensed); etiquetas en texto normal, sin mayúsculas.
+   ========================================================================== */
+
+/* ----- Encabezado ----- */
+.topbar{
+  justify-content:space-between !important; padding:10px 14px 10px 16px !important;
+  background:linear-gradient(180deg,#0c1916 0%,#08110f 100%) !important;
+  border-bottom:1px solid rgba(52,211,153,.14) !important;
+  box-shadow:0 12px 28px -20px rgba(0,0,0,.95) !important;
+}
+.topbar::after{
+  content:""; position:absolute; left:0; right:0; bottom:-1px; height:1px; pointer-events:none;
+  background:linear-gradient(90deg, transparent 0%, rgba(52,211,153,.75) 50%, transparent 100%);
+}
+.topbar .titulo-wrap{ gap:11px !important; min-width:0; }
+.tb-logo{
+  width:44px; height:44px; flex:none; border-radius:50%; display:grid; place-items:center;
+  background:radial-gradient(circle, rgba(16,185,129,.16), rgba(0,0,0,.35) 72%);
+  box-shadow:inset 0 0 0 1.5px rgba(52,211,153,.5), 0 0 18px -2px rgba(16,185,129,.35);
+}
+.tb-logo .logo-cy{ width:34px !important; height:34px !important; }
+.tb-marca{ display:flex; flex-direction:column; min-width:0; line-height:1; }
+.topbar .tb-marca h2{
+  font-family:var(--cy-display) !important; font-size:25px !important; font-weight:800 !important; line-height:.95 !important;
+  letter-spacing:.7px !important; margin:0 !important; color:#f4fbf8 !important; animation:none !important;
+}
+.topbar .tb-marca h2 .accent{ color:#34d399 !important; text-shadow:0 0 16px rgba(52,211,153,.35) !important; }
+.tb-marca small{ margin-top:3px; font-size:11.5px; font-weight:600; color:#8fa59d; letter-spacing:.2px; }
+.topbar .btn-cerrar-sesion{
+  position:static !important; transform:none !important; flex:none; width:40px !important; height:40px !important;
+  border-radius:12px !important; color:#a9bcb5 !important; background:rgba(255,255,255,.05) !important;
+  border:1px solid rgba(255,255,255,.1) !important; box-shadow:none !important;
+}
+
+/* ----- Filtros con conteo ----- */
+.list-filter-container.fc{ display:flex !important; flex-wrap:wrap !important; gap:8px !important; padding:2px 0 4px !important; margin:14px 0 0 !important; }
+#filter-all{ --fc:#e2e8f0; } #filter-activo{ --fc:#10b981; } #filter-vencido{ --fc:#f43f5e; }
+#filter-deuda{ --fc:#f5b83d; } #filter-avisar{ --fc:#facc15; }
+.list-filter-container.fc .fc-b{
+  flex:1 1 auto !important; min-height:42px !important; padding:0 8px 0 13px !important; gap:7px !important;
+  border-radius:12px !important; font-size:13.5px !important; font-weight:600 !important; letter-spacing:.1px !important;
+  color:#cfdcd6 !important; background:rgba(255,255,255,.04) !important; border:1px solid rgba(255,255,255,.09) !important;
+  box-shadow:none !important; filter:none !important; transform:none;
+}
+.list-filter-container.fc .fc-b:active{ transform:scale(.97); }
+.fc-b .fc-dot{ width:8px; height:8px; border-radius:50%; background:var(--fc); flex:none; }
+.fc-b > .fa-bell{ color:var(--fc); font-size:12px; }
+.fc-b .fc-n{
+  min-width:24px; height:22px; padding:0 7px; border-radius:7px; display:inline-grid; place-items:center;
+  font-family:var(--cy-display); font-size:15px; font-weight:700; color:#cfdcd6 !important; background:rgba(255,255,255,.07) !important;
+  font-variant-numeric:tabular-nums; margin:0 !important;
+}
+.list-filter-container.fc .fc-b.active{
+  color:#fff !important; background:rgba(255,255,255,.06) !important;
+  border-color:var(--fc) !important; box-shadow:inset 0 0 0 1px var(--fc), 0 8px 18px -12px var(--fc) !important;
+}
+.list-filter-container.fc .fc-b.active .fc-n{ color:#04120d !important; background:var(--fc) !important; }
+
+/* ----- Tarjeta de socio ----- */
+.socios-grid{ gap:14px !important; margin-top:16px !important; }
+.sc{
+  --c:#10b981; --c-suave:rgba(16,185,129,.11); --c-linea:rgba(16,185,129,.4);
+  position:relative; isolation:isolate; overflow:hidden; padding:16px 15px 12px 19px; border-radius:20px;
+  background:linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.012)), #0b1416;
+  border:1px solid rgba(255,255,255,.075);
+  box-shadow:0 16px 30px -24px rgba(0,0,0,.95);
+  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+  -webkit-tap-highlight-color:transparent; cursor:pointer;
+}
+.sc--deuda{ --c:#f5b83d; --c-suave:rgba(245,184,61,.11); --c-linea:rgba(245,184,61,.45); }
+.sc--vencido{ --c:#f43f5e; --c-suave:rgba(244,63,94,.1); --c-linea:rgba(244,63,94,.42); }
+.sc--bloqueado{ --c:#ef4444; --c-suave:rgba(239,68,68,.12); --c-linea:rgba(239,68,68,.48); }
+.sc--agotado{ --c:#a78bfa; --c-suave:rgba(167,139,250,.11); --c-linea:rgba(167,139,250,.42); }
+.sc::before{ /* franja de estado */
+  content:""; position:absolute; left:0; top:16px; bottom:16px; width:4px; border-radius:0 4px 4px 0;
+  background:var(--c); box-shadow:0 0 14px var(--c);
+}
+.sc::after{ /* tinte de estado, muy suave */
+  content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:radial-gradient(110% 55% at 100% 0%, var(--c-suave), transparent 62%);
+}
+.sc.seleccionada{
+  transform:translateY(-3px); border-color:var(--c-linea);
+  box-shadow:0 22px 34px -22px var(--c-linea), 0 0 0 1px var(--c-linea);
+}
+.sc:active:not(:has(button:active)){ transform:translateY(-1px) scale(.995); }
+
+.sc-head{ display:flex; align-items:center; gap:12px; }
+.sc-av{
+  width:44px; height:44px; flex:none; border-radius:50%; display:grid; place-items:center;
+  font-family:var(--cy-display); font-weight:700; font-size:22px; color:var(--c, #34d399);
+  background:var(--c-suave, rgba(16,185,129,.11)); border:1px solid var(--c-linea, rgba(16,185,129,.4));
+}
+.sc-id{ flex:1; min-width:0; }
+.sc-id h4{
+  margin:0; font-family:var(--cy-display) !important; font-size:21px; font-weight:700; line-height:1.05;
+  color:#f4fbf8; letter-spacing:.2px; overflow-wrap:break-word;
+}
+.sc-id span{ display:block; margin-top:3px; font-size:12.5px; color:#8da09a; font-variant-numeric:tabular-nums; }
+.sc-badge{
+  align-self:flex-start; flex:none; display:inline-flex; align-items:center; gap:6px; padding:5px 10px; border-radius:999px;
+  font-size:12px; font-weight:700; color:var(--c); background:var(--c-suave); border:1px solid var(--c-linea); white-space:nowrap;
+}
+.sc-badge i{ width:7px; height:7px; border-radius:50%; background:var(--c); }
+.sc-alerta{
+  margin:12px 0 0; padding:8px 11px; border-radius:11px; font-size:12.5px; font-weight:700; line-height:1.35;
+  color:#fecaca; background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.35);
+}
+.sc-alerta i{ color:#f87171; margin-right:4px; }
+.sc-plan{
+  margin-top:12px; max-width:100%; display:inline-flex; align-items:center; gap:7px; padding:6px 11px; border-radius:10px;
+  font-size:13px; font-weight:600; color:#dbe7e2; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
+}
+.sc-plan i{ color:#7dd3fc; font-size:12px; }
+.sc-plan span{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sc-stats{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); margin-top:12px; padding-top:12px; border-top:1px solid rgba(255,255,255,.06); }
+.sc-stats > div{ min-width:0; padding:0 10px; border-left:1px solid rgba(255,255,255,.06); }
+.sc-stats > div:first-child{ padding-left:0; border-left:0; }
+.sc-stats span{ display:block; font-size:11.5px; font-weight:500; color:#8da09a; margin-bottom:2px; }
+.sc-stats b{ display:block; font-family:var(--cy-display); font-size:21px; font-weight:700; line-height:1.05; color:#eef4f1; font-variant-numeric:tabular-nums; }
+.sc-stats b i{ font-style:normal; font-size:.75em; color:#8da09a; }
+.sc-stats b.warn{ color:#f5b83d; } .sc-stats b.mal{ color:#fb7185; }
+.sc-stats small{ display:block; margin-top:2px; font-size:11px; color:#6f847d; }
+.sc-bar{ height:4px; margin-top:12px; border-radius:4px; background:rgba(255,255,255,.06); overflow:hidden; }
+.sc-bar i{ display:block; height:100%; border-radius:inherit; background:var(--c); transform-origin:left; transform:scaleX(var(--p)); opacity:.9; }
+.sc-deuda{
+  margin-top:12px; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 12px; border-radius:12px;
+  font-size:13px; font-weight:600;
+}
+.sc-deuda i{ margin-right:4px; }
+.sc-deuda.no{ color:#6ee7b7; background:rgba(16,185,129,.06); border:1px solid rgba(16,185,129,.16); }
+.sc-deuda.si{ color:#fde3a7; background:rgba(245,184,61,.1); border:1px solid rgba(245,184,61,.32); }
+.sc-deuda.si b{ font-family:var(--cy-display); font-size:21px; font-weight:700; color:#fbbf24; line-height:1; }
+
+.sc-acc{ display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,.06); }
+.sc .sc-btn{
+  min-height:54px !important; margin:0 !important; padding:6px 2px !important; border-radius:13px !important;
+  display:flex !important; flex-direction:column; align-items:center; justify-content:center; gap:5px !important;
+  font-size:11px !important; font-weight:600 !important; letter-spacing:.1px !important; color:#cfdcd6 !important;
+  background:rgba(255,255,255,.045) !important; border:1px solid rgba(255,255,255,.085) !important;
+  box-shadow:none !important; filter:none !important; transition:background .15s ease, transform .1s ease !important;
+}
+.sc .sc-btn i{ font-size:17px; }
+.sc .sc-btn span{ max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sc .sc-btn:hover{ transform:none !important; background:rgba(255,255,255,.08) !important; }
+.sc .sc-btn:active{ transform:scale(.94) !important; }
+.sc .sc-btn:focus-visible{ outline:2px solid #a7f3d0; outline-offset:2px; }
+.sc .ic-deuda{ color:#60a5fa; } .sc .ic-adel{ color:#a78bfa; } .sc .ic-wsp{ color:#25d366; } .sc .ic-edit{ color:#fbbf24; }
+.sc .sc-btn--peligro i{ color:#f87171; }
+.sc .sc-btn--renovar{
+  color:#02150d !important; background:linear-gradient(180deg,#22d3a0 0%,#0d9b6c 100%) !important; border-color:transparent !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35), 0 8px 16px -10px rgba(16,185,129,.9) !important;
+}
+
+/* ----- Por avisar ----- */
+.pa-row{
+  display:flex; align-items:center; gap:12px; padding:12px 12px 12px 14px; border-radius:16px;
+  background:linear-gradient(180deg, rgba(250,204,21,.07), rgba(250,204,21,.02)), #0b1416; border:1px solid rgba(250,204,21,.28);
+  --c:#facc15; --c-suave:rgba(250,204,21,.12); --c-linea:rgba(250,204,21,.4);
+}
+.pa-main{ flex:1; min-width:0; }
+.pa-main b{ display:block; font-family:var(--cy-display); font-size:19px; font-weight:700; color:#f4fbf8; line-height:1.1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.pa-main span{ display:block; margin-top:3px; font-size:12.5px; color:#fcd34d; }
+.pa-wsp{
+  width:46px !important; height:46px !important; flex:none; border-radius:14px !important; margin:0 !important; padding:0 !important;
+  color:#fff !important; font-size:20px; background:linear-gradient(180deg,#2be36f,#12a84a) !important; border:0 !important;
+  box-shadow:0 8px 16px -10px rgba(37,211,102,.9) !important;
+}
+.pa-sep{ margin:12px 2px 0; font-size:12.5px; font-weight:700; color:#8da09a; }
+.pa-row.hecho{ opacity:.6; background:#0b1416; border-color:rgba(255,255,255,.08); --c:#94a3b8; --c-suave:rgba(148,163,184,.1); --c-linea:rgba(148,163,184,.3); }
+.pa-row.hecho .pa-main span{ color:#8da09a; }
+.pa-ok{ flex:none; font-size:12.5px; font-weight:700; color:#34d399; white-space:nowrap; }
+
+@media (max-width:370px){
+  .sc .sc-btn span{ font-size:10px; }
+  .sc-stats b{ font-size:19px; }
+  .topbar .tb-marca h2{ font-size:22px !important; }
+}
+@media (prefers-reduced-motion: reduce){ .sc{ transition:none; } }
+
+/* Tarjeta de socio en la pestaña Ingreso (misma plantilla que la lista) */
+#resultado .sc{ margin:0 0 14px; cursor:default; }
+.sc .sc-grande{
+  width:100% !important; min-height:54px !important; margin:14px 0 0 !important; padding:0 16px !important; border-radius:15px !important;
+  display:flex !important; align-items:center; justify-content:center; gap:10px !important;
+  font-family:var(--cy-display) !important; font-size:21px !important; font-weight:800 !important; letter-spacing:.3px !important;
+  color:#02150d !important; border:0 !important; filter:none !important;
+  background:linear-gradient(180deg,#22d3a0 0%,#0d9b6c 100%) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35), 0 10px 20px -12px rgba(16,185,129,.95) !important;
+}
+.sc .sc-grande--renovar{ color:#fff !important; background:linear-gradient(180deg,#3b82f6 0%,#1d4ed8 100%) !important; box-shadow:inset 0 1px 0 rgba(255,255,255,.25), 0 10px 20px -12px rgba(59,130,246,.95) !important; }
+.sc .sc-grande:hover{ transform:none !important; }
+.sc .sc-grande:active{ transform:scale(.98) !important; }
+.sc-nota{ margin:12px 0 0; font-size:13px; font-weight:600; color:#fca5a5; }
+.sc-nota i{ margin-right:5px; }
 </style>
 </head>
 
@@ -3548,8 +3749,11 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
 
 <div class="topbar" id="topbarPrincipal">
   <div class="titulo-wrap">
-    <span class="logo-cy" style="width:30px;height:30px;flex-shrink:0;"></span>
-    <h2>C&amp;Y <span class="accent">FITNESS</span> GYM</h2>
+    <span class="tb-logo"><span class="logo-cy"></span></span>
+    <div class="tb-marca">
+      <h2>C&amp;Y <span class="accent">FITNESS</span> GYM</h2>
+      <small>Panel de recepción</small>
+    </div>
   </div>
   <button type="button" id="btnCerrarSesion" class="btn-cerrar-sesion" onclick="cerrarSesionStaff()" title="Cerrar sesión" aria-label="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
 </div>
@@ -4079,12 +4283,12 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
       <h3><i class="fa-solid fa-users"></i> Lista de socios</h3>
       <input id="buscadorLista" placeholder="Buscar por nombre o DNI" oninput="filtrarLista()">
 
-      <div class="list-filter-container">
-        <button id="filter-all" class="filter-btn active" onclick="cambiarFiltroEstado('todos')">Todos</button>
-        <button id="filter-activo" class="filter-btn" onclick="cambiarFiltroEstado('ACTIVO')"><i class="fa-solid fa-circle-check"></i> Activos</button>
-        <button id="filter-vencido" class="filter-btn" onclick="cambiarFiltroEstado('VENCIDO')"><i class="fa-solid fa-circle-xmark"></i> Vencidos</button>
-        <button id="filter-deuda" class="filter-btn warn" onclick="cambiarFiltroEstado('DEUDORES')"><i class="fa-solid fa-sack-dollar"></i> Deudores</button>
-        <button id="filter-avisar" class="filter-btn alert" onclick="cambiarFiltroEstado('POR_AVISAR')"><i class="fa-solid fa-bell"></i> Por avisar <span id="contadorPorAvisar" style="background:#f59e0b;color:#1e1b0a;border-radius:999px;padding:1px 7px;font-size:11px;font-weight:800;margin-left:4px;">0</span></button>
+      <div class="list-filter-container fc">
+        <button id="filter-all" class="filter-btn fc-b active" onclick="cambiarFiltroEstado('todos')"><span>Todos</span><b class="fc-n" id="cnt-todos">0</b></button>
+        <button id="filter-activo" class="filter-btn fc-b fc-activo" onclick="cambiarFiltroEstado('ACTIVO')"><i class="fc-dot"></i><span>Activos</span><b class="fc-n" id="cnt-activo">0</b></button>
+        <button id="filter-vencido" class="filter-btn fc-b fc-vencido" onclick="cambiarFiltroEstado('VENCIDO')"><i class="fc-dot"></i><span>Vencidos</span><b class="fc-n" id="cnt-vencido">0</b></button>
+        <button id="filter-deuda" class="filter-btn fc-b fc-deuda" onclick="cambiarFiltroEstado('DEUDORES')"><i class="fc-dot"></i><span>Deudores</span><b class="fc-n" id="cnt-deuda">0</b></button>
+        <button id="filter-avisar" class="filter-btn fc-b fc-avisar" onclick="cambiarFiltroEstado('POR_AVISAR')"><i class="fa-solid fa-bell"></i><span>Por avisar</span><b class="fc-n" id="contadorPorAvisar">0</b></button>
       </div>
     </div>
 
@@ -4532,11 +4736,11 @@ document.addEventListener("DOMContentLoaded", () => {
       // tarjeta — el botón hace su propia función y listo.
       if (e.target.closest("button")) return;
 
-      const card = e.target.closest(".modern-socio-card");
+      const card = e.target.closest(".sc");
       if (!card) return;
 
       const yaSeleccionada = card.classList.contains("seleccionada");
-      document.querySelectorAll(".modern-socio-card.seleccionada")
+      document.querySelectorAll(".sc.seleccionada")
         .forEach(c => c.classList.remove("seleccionada"));
       if (!yaSeleccionada) card.classList.add("seleccionada");
     });
@@ -4544,8 +4748,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Cerrar la tarjeta seleccionada al tocar en cualquier lugar fuera de las tarjetas
   document.addEventListener("click", (e) => {
-    if (!e.target.closest(".modern-socio-card")) {
-      document.querySelectorAll(".modern-socio-card.seleccionada")
+    if (!e.target.closest(".sc")) {
+      document.querySelectorAll(".sc.seleccionada")
         .forEach(c => c.classList.remove("seleccionada"));
     }
   });
@@ -4554,7 +4758,7 @@ document.addEventListener("DOMContentLoaded", () => {
   var _selCards = document.getElementsByClassName("seleccionada");
   window.addEventListener("scroll", () => {
     if (!_selCards.length) return;
-    document.querySelectorAll(".modern-socio-card.seleccionada")
+    document.querySelectorAll(".sc.seleccionada")
       .forEach(c => c.classList.remove("seleccionada"));
   }, { passive: true });
 });
@@ -5350,66 +5554,23 @@ window.buscarAutomatico = function(){
 };
 
 function generarCardSocio(data){
-  let diasDeuda = data.fecha_deuda ? Math.floor((new Date() - new Date(data.fecha_deuda)) / 86400000) : 0;
-  if (parseFloat(data.deuda || 0) > 0 && diasDeuda > 7) {
-    return `
-    <div class="res-alert">
-      <h3><i class="fa-solid fa-ban"></i> Acceso bloqueado</h3>
-      <div style="font-weight:700;color:#eef4f2;font-size:17px;">${escaparHTML(data.nombre)}</div>
-      <p style="font-weight:700; font-size:16px; margin:10px 0 4px;"><i class="fa-solid fa-sack-dollar"></i> Deuda pendiente: S/ ${escaparHTML(data.deuda)}</p>
-      <p style="color:#8da09a;margin:0;">Regularice su pago para habilitar el acceso.</p>
-    </div>`;
+  const c = scCuerpo(data);
+  let accion;
+  if (c.tieneBloqueoDeuda) {
+    // Igual que antes: con deuda de más de 7 días no se ofrece registrar el ingreso
+    accion = `<p class="sc-nota"><i class="fa-solid fa-ban"></i> Regularice su pago para habilitar el acceso.</p>`;
+  } else {
+    const esInterdiario = (data.tipo_memb || "").toLowerCase().includes("interdiario");
+    const asistenciasAgotadas = esInterdiario && data.dias_restantes <= 0;
+    accion = (c.estado === "ACTIVO" && !asistenciasAgotadas)
+      ? `<button class="sc-grande" onclick="asistenciaNueva(${jsAttr(data.dni)}, ${Number(data.dias_restantes) || 0})"><i class="fa-solid fa-square-check"></i> Registrar ingreso</button>`
+      : `<button class="sc-grande sc-grande--renovar" onclick="renovar(${jsAttr(data.dni)})"><i class="fa-solid fa-rotate"></i> Renovar membresía</button>`;
   }
-  let estado = estadoSocio(data);
-  let esInterdiario = (data.tipo_memb || "").toLowerCase().includes("interdiario");
-  let asistenciasAgotadas = esInterdiario && data.dias_restantes <= 0;
-
-  let color = (estado === "ACTIVO" && !asistenciasAgotadas) ? "#10b981" : "#f06a6a";
-  { const _d = parseFloat(data.deuda || 0) > 0;
-    const _dd = data.fecha_deuda ? Math.floor((new Date() - new Date(data.fecha_deuda)) / 86400000) : 0;
-    if (_d && _dd > 7) color = "#f06a6a"; else if (_d && color === "#10b981") color = "#f5b53d"; }
-  let botones = "";
-  let porcentaje = (data.dias_restantes / data.dias_totales) * 100;
-  let colorBarra = "#10b981";
-
-  if(porcentaje <= 50) colorBarra = "#f5b53d";
-  if(porcentaje <= 20) colorBarra = "#f06a6a";
-
-  if(estado === "ACTIVO" && !asistenciasAgotadas){
-    botones += `<button class="btn-green" onclick="asistenciaNueva(${jsAttr(data.dni)}, ${data.dias_restantes})"><i class="fa-solid fa-square-check"></i> Registrar ingreso</button>`;
-  }else{
-    botones += `<button class="btn-blue" onclick="renovar(${jsAttr(data.dni)})"><i class="fa-solid fa-rotate"></i> Renovar membresía</button>`;
-  }
-
-  // Ajuste en visualización rápida de días restantes en control de accesos
-  const dateHoy = new Date();
-  dateHoy.setHours(0,0,0,0);
-  const dateFinSocio = new Date(data.fecha_fin + "T00:00:00");
-  const diasRestantesCard = Math.max(0, Math.round((dateFinSocio - dateHoy) / 86400000));
-  const usadas = data.dias_totales - data.dias_restantes;
-  const fraccionUsada = data.dias_totales > 0 ? Math.min(1, Math.max(0, usadas / data.dias_totales)) : 0;
-  const inicial = String(data.nombre || "?").trim().charAt(0).toUpperCase();
-
   return `
-  <div class="res-card" style="--st:${color};">
-    <div class="res-head">
-      <div class="res-avatar">${inicial}</div>
-      <div class="res-id"><h3>${escaparHTML(data.nombre)}</h3><small>DNI ${escaparHTML(data.dni)}</small></div>
-      <span class="res-badge">${(parseFloat(data.deuda || 0) > 0 && estado === "ACTIVO") ? "CON DEUDA" : estado}</span>
-    </div>
-    <div class="res-grid">
-      <div><span>Plan</span><b>${escaparHTML(data.tipo_memb)}</b></div>
-      <div><span>Días de vigencia</span><b>${diasRestantesCard}</b></div>
-      <div><span>Inicio</span><b>${escaparHTML(data.inicio)}</b></div>
-      <div><span>Vence</span><b>${escaparHTML(data.fecha_fin)}</b></div>
-    </div>
-    <div class="res-uso">
-      <div class="res-uso-top"><span><i class="fa-solid fa-dumbbell"></i>Asistencias</span><b>${usadas} de ${data.dias_totales}</b></div>
-      <div class="res-bar"><i style="transform:scaleX(${fraccionUsada});background:${colorBarra};"></i></div>
-    </div>
-    <div class="res-deuda"><span>Deuda</span><b style="color:${parseFloat(data.deuda || 0) > 0 ? '#f06a6a' : '#34d399'};">S/ ${escaparHTML(data.deuda)}</b></div>
-    ${botones}
-  </div>`;
+  <article class="sc sc--${c.st} sc--ingreso">
+    ${c.html}
+    ${accion}
+  </article>`;
 }
 
 function mostrarSocio(data){
@@ -5621,6 +5782,68 @@ window.cambiarFiltroEstado = function(estado) {
   filtrarLista();
 };
 
+// Parte común de la tarjeta de socio (lista y pestaña Ingreso):
+// estado por color, encabezado, plan, fechas, asistencias y deuda.
+const _scMES = ["ene","feb","mar","abr","may","jun","jul","ago","set","oct","nov","dic"];
+function scCuerpo(s){
+  const _hoy0 = new Date(); _hoy0.setHours(0,0,0,0);
+  const fechaCorta = (iso) => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || "");
+    if (!m) return "—";
+    return m[3] + " " + _scMES[+m[2] - 1] + (+m[1] !== _hoy0.getFullYear() ? " " + m[1].slice(2) : "");
+  };
+  let estado = estadoSocio(s);
+  const fin = new Date((s.fecha_fin || "") + "T00:00:00");
+  const ini = new Date((s.inicio || "") + "T00:00:00");
+  const diasDiff = isNaN(fin) ? null : Math.round((fin - _hoy0) / 86400000);
+  const total = Number(s.dias_totales) || 0;
+  const usadas = total ? Math.max(0, total - (Number(s.dias_restantes) || 0)) : 0;
+  let avance = 0;
+  if (!isNaN(fin) && !isNaN(ini) && fin > ini) avance = Math.min(1, Math.max(0, (_hoy0 - ini) / (fin - ini)));
+
+  let diasDeuda = s.fecha_deuda ? Math.floor((new Date() - new Date(s.fecha_deuda)) / 86400000) : 0;
+  let tieneDeuda = parseFloat(s.deuda || 0) > 0;
+  let tieneBloqueoDeuda = tieneDeuda && diasDeuda > 7;
+
+  // Estado visual (solo color; no cambia ninguna regla)
+  let st = "activo", etiqueta = "Activo";
+  if (tieneBloqueoDeuda) { st = "bloqueado"; etiqueta = "Bloqueado"; }
+  else if (estado === "VENCIDO") { st = "vencido"; etiqueta = "Vencido"; }
+  else if (estado === "AGOTADO") { st = "agotado"; etiqueta = "Agotado"; }
+  else if (tieneDeuda) { st = "deuda"; etiqueta = "Con deuda"; }
+
+  let quedan;
+  if (diasDiff === null) quedan = `<b>—</b>`;
+  else if (diasDiff < 0) quedan = `<b class="mal">Venció</b><small>hace ${-diasDiff} ${-diasDiff === 1 ? "día" : "días"}</small>`;
+  else if (diasDiff === 0) quedan = `<b class="warn">Hoy</b><small>último día</small>`;
+  else quedan = `<b class="${diasDiff <= 5 ? "warn" : ""}">${diasDiff} ${diasDiff === 1 ? "día" : "días"}</b>`;
+
+  return { estado, st, tieneDeuda, tieneBloqueoDeuda, html: `
+      <header class="sc-head">
+      <div class="sc-av" aria-hidden="true">${escaparHTML(String(s.nombre || "?").trim().charAt(0).toUpperCase())}</div>
+      <div class="sc-id">
+        <h4>${escaparHTML(s.nombre)}</h4>
+        <span>DNI ${escaparHTML(s.dni)}</span>
+      </div>
+      <span class="sc-badge"><i aria-hidden="true"></i>${etiqueta}</span>
+    </header>
+
+    ${tieneBloqueoDeuda ? `<div class="sc-alerta"><i class="fa-solid fa-triangle-exclamation"></i> Acceso bloqueado: deuda de más de 7 días</div>` : ""}
+
+    <div class="sc-plan"><i class="fa-solid fa-id-card"></i><span>${escaparHTML(String(s.tipo_memb || "Mensual").trim())}</span></div>
+
+    <div class="sc-stats">
+      <div><span>Vence</span><b>${fechaCorta(s.fecha_fin)}</b><small>desde ${fechaCorta(s.inicio)}</small></div>
+      <div><span>Quedan</span>${quedan}</div>
+      <div><span>Asistencias</span><b>${total ? usadas + `<i>/${total}</i>` : "—"}</b></div>
+    </div>
+    <div class="sc-bar" title="Avance del periodo"><i style="--p:${avance.toFixed(3)}"></i></div>
+
+    ${tieneDeuda ? `<div class="sc-deuda si"><span><i class="fa-solid fa-sack-dollar"></i> Deuda pendiente</span><b>S/ ${escaparHTML(s.deuda)}</b></div>` : ""}
+
+` };
+}
+
 function mostrarLista(data){
   let html = "";
   let listado = data || [];
@@ -5633,32 +5856,8 @@ function mostrarLista(data){
   }
 
   listado.forEach(s => {
-    let estado = estadoSocio(s);
-    let badgeClass = estado === "ACTIVO" ? "activo" : "vencido";
-    let textoEstado = estado === "ACTIVO" ? "🟢 Activo" : "🔴 Vencido";
-    
-    const dateHoy = new Date();
-    dateHoy.setHours(0,0,0,0);
-    const dateFinSocio = new Date(s.fecha_fin + "T00:00:00");
-    let diasRestantes = Math.max(0, Math.round((dateFinSocio - dateHoy) / 86400000));
-    
-    let asistenciasConsumidas = s.dias_totales - s.dias_restantes;
-    let diasDeuda = s.fecha_deuda ? Math.floor((new Date() - new Date(s.fecha_deuda)) / 86400000) : 0;
-    let tieneBloqueoDeuda = parseFloat(s.deuda || 0) > 0 && diasDeuda > 7;
-    let tieneDeuda = parseFloat(s.deuda || 0) > 0;
-
-    // Clase de acento neón según el estado real del socio (no cambia ninguna regla de negocio, solo el color)
-    let claseNeon = "neon-activo";
-    if (tieneBloqueoDeuda) claseNeon = "neon-bloqueado";
-    else if (estado !== "ACTIVO") claseNeon = "neon-vencido";
-    else if (tieneDeuda) claseNeon = "neon-deudor";
-
-    let botonAccionPrincipal = "";
-    if(estado === "ACTIVO"){
-botonAccionPrincipal = `<button class="btn-blue" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; border: none; padding: 2px 0; width: 42px; height: 38px; border-radius: 8px; cursor: pointer; flex-shrink: 0; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;" onclick="editarDeuda(${jsAttr(s.dni)})" title="Gestionar Deuda"><i class="fa-solid fa-money-bill-wave" style="font-size: 11px;"></i><span style="font-size: 7px; margin-top: 1px; font-weight: 600; text-transform: uppercase;">DEUDA</span></button>`;
-    } else {
-      botonAccionPrincipal = `<button class="btn-green" onclick="renovar(${jsAttr(s.dni)})"><i class="fa-solid fa-rotate"></i> Renovar</button>`;
-    }
+    const c = scCuerpo(s);
+    const estado = c.estado, st = c.st;
 
     // --- LIMPIEZA DEL TELÉFONO ---
     let telfLimpio = (s.telefono || "").replace(/\D/g, '');
@@ -5679,75 +5878,21 @@ botonAccionPrincipal = `<button class="btn-blue" style="background: linear-gradi
     let msjWsp = encodeURIComponent(textoMensaje);
     let urlWsp = telfLimpio ? `https://wa.me/${telfLimpio}?text=${msjWsp}` : '#';
 
+    const accionPrincipal = estado === "ACTIVO"
+      ? `<button class="sc-btn" onclick="editarDeuda(${jsAttr(s.dni)})" title="Gestionar deuda"><i class="fa-solid fa-money-bill-wave ic-deuda"></i><span>Deuda</span></button>`
+      : `<button class="sc-btn sc-btn--renovar" onclick="renovar(${jsAttr(s.dni)})" title="Renovar membresía"><i class="fa-solid fa-rotate"></i><span>Renovar</span></button>`;
+
     html += `
-    <div class="modern-socio-card ${claseNeon}">
-      
-      <div class="socio-card-header">
-        <div class="socio-avatar-info">
-          <div class="socio-avatar">${s.nombre.charAt(0).toUpperCase()}</div>
-          <div style="min-width: 0; flex: 1;">
-            <strong style="font-size:16px; color:#ffffff; display:block; max-width:130px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escaparHTML(s.nombre)}</strong>
-            <small style="color:#64748b; font-size:12px;">DNI: ${escaparHTML(s.dni)}</small>
-          </div>
-        </div>
-        <span class="socio-badge ${badgeClass}">${textoEstado}</span>
-      </div>
-
-      ${tieneBloqueoDeuda ? '<div style="background:linear-gradient(90deg,#ef4444,#b91c1c); color:white; font-size:11px; font-weight:700; text-align:center; padding:5px; border-radius:8px; margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px;"><i class="fa-solid fa-triangle-exclamation"></i> Acceso Bloqueado</div>' : ''}
-
-      <div class="socio-body-info">
-        <div class="socio-info-row">
-          <span>Plan:</span>
-          <strong style="color:#60a5fa; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"><i class="fa-solid fa-address-card" style="font-size:12px;"></i> ${s.tipo_memb || 'Mensual'}</strong>
-        </div>
-        <div class="socio-info-row">
-          <span>Inicio:</span>
-          <span style="color:#f3f4f6;">${s.inicio || '--'}</span>
-        </div>
-        <div class="socio-info-row">
-          <span>Vence:</span>
-          <span style="color:#f3f4f6;">${s.fecha_fin || '--'}</span>
-        </div>
-        <div class="socio-info-row">
-          <span>Días rest.:</span>
-          <strong style="color:${diasRestantes <= 5 ? '#ef4444' : '#10b981'};">${diasRestantes} días</strong>
-        </div>
-        <div class="socio-info-row">
-          <span>Asistencias:</span>
-          <strong style="color:#c084fc;">🏋️ ${asistenciasConsumidas} / ${s.dias_totales}</strong>
-        </div>
-        <div class="socio-info-row" style="margin-top:8px; border-top:1px solid rgba(255,255,255,0.06); padding-top:8px;">
-          <span>Deuda:</span>
-          <strong style="color:${parseFloat(s.deuda || 0) > 0 ? '#f87171' : '#10b981'};">S/ ${s.deuda || 0}</strong>
-        </div>
-      </div>
-
-      <div class="socio-card-actions">
-        ${botonAccionPrincipal}
-        <button class="btn-purple" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; border: none; padding: 2px 0; width: 42px; height: 38px; border-radius: 8px; cursor: pointer; flex-shrink: 0; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;" onclick="adelantarMembresia(${jsAttr(s.dni)})" title="Adelantar Membresía">
-  <i class="fa-solid fa-forward" style="font-size: 11px;"></i>
-  <span style="font-size: 7px; margin-top: 1px; font-weight: 600; text-transform: uppercase;">Adelant.</span>
-</button>
-
-        <button class="btn-green" style="background: linear-gradient(135deg, #22c55e, #15803d); color: white; border: none; padding: 2px 0; width: 42px; height: 38px; border-radius: 8px; cursor: pointer; flex-shrink: 0; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;" 
-                onclick="${telfLimpio ? `window.open('${urlWsp}', '_blank')` : "mostrarToast('⚠️ Socio sin número válido', '#f59e0b')"}" 
-                title="Abrir WhatsApp">
-          <i class="fa-brands fa-whatsapp" style="font-size: 11px;"></i>
-          <span style="font-size: 7px; margin-top: 1px; font-weight: 600; text-transform: uppercase;">WSP</span>
-        </button>
-
-        <button class="btn-amber" style="background: linear-gradient(135deg, #f59e0b, #b45309); color: white; border: none; padding: 2px 0; width: 42px; height: 38px; border-radius: 8px; cursor: pointer; flex-shrink: 0; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;" onclick="abrirModalEditarSocio(${jsAttr(s.dni)})" title="Editar datos del socio">
-          <i class="fa-solid fa-pen-to-square" style="font-size: 11px;"></i>
-          <span style="font-size: 7px; margin-top: 1px; font-weight: 600; text-transform: uppercase;">Editar</span>
-        </button>
-
-        <button class="btn-red" style="display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;" onclick="eliminar(${jsAttr(s.dni)})" title="Eliminar Socio">
-          <i class="fa-solid fa-trash" style="font-size: 11px;"></i>
-          <span style="font-size: 7px; margin-top: 1px; font-weight: 600; text-transform: uppercase;">Elim.</span>
-        </button>
-      </div>
-
-    </div>`;
+    <article class="sc sc--${st}">
+      ${c.html}
+      <footer class="sc-acc">
+        ${accionPrincipal}
+        <button class="sc-btn" onclick="adelantarMembresia(${jsAttr(s.dni)})" title="Adelantar membresía"><i class="fa-solid fa-forward ic-adel"></i><span>Adelantar</span></button>
+        <button class="sc-btn" onclick="${telfLimpio ? `window.open(${jsAttr(urlWsp)}, '_blank')` : "mostrarToast('⚠️ Socio sin número válido', '#f59e0b')"}" title="Abrir WhatsApp"><i class="fa-brands fa-whatsapp ic-wsp"></i><span>WhatsApp</span></button>
+        <button class="sc-btn" onclick="abrirModalEditarSocio(${jsAttr(s.dni)})" title="Editar datos del socio"><i class="fa-solid fa-pen-to-square ic-edit"></i><span>Editar</span></button>
+        <button class="sc-btn sc-btn--peligro" onclick="eliminar(${jsAttr(s.dni)})" title="Eliminar socio"><i class="fa-solid fa-trash-can"></i><span>Eliminar</span></button>
+      </footer>
+    </article>`;
   });
 
   const lDiv = document.getElementById("lista");
@@ -5779,6 +5924,19 @@ function actualizarContadorPorAvisar(){
   badge.textContent = pendientes.length;
 }
 
+// Números de cada filtro (misma lógica que el filtrado de abajo)
+function actualizarConteosFiltros(){
+  const d = dataGlobal || [];
+  let act = 0, ven = 0, deu = 0;
+  d.forEach(s => {
+    const e = estadoSocio(s);
+    if (e === "ACTIVO") act++; else if (e === "VENCIDO") ven++;
+    const m = parseFloat(s.deuda); if (!isNaN(m) && m > 0) deu++;
+  });
+  const put = (id, n) => { const el = document.getElementById(id); if (el) el.textContent = n; };
+  put("cnt-todos", d.length); put("cnt-activo", act); put("cnt-vencido", ven); put("cnt-deuda", deu);
+}
+
 window.filtrarLista = function(){
   let v = document.getElementById("buscadorLista").value.toLowerCase();
   
@@ -5788,6 +5946,7 @@ window.filtrarLista = function(){
   );
 
   actualizarContadorPorAvisar();
+  actualizarConteosFiltros();
 
   if (filtroEstadoActual === 'POR_AVISAR') {
     mostrarListaPorAvisar(filtrados);
@@ -5829,7 +5988,7 @@ function mostrarListaPorAvisar(data){
   const avisados = candidatos.filter(s => s.ultimo_aviso_vencimiento === hoy);
 
   if (candidatos.length === 0) {
-    lDiv.innerHTML = "<p style='grid-column: 1/-1; text-align:center; color:#64748b; padding:30px; background:rgba(0,0,0,0.2); border-radius:12px;'>Nadie vence mañana por ahora. 🎉</p>";
+    lDiv.innerHTML = "<div class='empty-state'><i class='fa-solid fa-bell-slash'></i><b>Nadie vence mañana</b><span>Cuando alguien esté por vencer, aparecerá aquí para avisarle por WhatsApp.</span></div>";
     return;
   }
 
@@ -5839,27 +5998,27 @@ function mostrarListaPorAvisar(data){
 
   pendientes.forEach(s => {
     html += `
-    <div style="display:flex; align-items:center; gap:12px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.35); border-radius:14px; padding:12px 14px;">
-      <div style="flex:1; min-width:0;">
-        <div style="color:#fff; font-weight:700; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escaparHTML(s.nombre)}</div>
-        <div style="color:#fbbf24; font-size:12.5px; margin-top:2px;">⏰ Vence mañana &bull; ${mañanaBonita}</div>
+    <div class="pa-row">
+      <div class="sc-av" aria-hidden="true">${escaparHTML(String(s.nombre || "?").trim().charAt(0).toUpperCase())}</div>
+      <div class="pa-main">
+        <b>${escaparHTML(s.nombre)}</b>
+        <span><i class="fa-regular fa-clock"></i> Vence mañana, ${mañanaBonita}</span>
       </div>
-      <button class="btn-green" style="background: linear-gradient(135deg, #22c55e, #15803d); width:44px; height:38px; flex-shrink:0;" onclick="enviarAvisoVencimiento(${jsAttr(s.dni)})" title="Avisar por WhatsApp">
-        <i class="fa-brands fa-whatsapp" style="font-size:16px;"></i>
-      </button>
+      <button class="pa-wsp" onclick="enviarAvisoVencimiento(${jsAttr(s.dni)})" title="Avisar por WhatsApp" aria-label="Avisar por WhatsApp"><i class="fa-brands fa-whatsapp"></i></button>
     </div>`;
   });
 
   if (avisados.length > 0) {
-    html += `<div style="margin:10px 0 2px; color:#64748b; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Ya avisados hoy</div>`;
+    html += `<div class="pa-sep">Ya avisados hoy</div>`;
     avisados.forEach(s => {
       html += `
-      <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:12px 14px; opacity:0.55;">
-        <div style="flex:1; min-width:0;">
-          <div style="color:#cbd5e1; font-weight:600; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escaparHTML(s.nombre)}</div>
-          <div style="color:#64748b; font-size:12.5px; margin-top:2px;">⏰ Vence mañana &bull; ${mañanaBonita}</div>
+      <div class="pa-row hecho">
+        <div class="sc-av" aria-hidden="true">${escaparHTML(String(s.nombre || "?").trim().charAt(0).toUpperCase())}</div>
+        <div class="pa-main">
+          <b>${escaparHTML(s.nombre)}</b>
+          <span><i class="fa-regular fa-clock"></i> Vence mañana, ${mañanaBonita}</span>
         </div>
-        <div style="color:#22c55e; font-size:13px; font-weight:700; white-space:nowrap;">✓ Enviado hoy</div>
+        <span class="pa-ok"><i class="fa-solid fa-check"></i> Enviado</span>
       </div>`;
     });
   }

@@ -3371,10 +3371,21 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
           id="qrPhone" 
           name="telefonoSocio" 
           autocomplete="off" 
-          placeholder="Ingresa tu número la primera vez" 
+          placeholder="Tu número de celular" 
           required
           style="width:100%;padding:15px 16px;border-radius:50px;border:1.5px solid rgba(16,185,129,.4);background:rgba(6,20,18,.6);color:#fff;font-size:15px;margin-bottom:12px;box-sizing:border-box;text-align:center;"
         >
+        <input 
+          type="tel" 
+          id="qrDni" 
+          name="dniSocio" 
+          inputmode="numeric"
+          autocomplete="off" 
+          placeholder="Tu DNI" 
+          required
+          style="width:100%;padding:15px 16px;border-radius:50px;border:1.5px solid rgba(16,185,129,.4);background:rgba(6,20,18,.6);color:#fff;font-size:15px;margin-bottom:12px;box-sizing:border-box;text-align:center;"
+        >
+        <p id="qrFormAviso" style="color:#94a3b8;font-size:13px;margin:0 0 12px;text-align:center;">Solo la primera vez en este celular.</p>
         <button type="submit" class="qr-btn-principal">
           <span class="icono-circulo">🔍</span> Buscar <span class="flecha">→</span>
         </button>
@@ -3959,6 +3970,41 @@ function guardarTelefonoSeguro(telefono) {
   try { localStorage.setItem("telefonoGym", telefono); } catch (e) {}
   try { sessionStorage.setItem("telefonoGym", telefono); } catch (e) {}
 }
+// El DNI se pide junto con el teléfono (una sola vez por celular): así nadie
+// puede ver los datos de un socio sabiendo solo su número.
+function leerDniSeguro() {
+  let valor = null;
+  try { valor = localStorage.getItem("dniGym"); } catch (e) {}
+  if (!valor) {
+    try { valor = sessionStorage.getItem("dniGym"); } catch (e) {}
+  }
+  return valor;
+}
+function guardarDniSeguro(dni) {
+  try { localStorage.setItem("dniGym", dni); } catch (e) {}
+  try { sessionStorage.setItem("dniGym", dni); } catch (e) {}
+}
+function borrarDniSeguro() {
+  try { localStorage.removeItem("dniGym"); } catch (e) {}
+  try { sessionStorage.removeItem("dniGym"); } catch (e) {}
+}
+// Muestra el formulario de teléfono + DNI (con el teléfono ya escrito si lo tenemos)
+function mostrarFormularioSocioQR(mensaje) {
+  const tarjeta = document.getElementById("qrCardPrimeraVez");
+  if (tarjeta) tarjeta.style.display = "block";
+  const opciones = document.getElementById("qrOpcionesInicio");
+  if (opciones) opciones.style.display = "none";
+  const form = document.getElementById("loginFormGym");
+  if (form) form.style.display = "block";
+  const aviso = document.getElementById("qrFormAviso");
+  if (aviso && mensaje) aviso.textContent = mensaje;
+  const tel = leerTelefonoSeguro();
+  const phoneInput = document.getElementById("qrPhone");
+  const dniInput = document.getElementById("qrDni");
+  if (phoneInput && tel && !phoneInput.value) phoneInput.value = tel;
+  if (dniInput) dniInput.value = "";
+  if (phoneInput && !phoneInput.value) phoneInput.focus(); else if (dniInput) dniInput.focus();
+}
 
 // --- DETECCIÓN: navegador embebido (WhatsApp/Instagram/Facebook/etc.) o cookies/almacenamiento bloqueado ---
 // Esto no cambia el flujo de registro; solo muestra un aviso para que la persona sepa cómo evitar
@@ -4044,7 +4090,6 @@ async function verificarAccesoSistema() {
 
   const mostrarDashboard = () => {
     document.getElementById("loading-screen").style.display = "none";
-    document.getElementById("dashboard").style.display = "grid";
   };
 
   // ¿Ya hay una sesión guardada en este dispositivo?
@@ -4181,9 +4226,10 @@ async function inicializarFlujoQRInterno(){
       // guardado por el propio celular (esto es lo que resuelve el caso de iPhone,
       // donde el localStorage no siempre persiste). Si lo encontramos, seguimos
       // directo al flujo de marcar asistencia, igual que ya le pasa a Android.
-      const telefonoRecuperado = await intentarRecuperarCredencialSilenciosa();
-      if (telefonoRecuperado) {
-        guardarTelefonoSeguro(telefonoRecuperado);
+      const recuperado = await intentarRecuperarCredencialSilenciosa();
+      if (recuperado) {
+        guardarTelefonoSeguro(recuperado.telefono);
+        if (recuperado.dni) guardarDniSeguro(recuperado.dni);
         await continuarConTelefonoGuardado();
         return;
       }
@@ -4231,6 +4277,10 @@ async function inicializarFlujoQRInterno(){
     await continuarConTelefonoGuardado();
 
     async function continuarConTelefonoGuardado(){
+      if (!leerDniSeguro()) {
+        mostrarFormularioSocioQR("Por seguridad, confirma tu DNI (solo una vez en este celular).");
+        return;
+      }
       if (tarjetaPrimeraVez) tarjetaPrimeraVez.style.display = "none";
       const formGym = document.getElementById("loginFormGym");
       if(formGym) formGym.style.display = "none";
@@ -4290,8 +4340,8 @@ const SUPABASE_URL = "https://ygbiqnbygjbrmwyttkku.supabase.co";
 const SUPABASE_KEY = "sb_publishable_M9fPsgu2VkCyu9ro0ECx8A_no-0RLLt";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// --- CREDENCIALES PUSHOVER PARA NOTIFICACIONES PUSH EN TIEMRE REAL ---
-const NTFY_TOPIC = "gym-clisman-alertas-2026";
+// Los avisos de ingreso al celular (ntfy) los manda la base de datos al
+// guardarse cada asistencia; el canal es secreto y NO está en esta página.
 
 let accesoAdmin = false; 
 let dataGlobal = [];
@@ -4308,25 +4358,6 @@ try {
   });
 } catch (e) {
   console.warn("No se pudo generar el QR de recepción:", e);
-}
-
-async function enviarNotificacionCelular(titulo, mensaje) {
-  try {
-    const url = `https://ntfy.sh/${NTFY_TOPIC}`;
-
-    await fetch(url, {
-      method: "POST",
-      body: mensaje,
-      headers: {
-        "Title": `=?UTF-8?B?${btoa(unescape(encodeURIComponent(titulo)))}?=`, 
-        "Priority": "high",
-        "Tags": "dumbbell"
-      }
-    });
-    console.log("Notificación enviada a ntfy correctamente.");
-  } catch (e) {
-    console.error("Error enviando push a ntfy:", e);
-  }
 }
 
 function fechaHoyISO(){
@@ -5078,12 +5109,14 @@ window.asistenciaNueva = async function(dni, diasRestantesPasados, socioConocido
   // vez más rápido (un viaje de red menos) y más seguro contra dos escaneos
   // casi simultáneos, porque la decisión final la toma la base de datos, no
   // dos consultas separadas que pueden pisarse entre sí.
-  const [resInsert] = await Promise.all([
-    supabaseClient.from("historial_asistencia").insert([{
-      nombre: socio.nombre, dni: socio.dni, hora, fecha: fechaHoy, metodo: metodoFinal
-    }]),
-    supabaseClient.from("socios").update({ dias_restantes: nuevosDias }).eq("dni", dni)
-  ]);
+  // Primero se guarda la asistencia y SOLO si se guardó se descuenta el día
+  // (antes iban en paralelo y un doble escaneo descontaba el día igual).
+  const resInsert = await supabaseClient.from("historial_asistencia").insert([{
+    nombre: socio.nombre, dni: socio.dni, hora, fecha: fechaHoy, metodo: metodoFinal
+  }]);
+  if (!resInsert.error) {
+    await supabaseClient.from("socios").update({ dias_restantes: nuevosDias }).eq("dni", dni);
+  }
 
   // Si el insert falló (ya sea por doble escaneo casi simultáneo, o porque
   // ya había marcado antes hoy), lo tratamos como "ya registrada" en vez de
@@ -5105,12 +5138,6 @@ window.asistenciaNueva = async function(dni, diasRestantesPasados, socioConocido
   // 🚀 TAREAS EN SEGUNDO PLANO (Sin await para no demorar la respuesta en pantalla)
   window.metodoIngreso = null;
   playSound("ACTIVO");
-
-  const formatearFechaPushover = (f) => f ? f.split('-').reverse().join('/') : '--/--/----';
-  enviarNotificacionCelular(
-    "🏋️ C&Y Fitness Gym", 
-    `Ingreso registrado (${metodoFinal}): ${socio.nombre}.\nPlan: ${socio.tipo_memb}.\nInicio: ${formatearFechaPushover(socio.inicio)} | Vence: ${formatearFechaPushover(socio.fecha_fin)}.\nRestan: ${nuevosDias} asistencias.`
-  );
 
   // El panel de Lista/Historial solo existe en el dashboard de administración —
   // en la pantalla pública del QR (donde escanea el socio) ni siquiera está en
@@ -5681,7 +5708,8 @@ if (!esVistaPublicaQR) {
 
 window.resetHistorial = async function(){
   if(!confirm("¿Seguro que quieres borrar el historial del día?")) return;
-  const { error } = await supabaseClient.from("historial_asistencia").delete().neq("id", 0);
+  // Solo las asistencias de HOY (antes borraba el historial completo)
+  const { error } = await supabaseClient.from("historial_asistencia").delete().eq("fecha", fechaHoyISO());
   if(error){
     alert("Error al borrar historial");
     return;
@@ -5717,11 +5745,14 @@ window.actualizarSistema = async function(){
 window.procesarIngresoSocio = function(event) {
   event.preventDefault(); // Evita que la página se recargue
   
-  let telefonoIngresado = document.getElementById("qrPhone").value;
+  let telefonoIngresado = document.getElementById("qrPhone").value.replace(/\D/g,'');
+  let dniIngresado = (document.getElementById("qrDni") || {}).value || "";
+  dniIngresado = dniIngresado.replace(/\D/g,'');
   
-  if (telefonoIngresado) {
-    // Guarda el número para mantener el automatismo (Android e iPhone)
+  if (telefonoIngresado && dniIngresado) {
+    // Guarda número y DNI para mantener el automatismo (Android e iPhone)
     guardarTelefonoSeguro(telefonoIngresado);
+    guardarDniSeguro(dniIngresado);
     
     // Oculta toda la pantalla de bienvenida (ahora es a pantalla completa) para que
     // el resultado de la búsqueda quede visible, igual que le pasa a un socio recurrente.
@@ -5739,14 +5770,14 @@ window.procesarIngresoSocio = function(event) {
 // contraseña), SOLO se llama una vez que ya encontramos al socio en la base de datos.
 // Esto es lo que le permite a un iPhone (donde el localStorage no siempre se conserva)
 // recordar el número la próxima vez, igual que ya le pasa a Android con localStorage.
-window.guardarCredencialNavegador = function(telefono){
+window.guardarCredencialNavegador = function(telefono, dni){
   try {
     const userInput = document.getElementById("credSaveUser");
     const passInput = document.getElementById("credSavePass");
     const form = document.getElementById("credSaveForm");
     if (!userInput || !passInput || !form) return;
     userInput.value = telefono;
-    passInput.value = "gym-" + telefono;
+    passInput.value = dni;
     form.submit();
   } catch (e) { /* si el navegador no lo soporta, no pasa nada, no interrumpe el flujo */ }
 };
@@ -5760,7 +5791,9 @@ window.intentarRecuperarCredencialSilenciosa = async function(){
     if (!('credentials' in navigator) || !window.PasswordCredential) return null;
     const cred = await navigator.credentials.get({ password: true, mediation: 'silent' });
     if (cred && cred.id) {
-      return cred.id.replace(/\D/g,'');
+      // Versiones anteriores guardaban "gym-<teléfono>" como contraseña; ahora es el DNI
+      const dni = (cred.password && !String(cred.password).startsWith("gym-")) ? String(cred.password).replace(/\D/g,'') : null;
+      return { telefono: cred.id.replace(/\D/g,''), dni: dni };
     }
   } catch (e) { /* sin soporte o sin credencial guardada: seguimos con el flujo normal */ }
   return null;
@@ -5771,22 +5804,34 @@ window.buscarQR = async function(esPrimeraVez){
   let phoneInput = document.getElementById("qrPhone");
   let telefono = telefonoGuardado || (phoneInput ? phoneInput.value : "");
   telefono = telefono.replace(/\D/g,'');
+  const dni = (leerDniSeguro() || "").replace(/\D/g,'');
 
   // La vista pública no puede leer la tabla de socios: el servidor devuelve
-  // solo los datos mínimos del socio con ese teléfono (o nada).
-  const { data: socio, error } = await supabaseClient.rpc("consultar_socio_qr", { p_telefono: telefono });
+  // solo los datos mínimos del socio si el teléfono Y el DNI coinciden.
+  const { data: socio, error } = await supabaseClient.rpc("consultar_socio_qr", { p_telefono: telefono, p_dni: dni });
   let div = document.getElementById("qrResult");
   if(!div) return;
   const filaAccesos0 = document.getElementById("cyPromoRow");
   if (filaAccesos0) filaAccesos0.style.display = "";
 
+  if (error) {
+    div.innerHTML = "<div class='card' style='text-align:center; color:#ef4444; font-weight:700;'>⚠️ Sin conexión. Intenta de nuevo.</div>";
+    return;
+  }
+  if (socio && socio.bloqueado) {
+    div.innerHTML = "<div class='card' style='text-align:center; color:#ef4444; font-weight:700;'>🚫 Demasiados intentos. Espera 15 minutos o acércate a recepción.</div>";
+    return;
+  }
   if(!socio){
-    div.innerHTML = "<div class='card' style='text-align:center; color:#ef4444; font-weight:700;'>❌ Número no registrado</div>";
+    borrarDniSeguro();
+    div.innerHTML = "<div class='card' style='text-align:center; color:#ef4444; font-weight:700;'>❌ El número o el DNI no coinciden con ningún socio</div>";
+    mostrarFormularioSocioQR("Revisa tu número y tu DNI.");
     return;
   }
 
+  socio.dni = dni;
   guardarTelefonoSeguro(telefono);
-  if (esPrimeraVez) guardarCredencialNavegador(telefono);
+  if (esPrimeraVez) guardarCredencialNavegador(telefono, dni);
   let estado = estadoSocio(socio);
 
   // 1. VALIDACIÓN DE DEUDA
@@ -5886,12 +5931,12 @@ window.confirmarAsistenciaQR = async function () {
     // 🚀 1. REGISTRAR ASISTENCIA — un solo viaje a Supabase (antes eran dos:
     // uno para revisar el estado del socio y otro para guardar la asistencia).
     const { data: resultado, error: errorRpc } = await supabaseClient.rpc(
-      "registrar_asistencia_publica",
-      { p_dni: socio.dni }
+      "registrar_asistencia_qr",
+      { p_telefono: (leerTelefonoSeguro() || "").replace(/\D/g,''), p_dni: socio.dni }
     );
 
     if (errorRpc || !resultado) {
-      console.error("Error llamando a registrar_asistencia_publica:", errorRpc);
+      console.error("Error llamando a registrar_asistencia_qr:", errorRpc);
       mostrarTarjetaEstado("⚠️ ERROR DE CONEXIÓN", "No se pudo registrar la asistencia. Intente escanear de nuevo.", "#ef4444");
       return;
     }
@@ -5906,6 +5951,9 @@ window.confirmarAsistenciaQR = async function () {
           break;
         case "DEUDA":
           mostrarTarjetaEstado("🚫 ACCESO BLOQUEADO", `<b>${escaparHTML(resultado.nombre)}</b><br><br>💰 Deuda pendiente: <b>S/ ${escaparHTML(resultado.deuda)}</b><br><br>Regularice su pago para habilitar su acceso.`, "#ef4444");
+          break;
+        case "BLOQUEADO":
+          mostrarTarjetaEstado("🚫 DEMASIADOS INTENTOS", "Espera 15 minutos o acércate a recepción.", "#ef4444");
           break;
         case "YA_REGISTRADO":
           mostrarTarjetaEstado("⚠️ ASISTENCIA YA REGISTRADA", `<b>${escaparHTML(resultado.nombre)}</b><br><br>Tu asistencia de hoy ya fue registrada.<br><br>💪 ¡Nos vemos en tu próximo entrenamiento!`, "#f59e0b");
@@ -5925,17 +5973,6 @@ window.confirmarAsistenciaQR = async function () {
     socio.dias_totales = resultado.dias_totales;
     socio.fecha_fin = resultado.fecha_fin;
     socio.inicio = resultado.inicio;
-
-    // 🔔 Aviso al celular del administrador — este paso se había perdido al
-    // mover el registro del QR al servidor (la función RPC no manda avisos
-    // por su cuenta). Lo restauramos acá, igual que ya lo hace el registro
-    // manual, para que vuelva a notificar siempre, sin importar quién
-    // escanee ni desde qué celular.
-    const formatearFechaPushoverQR = (f) => f ? f.split('-').reverse().join('/') : '--/--/----';
-    enviarNotificacionCelular(
-      "🏋️ C&Y Fitness Gym",
-      `Ingreso registrado (QR): ${socio.nombre}.\nPlan: ${socio.tipo_memb}.\nInicio: ${formatearFechaPushoverQR(socio.inicio)} | Vence: ${formatearFechaPushoverQR(socio.fecha_fin)}.\nRestan: ${socio.dias_restantes} asistencias.`
-    );
 
     // 🚀 2. OPTIMIZACIÓN: Usamos los datos ya actualizados en memoria (sin otra consulta)
     let usadas = socio.dias_totales - socio.dias_restantes;

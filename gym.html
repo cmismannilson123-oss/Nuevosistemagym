@@ -3663,6 +3663,7 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
 .sc-deuda i{ margin-right:4px; }
 .sc-deuda.no{ color:#6ee7b7; background:rgba(16,185,129,.06); border:1px solid rgba(16,185,129,.16); }
 .sc-deuda.si{ color:#fde3a7; background:rgba(245,184,61,.1); border:1px solid rgba(245,184,61,.32); }
+.sc-deuda.no b{ font-family:var(--cy-display); font-size:21px; font-weight:700; color:#34d399; line-height:1; }
 .sc-deuda.si b{ font-family:var(--cy-display); font-size:21px; font-weight:700; color:#fbbf24; line-height:1; }
 
 .sc-acc{ display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:6px; margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,.06); }
@@ -5763,6 +5764,7 @@ function generarCardSocio(data){
   return `
   <article class="sc sc--${c.st} sc--ingreso">
     ${c.html}
+    ${c.tieneDeuda ? "" : `<div class="sc-deuda no"><span><i class="fa-solid fa-circle-check"></i> Sin deuda</span><b>S/ 0</b></div>`}
     ${accion}
   </article>`;
 }
@@ -5904,7 +5906,8 @@ window.asistenciaNueva = async function(dni, diasRestantesPasados, socioConocido
         <div><span>Quedan</span><b class="${diasRestantesCard <= 5 ? "warn" : ""}">${diasRestantesCard} ${diasRestantesCard === 1 ? "día" : "días"}</b></div>
         <div><span>Asistencias</span><b>${_tot ? (_tot - nuevosDias) + `<i>/${_tot}</i>` : "—"}</b></div>
       </div>
-      ${_deuda ? `<div class="sc-deuda si"><span><i class="fa-solid fa-sack-dollar"></i> Deuda pendiente</span><b>S/ ${escaparHTML(socio.deuda)}</b></div>` : ""}
+      ${_deuda ? `<div class="sc-deuda si"><span><i class="fa-solid fa-sack-dollar"></i> Deuda pendiente</span><b>S/ ${escaparHTML(socio.deuda)}</b></div>`
+               : `<div class="sc-deuda no"><span><i class="fa-solid fa-circle-check"></i> Sin deuda</span><b>S/ 0</b></div>`}
     </article>`;
 
     setTimeout(()=>{

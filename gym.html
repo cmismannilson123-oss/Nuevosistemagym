@@ -104,6 +104,13 @@ body{
 }
 
 .topbar .titulo-wrap{ display:flex; align-items:center; gap:10px; min-width:0; }
+.btn-cerrar-sesion{
+  position:absolute; right:12px; top:50%; transform:translateY(-50%);
+  width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.05); color:#94a3b8; font-size:15px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; padding:0;
+}
+.btn-cerrar-sesion:active{ background:rgba(239,68,68,.15); color:#ef4444; }
 
 .topbar h2{
   margin: 0;
@@ -3171,9 +3178,12 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
   <div style="text-align:center; width:90%; max-width:320px;">
     <div class="qr-logo-ring" style="width:96px;height:96px;"><span class="logo-cy"></span></div>
     <p style="font-size:17px; font-weight:800; letter-spacing:0.5px; margin:0 0 18px 0;"><i class="fa-solid fa-lock" style="color:#10b981; margin-right:8px;"></i>Sistema Protegido</p>
-    <input type="password" id="claveNivel1Input" placeholder="Contraseña general" style="width:100%; padding:14px 16px; border-radius:50px; border:1.5px solid rgba(16,185,129,.4); background:rgba(6,20,18,.6); color:#fff; box-sizing:border-box; font-size:15px; margin-bottom:12px; text-align:center;">
-    <button id="btnClaveNivel1" type="button" class="qr-btn-principal"><span class="icono-circulo">🔓</span> Ingresar</button>
-    <p id="claveNivel1Error" style="color:#ef4444; font-size:13px; margin-top:10px; min-height:16px;"></p>
+    <form id="loginStaffForm" style="display:none;" autocomplete="on">
+      <input type="email" id="loginEmail" name="email" autocomplete="username" placeholder="Correo" required style="width:100%; padding:14px 16px; border-radius:50px; border:1.5px solid rgba(16,185,129,.4); background:rgba(6,20,18,.6); color:#fff; box-sizing:border-box; font-size:15px; margin-bottom:12px; text-align:center;">
+      <input type="password" id="loginPassword" name="password" autocomplete="current-password" placeholder="Contraseña" required style="width:100%; padding:14px 16px; border-radius:50px; border:1.5px solid rgba(16,185,129,.4); background:rgba(6,20,18,.6); color:#fff; box-sizing:border-box; font-size:15px; margin-bottom:12px; text-align:center;">
+      <button id="btnLoginStaff" type="submit" class="qr-btn-principal"><span class="icono-circulo">🔓</span> Ingresar</button>
+    </form>
+    <p id="loginError" style="color:#ef4444; font-size:13px; margin-top:10px; min-height:16px;"></p>
   </div>
 </div>
 
@@ -3185,6 +3195,7 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
     <span class="logo-cy" style="width:30px;height:30px;flex-shrink:0;"></span>
     <h2>C&amp;Y <span class="accent">FITNESS</span> GYM</h2>
   </div>
+  <button type="button" id="btnCerrarSesion" class="btn-cerrar-sesion" onclick="cerrarSesionStaff()" title="Cerrar sesión" aria-label="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
 </div>
 <div class="topbar-spacer" id="topbarSpacer"></div>
 <script>
@@ -3915,10 +3926,23 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
 
 <script>
   let esAdelanto = false;
-// --- CONFIGURACIÓN DE SEGURIDAD INDEPENDIENTE POR NIVELES ---
-const CLAVE_NIVEL1 = "fuerzafitnes123"; // Puerta de acceso al sistema
-const CLAVE_NIVEL2 = "gym123";           // Para el panel de Registrar Socio (Tab 2)
-const CLAVE_NIVEL3 = "gym123";           // Para el panel de Lista de Socios (Tab 3)
+// --- SEGURIDAD ---
+// El acceso al panel se controla con usuarios reales de Supabase Auth (correo +
+// contraseña). Las reglas de la base de datos (RLS) solo dejan leer/escribir a
+// los usuarios que están en la tabla "staff", así que aquí NO hay contraseñas
+// guardadas: cualquiera puede ver el código de esta página.
+
+// Convierte un texto en HTML seguro (evita que un nombre como "<img onerror=...>"
+// se ejecute como código al pintarlo con innerHTML).
+function escaparHTML(t) {
+  return String(t == null ? "" : t)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+// Para pasar un valor como texto dentro de onclick="funcion(...)"
+function jsAttr(v) {
+  return escaparHTML(JSON.stringify(String(v == null ? "" : v)));
+}
 
 // --- CATÁLOGO DE PRODUCTOS: ventana flotante con las páginas del catálogo ---
 // Lectura/escritura segura del teléfono guardado: si el navegador bloquea el almacenamiento,
@@ -3999,8 +4023,8 @@ document.addEventListener("click", function(e){
   if (m && e.target === m) cerrarPromoModal();
 });
 
-// FILTRO 1: Entrada general al sistema
-function verificarAccesoSistema() {
+// Entrada al sistema: vista pública del QR, o login del personal
+async function verificarAccesoSistema() {
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get("qr") === "1") {
     document.getElementById("loading-screen").style.display = "none";
@@ -4009,58 +4033,71 @@ function verificarAccesoSistema() {
     return;
   }
 
-  // Comprobar la marca del primer nivel en el celular
-  if (localStorage.getItem("auth_nivel1") === "true") {
+  // Limpia las marcas del sistema de claves anterior
+  try { ["auth_nivel1", "auth_nivel2", "auth_nivel3"].forEach(k => localStorage.removeItem(k)); } catch (e) {}
+
+  const form = document.getElementById("loginStaffForm");
+  const inputEmail = document.getElementById("loginEmail");
+  const inputPass = document.getElementById("loginPassword");
+  const btn = document.getElementById("btnLoginStaff");
+  const errorMsg = document.getElementById("loginError");
+
+  const mostrarDashboard = () => {
     document.getElementById("loading-screen").style.display = "none";
     document.getElementById("dashboard").style.display = "grid";
-    return;
-  }
-
-  // Mostramos el formulario de contraseña dentro de la propia página (en vez de prompt(),
-  // que muchos navegadores/apps bloquean si no viene de un clic del usuario)
-  const input = document.getElementById("claveNivel1Input");
-  const btn = document.getElementById("btnClaveNivel1");
-  const errorMsg = document.getElementById("claveNivel1Error");
-
-  const intentarAcceso = () => {
-    const pass = input ? input.value : "";
-    if (pass === CLAVE_NIVEL1) {
-      localStorage.setItem("auth_nivel1", "true");
-      document.getElementById("loading-screen").style.display = "none";
-      document.getElementById("dashboard").style.display = "grid";
-    } else {
-      if (errorMsg) errorMsg.textContent = "❌ Contraseña incorrecta. Intenta de nuevo.";
-      if (input) { input.value = ""; input.focus(); }
-    }
   };
 
-  if (btn) btn.addEventListener("click", intentarAcceso);
-  if (input) {
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") intentarAcceso();
-    });
-    input.focus();
+  // ¿Ya hay una sesión guardada en este dispositivo?
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (session) {
+    const { data: esStaff } = await supabaseClient.rpc("es_staff");
+    if (esStaff === true) { mostrarDashboard(); return; }
+    await supabaseClient.auth.signOut();
+    if (errorMsg) errorMsg.textContent = "❌ Este usuario no tiene permiso para usar el sistema.";
   }
+
+  if (!form) return;
+  form.style.display = "block";
+  if (inputEmail) inputEmail.focus();
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (btn.disabled) return;
+    btn.disabled = true;
+    if (errorMsg) errorMsg.textContent = "";
+
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email: inputEmail.value.trim(),
+      password: inputPass.value
+    });
+
+    if (error) {
+      btn.disabled = false;
+      if (errorMsg) errorMsg.textContent = "❌ Correo o contraseña incorrectos.";
+      inputPass.value = "";
+      inputPass.focus();
+      return;
+    }
+
+    const { data: esStaff } = await supabaseClient.rpc("es_staff");
+    if (esStaff !== true) {
+      await supabaseClient.auth.signOut();
+      btn.disabled = false;
+      if (errorMsg) errorMsg.textContent = "❌ Este usuario no tiene permiso para usar el sistema.";
+      return;
+    }
+
+    // Recargamos para que la lista, el historial y el tiempo real arranquen
+    // ya con la sesión iniciada.
+    location.reload();
+  });
 }
 
-// FILTROS 2 Y 3: Control específico de paneles internos
-function verificarAccesoPanel(nivel, claveCorrecta, nombrePanel) {
-  const claveLocal = `auth_nivel${nivel}`;
-  
-  // Si este dispositivo ya guardó permanentemente este nivel, permitir paso directo
-  if (localStorage.getItem(claveLocal) === "true") {
-    return true;
-  }
-  
-  let pass = prompt(`🔒 CONTROL DE ACCESO.\nIngrese la contraseña de administrador para ver: [${nombrePanel}]`);
-  if (pass === claveCorrecta) {
-    localStorage.setItem(claveLocal, "true");
-    return true;
-  } else {
-    alert("❌ Contraseña incorrecta. No tienes permisos para ver este panel.");
-    return false;
-  }
-}
+window.cerrarSesionStaff = async function() {
+  if (!confirm("¿Cerrar sesión en este dispositivo?")) return;
+  await supabaseClient.auth.signOut();
+  location.reload();
+};
 
 document.addEventListener("DOMContentLoaded", () => {
   document.body.style.visibility = "visible";
@@ -4524,14 +4561,6 @@ function actualizarDashboard(){
 let socioRenovar = null;
 
 window.renovar = async function(dni){
-  // 🔒 CONTROL DE SEGURIDAD CON PIN RAPIDO
-  let pinAdmin = prompt("🔒 ACCESO RESTRINGIDO\nIngrese el PIN de administrador para habilitar la renovación:");
-  
-  if (pinAdmin !== "1234") {
-    alert("❌ PIN incorrecto. No tienes autorización para renovar.");
-    return; 
-  }
-
   socioRenovar = dni;
   const socio = (dataGlobal || []).find(s => s.dni === dni);
   if(!socio) return;
@@ -4554,13 +4583,6 @@ window.renovar = async function(dni){
 };
 // FUNCIÓN PARA ADELANTAR MEMBRESÍA
 window.adelantarMembresia = async function(dni) {
-  let pinAdmin = prompt("🔒 ACCESO RESTRINGIDO\nIngrese el PIN de administrador para adelantar membresía:");
-  
-  if (pinAdmin !== "1234") {
-    alert("❌ PIN incorrecto.");
-    return; 
-  }
-
   socioRenovar = dni;
   const socio = (dataGlobal || []).find(s => s.dni === dni);
   if(!socio) return;
@@ -4927,8 +4949,8 @@ function generarCardSocio(data){
     return `
     <div class="res-alert">
       <h3><i class="fa-solid fa-ban"></i> Acceso bloqueado</h3>
-      <div style="font-weight:700;color:#eef4f2;font-size:17px;">${data.nombre}</div>
-      <p style="font-weight:700; font-size:16px; margin:10px 0 4px;"><i class="fa-solid fa-sack-dollar"></i> Deuda pendiente: S/ ${data.deuda}</p>
+      <div style="font-weight:700;color:#eef4f2;font-size:17px;">${escaparHTML(data.nombre)}</div>
+      <p style="font-weight:700; font-size:16px; margin:10px 0 4px;"><i class="fa-solid fa-sack-dollar"></i> Deuda pendiente: S/ ${escaparHTML(data.deuda)}</p>
       <p style="color:#8da09a;margin:0;">Regularice su pago para habilitar el acceso.</p>
     </div>`;
   }
@@ -4948,9 +4970,9 @@ function generarCardSocio(data){
   if(porcentaje <= 20) colorBarra = "#f06a6a";
 
   if(estado === "ACTIVO" && !asistenciasAgotadas){
-    botones += `<button class="btn-green" onclick="asistenciaNueva('${data.dni}', ${data.dias_restantes})"><i class="fa-solid fa-square-check"></i> Registrar ingreso</button>`;
+    botones += `<button class="btn-green" onclick="asistenciaNueva(${jsAttr(data.dni)}, ${data.dias_restantes})"><i class="fa-solid fa-square-check"></i> Registrar ingreso</button>`;
   }else{
-    botones += `<button class="btn-blue" onclick="renovar('${data.dni}')"><i class="fa-solid fa-rotate"></i> Renovar membresía</button>`;
+    botones += `<button class="btn-blue" onclick="renovar(${jsAttr(data.dni)})"><i class="fa-solid fa-rotate"></i> Renovar membresía</button>`;
   }
 
   // Ajuste en visualización rápida de días restantes en control de accesos
@@ -4966,20 +4988,20 @@ function generarCardSocio(data){
   <div class="res-card" style="--st:${color};">
     <div class="res-head">
       <div class="res-avatar">${inicial}</div>
-      <div class="res-id"><h3>${data.nombre}</h3><small>DNI ${data.dni}</small></div>
+      <div class="res-id"><h3>${escaparHTML(data.nombre)}</h3><small>DNI ${escaparHTML(data.dni)}</small></div>
       <span class="res-badge">${(parseFloat(data.deuda || 0) > 0 && estado === "ACTIVO") ? "CON DEUDA" : estado}</span>
     </div>
     <div class="res-grid">
-      <div><span>Plan</span><b>${data.tipo_memb}</b></div>
+      <div><span>Plan</span><b>${escaparHTML(data.tipo_memb)}</b></div>
       <div><span>Días de vigencia</span><b>${diasRestantesCard}</b></div>
-      <div><span>Inicio</span><b>${data.inicio}</b></div>
-      <div><span>Vence</span><b>${data.fecha_fin}</b></div>
+      <div><span>Inicio</span><b>${escaparHTML(data.inicio)}</b></div>
+      <div><span>Vence</span><b>${escaparHTML(data.fecha_fin)}</b></div>
     </div>
     <div class="res-uso">
       <div class="res-uso-top"><span><i class="fa-solid fa-dumbbell"></i>Asistencias</span><b>${usadas} de ${data.dias_totales}</b></div>
       <div class="res-bar"><i style="transform:scaleX(${fraccionUsada});background:${colorBarra};"></i></div>
     </div>
-    <div class="res-deuda"><span>Deuda</span><b style="color:${parseFloat(data.deuda || 0) > 0 ? '#f06a6a' : '#34d399'};">S/ ${data.deuda}</b></div>
+    <div class="res-deuda"><span>Deuda</span><b style="color:${parseFloat(data.deuda || 0) > 0 ? '#f06a6a' : '#34d399'};">S/ ${escaparHTML(data.deuda)}</b></div>
     ${botones}
   </div>`;
 }
@@ -5006,7 +5028,7 @@ window.asistenciaNueva = async function(dni, diasRestantesPasados, socioConocido
   // 1. VALIDACIÓN DÍAS AGOTADOS
   const esInterdiario = (socio.tipo_memb || "").toLowerCase().includes("interdiario");
   if(esInterdiario && socio.dias_restantes <= 0){
-    mostrarTarjetaEstado("🚫 MEMBRESÍA AGOTADA", `<b>${socio.nombre}</b><br><br>Ha consumido las 15 asistencias de su plan Interdiario.<br><br>Acérquese a recepción para renovar su membresía.`);
+    mostrarTarjetaEstado("🚫 MEMBRESÍA AGOTADA", `<b>${escaparHTML(socio.nombre)}</b><br><br>Ha consumido las 15 asistencias de su plan Interdiario.<br><br>Acérquese a recepción para renovar su membresía.`);
     playSound("VENCIDO");
     return false;
   }
@@ -5022,7 +5044,7 @@ window.asistenciaNueva = async function(dni, diasRestantesPasados, socioConocido
   if (parseFloat(socio.deuda || 0) > 0 && socio.fecha_deuda) {
     const diasDeuda = Math.floor((new Date() - new Date(socio.fecha_deuda)) / 86400000);
     if (diasDeuda > 7) {
-      mostrarTarjetaEstado("🚫 ACCESO BLOQUEADO", `<b>${socio.nombre}</b><br><br>💰 Deuda pendiente: <b>S/ ${socio.deuda}</b><br><br>Regularice su pago para habilitar su acceso.`, "#ef4444");
+      mostrarTarjetaEstado("🚫 ACCESO BLOQUEADO", `<b>${escaparHTML(socio.nombre)}</b><br><br>💰 Deuda pendiente: <b>S/ ${escaparHTML(socio.deuda)}</b><br><br>Regularice su pago para habilitar su acceso.`, "#ef4444");
       playSound("VENCIDO");
       return false;
     }
@@ -5069,7 +5091,7 @@ window.asistenciaNueva = async function(dni, diasRestantesPasados, socioConocido
   if (resInsert && resInsert.error) {
     console.warn("No se pudo registrar la asistencia (posiblemente ya registrada hoy, o doble escaneo casi simultáneo):", resInsert.error);
     mostrarTarjetaEstado("⚠️ ASISTENCIA YA REGISTRADA",
-      `<b>${socio.nombre}</b><br><br>Tu asistencia de hoy ya fue registrada.<br><br>💪 ¡Nos vemos en tu próximo entrenamiento!`,
+      `<b>${escaparHTML(socio.nombre)}</b><br><br>Tu asistencia de hoy ya fue registrada.<br><br>💪 ¡Nos vemos en tu próximo entrenamiento!`,
       "#f59e0b"
     );
     playSound("VENCIDO");
@@ -5113,8 +5135,8 @@ window.asistenciaNueva = async function(dni, diasRestantesPasados, socioConocido
     <div class="card" style="text-align:center;padding:30px;border:2px solid #10b981;animation:fade .4s;background:rgba(16,185,129,.05);">
       <h1 style="color:#10b981; margin-top:0;">🏋️ C&Y FITNESS GYM</h1>
       <h2 style="color:#3b82f6; font-size:20px; text-transform:uppercase; letter-spacing:1px;">✅ ASISTENCIA REGISTRADA</h2>
-      <h2 style="font-size:26px; margin:10px 0;">${socio.nombre}</h2>
-      <p style="color:#94a3b8; font-size:15px;">💳 Plan: ${socio.tipo_memb} | Fin: ${socio.fecha_fin}</p>
+      <h2 style="font-size:26px; margin:10px 0;">${escaparHTML(socio.nombre)}</h2>
+      <p style="color:#94a3b8; font-size:15px;">💳 Plan: ${escaparHTML(socio.tipo_memb)} | Fin: ${escaparHTML(socio.fecha_fin)}</p>
       <p style="font-size:16px; font-weight:bold; color:#10b981; margin-bottom: 10px;">📅 Vigencia restante: ${diasRestantesCard} días</p>
       <p style="font-size:22px;font-weight:bold;color:#60a5fa; background:rgba(59,130,246,0.1); padding:10px; border-radius:12px; display:inline-block; margin:10px 0;">🏋️ Asistencias: ${socio.dias_totales - nuevosDias} / ${socio.dias_totales}</p>
       <p style="background:rgba(239,68,68,.15);padding:10px;border-radius:12px;border:1px solid rgba(239,68,68,0.2);color:#ef4444;font-weight:bold; max-width:200px; margin:auto;">💰 Deuda: S/ ${socio.deuda || 0}</p>
@@ -5158,8 +5180,8 @@ async function mostrarHistorial(){
     <div class="act-item">
       <div class="act-avatar">${inicial}</div>
       <div class="act-main">
-        <div class="act-name">${h.nombre}</div>
-        <div class="act-meta"><i class="fa-regular fa-clock"></i>${h.hora}</div>
+        <div class="act-name">${escaparHTML(h.nombre)}</div>
+        <div class="act-meta"><i class="fa-regular fa-clock"></i>${escaparHTML(h.hora)}</div>
       </div>
       <span class="act-chip ${esQR ? "qr" : "manual"}"><i class="fa-solid ${esQR ? "fa-qrcode" : "fa-hand-pointer"}"></i>${esQR ? "QR" : "Manual"}</span>
     </div>`;
@@ -5231,9 +5253,9 @@ function mostrarLista(data){
 
     let botonAccionPrincipal = "";
     if(estado === "ACTIVO"){
-botonAccionPrincipal = `<button class="btn-blue" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; border: none; padding: 2px 0; width: 42px; height: 38px; border-radius: 8px; cursor: pointer; flex-shrink: 0; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;" onclick="editarDeuda('${s.dni}')" title="Gestionar Deuda"><i class="fa-solid fa-money-bill-wave" style="font-size: 11px;"></i><span style="font-size: 7px; margin-top: 1px; font-weight: 600; text-transform: uppercase;">DEUDA</span></button>`;
+botonAccionPrincipal = `<button class="btn-blue" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; border: none; padding: 2px 0; width: 42px; height: 38px; border-radius: 8px; cursor: pointer; flex-shrink: 0; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;" onclick="editarDeuda(${jsAttr(s.dni)})" title="Gestionar Deuda"><i class="fa-solid fa-money-bill-wave" style="font-size: 11px;"></i><span style="font-size: 7px; margin-top: 1px; font-weight: 600; text-transform: uppercase;">DEUDA</span></button>`;
     } else {
-      botonAccionPrincipal = `<button class="btn-green" onclick="renovar('${s.dni}')"><i class="fa-solid fa-rotate"></i> Renovar</button>`;
+      botonAccionPrincipal = `<button class="btn-green" onclick="renovar(${jsAttr(s.dni)})"><i class="fa-solid fa-rotate"></i> Renovar</button>`;
     }
 
     // --- LIMPIEZA DEL TELÉFONO ---
@@ -5262,8 +5284,8 @@ botonAccionPrincipal = `<button class="btn-blue" style="background: linear-gradi
         <div class="socio-avatar-info">
           <div class="socio-avatar">${s.nombre.charAt(0).toUpperCase()}</div>
           <div style="min-width: 0; flex: 1;">
-            <strong style="font-size:16px; color:#ffffff; display:block; max-width:130px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${s.nombre}</strong>
-            <small style="color:#64748b; font-size:12px;">DNI: ${s.dni}</small>
+            <strong style="font-size:16px; color:#ffffff; display:block; max-width:130px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escaparHTML(s.nombre)}</strong>
+            <small style="color:#64748b; font-size:12px;">DNI: ${escaparHTML(s.dni)}</small>
           </div>
         </div>
         <span class="socio-badge ${badgeClass}">${textoEstado}</span>
@@ -5300,7 +5322,7 @@ botonAccionPrincipal = `<button class="btn-blue" style="background: linear-gradi
 
       <div class="socio-card-actions">
         ${botonAccionPrincipal}
-        <button class="btn-purple" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; border: none; padding: 2px 0; width: 42px; height: 38px; border-radius: 8px; cursor: pointer; flex-shrink: 0; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;" onclick="adelantarMembresia('${s.dni}')" title="Adelantar Membresía">
+        <button class="btn-purple" style="background: linear-gradient(135deg, #8b5cf6, #6d28d9); color: white; border: none; padding: 2px 0; width: 42px; height: 38px; border-radius: 8px; cursor: pointer; flex-shrink: 0; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;" onclick="adelantarMembresia(${jsAttr(s.dni)})" title="Adelantar Membresía">
   <i class="fa-solid fa-forward" style="font-size: 11px;"></i>
   <span style="font-size: 7px; margin-top: 1px; font-weight: 600; text-transform: uppercase;">Adelant.</span>
 </button>
@@ -5312,12 +5334,12 @@ botonAccionPrincipal = `<button class="btn-blue" style="background: linear-gradi
           <span style="font-size: 7px; margin-top: 1px; font-weight: 600; text-transform: uppercase;">WSP</span>
         </button>
 
-        <button class="btn-amber" style="background: linear-gradient(135deg, #f59e0b, #b45309); color: white; border: none; padding: 2px 0; width: 42px; height: 38px; border-radius: 8px; cursor: pointer; flex-shrink: 0; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;" onclick="abrirModalEditarSocio('${s.dni}')" title="Editar datos del socio">
+        <button class="btn-amber" style="background: linear-gradient(135deg, #f59e0b, #b45309); color: white; border: none; padding: 2px 0; width: 42px; height: 38px; border-radius: 8px; cursor: pointer; flex-shrink: 0; display: inline-flex; flex-direction: column; align-items: center; justify-content: center;" onclick="abrirModalEditarSocio(${jsAttr(s.dni)})" title="Editar datos del socio">
           <i class="fa-solid fa-pen-to-square" style="font-size: 11px;"></i>
           <span style="font-size: 7px; margin-top: 1px; font-weight: 600; text-transform: uppercase;">Editar</span>
         </button>
 
-        <button class="btn-red" style="display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;" onclick="eliminar('${s.dni}')" title="Eliminar Socio">
+        <button class="btn-red" style="display:inline-flex; flex-direction:column; align-items:center; justify-content:center; gap:1px;" onclick="eliminar(${jsAttr(s.dni)})" title="Eliminar Socio">
           <i class="fa-solid fa-trash" style="font-size: 11px;"></i>
           <span style="font-size: 7px; margin-top: 1px; font-weight: 600; text-transform: uppercase;">Elim.</span>
         </button>
@@ -5417,10 +5439,10 @@ function mostrarListaPorAvisar(data){
     html += `
     <div style="display:flex; align-items:center; gap:12px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.35); border-radius:14px; padding:12px 14px;">
       <div style="flex:1; min-width:0;">
-        <div style="color:#fff; font-weight:700; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${s.nombre}</div>
+        <div style="color:#fff; font-weight:700; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escaparHTML(s.nombre)}</div>
         <div style="color:#fbbf24; font-size:12.5px; margin-top:2px;">⏰ Vence mañana &bull; ${mañanaBonita}</div>
       </div>
-      <button class="btn-green" style="background: linear-gradient(135deg, #22c55e, #15803d); width:44px; height:38px; flex-shrink:0;" onclick="enviarAvisoVencimiento('${s.dni}')" title="Avisar por WhatsApp">
+      <button class="btn-green" style="background: linear-gradient(135deg, #22c55e, #15803d); width:44px; height:38px; flex-shrink:0;" onclick="enviarAvisoVencimiento(${jsAttr(s.dni)})" title="Avisar por WhatsApp">
         <i class="fa-brands fa-whatsapp" style="font-size:16px;"></i>
       </button>
     </div>`;
@@ -5432,7 +5454,7 @@ function mostrarListaPorAvisar(data){
       html += `
       <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:12px 14px; opacity:0.55;">
         <div style="flex:1; min-width:0;">
-          <div style="color:#cbd5e1; font-weight:600; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${s.nombre}</div>
+          <div style="color:#cbd5e1; font-weight:600; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escaparHTML(s.nombre)}</div>
           <div style="color:#64748b; font-size:12.5px; margin-top:2px;">⏰ Vence mañana &bull; ${mañanaBonita}</div>
         </div>
         <div style="color:#22c55e; font-size:13px; font-weight:700; white-space:nowrap;">✓ Enviado hoy</div>
@@ -5608,20 +5630,6 @@ window.eliminar = async function(dni){
 };
 
 function showTab(n,event){
-    // INTERCEPCIÓN FILTRADA: Nivel 2 para Registrar Socio
-    if (n === 2) {
-      if (!verificarAccesoPanel(2, CLAVE_NIVEL2, "Registrar Socio")) {
-        return; 
-      }
-    }
-    
-    // INTERCEPCIÓN FILTRADA: Nivel 3 para Lista de Socios
-    if (n === 3) {
-      if (!verificarAccesoPanel(3, CLAVE_NIVEL3, "Lista de Socios")) {
-        return; 
-      }
-    }
-
     document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
     document.querySelectorAll(".tabbtn").forEach(b=>b.classList.remove("active"));
     
@@ -5764,11 +5772,9 @@ window.buscarQR = async function(esPrimeraVez){
   let telefono = telefonoGuardado || (phoneInput ? phoneInput.value : "");
   telefono = telefono.replace(/\D/g,'');
 
-  const { data: socio, error } = await supabaseClient
-    .from("socios")
-    .select("id, dni, nombre, telefono, tipo_memb, dias_restantes, dias_totales, fecha_fin, inicio, deuda, fecha_deuda, precio")
-    .eq("telefono", telefono)
-    .single();
+  // La vista pública no puede leer la tabla de socios: el servidor devuelve
+  // solo los datos mínimos del socio con ese teléfono (o nada).
+  const { data: socio, error } = await supabaseClient.rpc("consultar_socio_qr", { p_telefono: telefono });
   let div = document.getElementById("qrResult");
   if(!div) return;
   const filaAccesos0 = document.getElementById("cyPromoRow");
@@ -5787,7 +5793,7 @@ window.buscarQR = async function(esPrimeraVez){
   if (parseFloat(socio.deuda || 0) > 0 && socio.fecha_deuda) {
     const diasDeuda = Math.floor((new Date() - new Date(socio.fecha_deuda)) / 86400000);
     if (diasDeuda > 7) {
-      div.innerHTML = `<div class="card" style="border:2px solid #ef4444; text-align:center;"><h2 style="color:#ef4444;">🚫 ACCESO BLOQUEADO</h2><h3>${socio.nombre}</h3><p>💰 Deuda pendiente: S/ ${socio.deuda}</p><p>Regularice su pago para habilitar su acceso.</p></div>`;
+      div.innerHTML = `<div class="card" style="border:2px solid #ef4444; text-align:center;"><h2 style="color:#ef4444;">🚫 ACCESO BLOQUEADO</h2><h3>${escaparHTML(socio.nombre)}</h3><p>💰 Deuda pendiente: S/ ${escaparHTML(socio.deuda)}</p><p>Regularice su pago para habilitar su acceso.</p></div>`;
       playSound("VENCIDO");
       return;
     }
@@ -5798,7 +5804,7 @@ window.buscarQR = async function(esPrimeraVez){
   if ((esInterdiario && socio.dias_restantes <= 0) || estado === "AGOTADO") {
     div.innerHTML = `<div class="card" style="border:2px solid #ef4444; text-align:center;">
       <h2 style="color:#ef4444;">🚫 MEMBRESÍA AGOTADA</h2>
-      <h3>${socio.nombre}</h3>
+      <h3>${escaparHTML(socio.nombre)}</h3>
       <p>Ha consumido todas las asistencias de su plan.<br><br>Acérquese a recepción para renovar.</p>
     </div>
     <div class="catalogo-promo-btn" onclick="abrirPlanesDesdeVencimiento()">
@@ -5817,7 +5823,7 @@ window.buscarQR = async function(esPrimeraVez){
   if(estado === "VENCIDO"){
     div.innerHTML = `<div class="card" style="border:2px solid #ef4444; text-align:center;">
       <h2 style="color:#ef4444;">❌ MEMBRESÍA VENCIDA</h2>
-      <h3>${socio.nombre}</h3>
+      <h3>${escaparHTML(socio.nombre)}</h3>
       <p>Su membresía ha vencido por fecha calendario.<br><br>Acérquese a recepción para renovar.</p>
     </div>
     <div class="catalogo-promo-btn" onclick="abrirPlanesDesdeVencimiento()">
@@ -5838,7 +5844,7 @@ window.buscarQR = async function(esPrimeraVez){
   div.innerHTML = `
   <div class="qr-hero-card">
     <div class="qr-logo-ring"><span class="logo-cy"></span></div>
-    <h2 class="qr-titulo">${socio.nombre}</h2>
+    <h2 class="qr-titulo">${escaparHTML(socio.nombre)}</h2>
     <div class="qr-badge"><i class="dot"></i> Socio Activo</div>
     <p class="qr-sub">Presiona el botón para registrar<br>tu asistencia de hoy</p>
 
@@ -5893,16 +5899,16 @@ window.confirmarAsistenciaQR = async function () {
     if (!resultado.ok) {
       switch (resultado.motivo) {
         case "AGOTADO":
-          mostrarTarjetaEstado("🚫 MEMBRESÍA AGOTADA", `<b>${resultado.nombre}</b><br><br>Ha consumido las 15 asistencias de su plan Interdiario.<br><br>Acérquese a recepción para renovar su membresía.`);
+          mostrarTarjetaEstado("🚫 MEMBRESÍA AGOTADA", `<b>${escaparHTML(resultado.nombre)}</b><br><br>Ha consumido las 15 asistencias de su plan Interdiario.<br><br>Acérquese a recepción para renovar su membresía.`);
           break;
         case "VENCIDO":
           mostrarTarjetaEstado("❌ MEMBRESÍA VENCIDA", "Su membresía ha vencido por fecha calendario.<br><br>Acérquese a recepción para renovarla.");
           break;
         case "DEUDA":
-          mostrarTarjetaEstado("🚫 ACCESO BLOQUEADO", `<b>${resultado.nombre}</b><br><br>💰 Deuda pendiente: <b>S/ ${resultado.deuda}</b><br><br>Regularice su pago para habilitar su acceso.`, "#ef4444");
+          mostrarTarjetaEstado("🚫 ACCESO BLOQUEADO", `<b>${escaparHTML(resultado.nombre)}</b><br><br>💰 Deuda pendiente: <b>S/ ${escaparHTML(resultado.deuda)}</b><br><br>Regularice su pago para habilitar su acceso.`, "#ef4444");
           break;
         case "YA_REGISTRADO":
-          mostrarTarjetaEstado("⚠️ ASISTENCIA YA REGISTRADA", `<b>${resultado.nombre}</b><br><br>Tu asistencia de hoy ya fue registrada.<br><br>💪 ¡Nos vemos en tu próximo entrenamiento!`, "#f59e0b");
+          mostrarTarjetaEstado("⚠️ ASISTENCIA YA REGISTRADA", `<b>${escaparHTML(resultado.nombre)}</b><br><br>Tu asistencia de hoy ya fue registrada.<br><br>💪 ¡Nos vemos en tu próximo entrenamiento!`, "#f59e0b");
           setTimeout(() => { mostrarSocio(socio); }, 2000);
           break;
         default:
@@ -5955,14 +5961,14 @@ window.confirmarAsistenciaQR = async function () {
           <span class="logo-cy"></span><span>C&Y <span class="accent">FITNESS</span></span>
         </h1>
 
-        <h3 class="stagger-item ok-hi" style="animation-delay:.1s;"><small>¡Bienvenido de nuevo,</small><b>${socio.nombre}!</b></h3>
+        <h3 class="stagger-item ok-hi" style="animation-delay:.1s;"><small>¡Bienvenido de nuevo,</small><b>${escaparHTML(socio.nombre)}!</b></h3>
 
         <div class="stagger-item qr-badge" style="animation-delay:.13s;"><i class="dot"></i> Socio Activo</div>
 
         <div class="stagger-item qr-info-grid" style="animation-delay:.17s;">
           <div class="box"><div class="l">Últ. asistencia</div><div class="v">Hoy</div></div>
           <div class="box"><div class="l">Hora</div><div class="v">${horaRegistro}</div></div>
-          <div class="box"><div class="l">Plan</div><div class="v">${socio.tipo_memb}</div></div>
+          <div class="box"><div class="l">Plan</div><div class="v">${escaparHTML(socio.tipo_memb)}</div></div>
         </div>
 
         <div class="stagger-item ok-rend" style="animation-delay:.2s;">
@@ -5972,8 +5978,8 @@ window.confirmarAsistenciaQR = async function () {
         </div>
 
         <div class="stagger-item ok-grid" style="animation-delay:.25s;">
-          <div class="ok-box"><div class="l">Fecha inicio</div><div class="v">${socio.inicio}</div></div>
-          <div class="ok-box"><div class="l">Vencimiento</div><div class="v">${socio.fecha_fin}</div></div>
+          <div class="ok-box"><div class="l">Fecha inicio</div><div class="v">${escaparHTML(socio.inicio)}</div></div>
+          <div class="ok-box"><div class="l">Vencimiento</div><div class="v">${escaparHTML(socio.fecha_fin)}</div></div>
           <div class="ok-box key ${diasVigenciaReales <= 7 ? 'low' : diasVigenciaReales <= 15 ? 'warn' : ''}"><div class="l">Días restantes</div><div class="v big">${diasVigenciaReales}<small> días</small></div></div>
           <div class="ok-box ${parseFloat(socio.deuda || 0) > 0 ? 'debt' : 'good'}"><div class="l">Estado de cuenta</div><div class="v"><span class="chip">${parseFloat(socio.deuda || 0) > 0 ? 'S/ ' + socio.deuda : 'Al día ✓'}</span></div></div>
         </div>
@@ -6482,10 +6488,10 @@ async function abrirCuadernoHistorial() {
           <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 5px; border-bottom: 1px dashed #2d2d37;">
             <div style="flex: 1; padding-right: 10px;">
               <div style="color: #fff; font-weight: 500; font-size: 14px;">
-                ${mov.nombre || 'Socio Anónimo'} ${tagDeuda}
+                ${escaparHTML(mov.nombre || 'Socio Anónimo')} ${tagDeuda}
               </div>
               <div style="color: #888; font-size: 11px; margin-top: 2px;">
-                ${mov.membresia} • <span style="color: #3b82f6;">${mov.concepto}</span>
+                ${escaparHTML(mov.membresia)} • <span style="color: #3b82f6;">${escaparHTML(mov.concepto)}</span>
               </div>
             </div>
             <div style="text-align: right;">
@@ -6755,7 +6761,7 @@ window.cyConfirmarIngreso = function(nombre){
   window.CY_PROMO = { DEFECTO: DEFECTO, ESTILOS: ESTILOS, restante: restante, fecha: fechaCorta };
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   function $(id){ return document.getElementById(id); }
-  function esc(t){ return String(t==null?'':t); }
+  function esc(t){ return escaparHTML(t); }
 
   /* ---------- Público ---------- */
   var btn = $('btnInscribirseQR');
@@ -6969,7 +6975,7 @@ window.cyConfirmarIngreso = function(nombre){
   async function eliminarPendiente(p, wrap, x){
     x.disabled = true;
     try{
-      var r = await supabaseClient.rpc('borrar_prospecto_qr', { p_dni: String(p.dni).trim(), p_clave: CLAVE_NIVEL2 });
+      var r = await supabaseClient.rpc('borrar_prospecto_qr', { p_dni: String(p.dni).trim() });
       if(r && r.error) throw r.error;
       pendientes = pendientes.filter(function(q){ return q.dni !== p.dni; });
       if(seleccionado === p.dni){ seleccionado = null; var av = $('avisoPremio'); if(av) av.style.display = 'none'; }
@@ -6998,7 +7004,7 @@ window.cyConfirmarIngreso = function(nombre){
     if(esPublico || cargando) return; cargando = true;
     var cont = $('pendLista');
     try{
-      var r = await supabaseClient.rpc('listar_prospectos_qr', { p_clave: CLAVE_NIVEL2 });
+      var r = await supabaseClient.rpc('listar_prospectos_qr');
       if(r.error) throw r.error;
       pendientes = r.data || [];
       pintarPendientes();
@@ -7011,7 +7017,7 @@ window.cyConfirmarIngreso = function(nombre){
   /* Se llama justo después de guardar un socio con éxito: quita su solicitud pendiente */
   window.cyProspectoProcesado = async function(dni){
     try{
-      var r = await supabaseClient.rpc('borrar_prospecto_qr', { p_dni: String(dni||'').trim(), p_clave: CLAVE_NIVEL2 });
+      var r = await supabaseClient.rpc('borrar_prospecto_qr', { p_dni: String(dni||'').trim() });
       if(r && r.error) throw r.error;
     }catch(e){ console.warn('No se pudo quitar la solicitud pendiente:', e); }
     seleccionado = null;
@@ -7050,7 +7056,6 @@ window.cyConfirmarIngreso = function(nombre){
 
   /* Sub-pestañas Invitar / Premios */
   window.cyInvTab = function(t){
-    if(t === 'premios' && typeof verificarAccesoPanel === 'function' && !verificarAccesoPanel(2, CLAVE_NIVEL2, 'Premios QR')) return;
     var premios = (t === 'premios');
     $('invPanelEnviar').style.display = premios ? 'none' : 'block';
     $('invPanelPremios').style.display = premios ? 'block' : 'none';
@@ -7094,7 +7099,7 @@ window.cyConfirmarIngreso = function(nombre){
     if(!editando && new Date(fin).getTime() <= Date.now()){ err.textContent = 'Esa fecha límite ya pasó.'; return; }
     err.textContent = ''; b.disabled = true;
     try{
-      var r = await supabaseClient.rpc('admin_guardar_premio_qr', { p_clave: CLAVE_NIVEL2, p_id: editando, p_titulo: titulo, p_descripcion: desc || null, p_estilo: estiloSel, p_inicio: ini, p_fin: fin, p_activo: editando ? null : true });
+      var r = await supabaseClient.rpc('admin_guardar_premio_qr', { p_id: editando, p_titulo: titulo, p_descripcion: desc || null, p_estilo: estiloSel, p_inicio: ini, p_fin: fin, p_activo: editando ? null : true });
       if(r && r.error) throw r.error;
       toast(editando ? '✅ Promoción actualizada' : '🔥 Promoción creada', '#10b981');
       limpiarForm(); cyCargarPremios();
@@ -7106,7 +7111,7 @@ window.cyConfirmarIngreso = function(nombre){
   window.cyCargarPremios = async function(manual){
     if(cargando) return; cargando = true;
     try{
-      var r = await supabaseClient.rpc('admin_listar_premios_qr', { p_clave: CLAVE_NIVEL2 });
+      var r = await supabaseClient.rpc('admin_listar_premios_qr');
       if(r.error) throw r.error;
       lista = r.data || []; pintarLista();
     }catch(e){
@@ -7171,7 +7176,7 @@ window.cyConfirmarIngreso = function(nombre){
   }
   async function alternar(p){
     try{
-      var r = await supabaseClient.rpc('admin_guardar_premio_qr', { p_clave: CLAVE_NIVEL2, p_id: p.id, p_titulo: p.titulo, p_descripcion: p.descripcion || null, p_estilo: p.estilo, p_inicio: p.inicio, p_fin: p.fin, p_activo: !p.activo });
+      var r = await supabaseClient.rpc('admin_guardar_premio_qr', { p_id: p.id, p_titulo: p.titulo, p_descripcion: p.descripcion || null, p_estilo: p.estilo, p_inicio: p.inicio, p_fin: p.fin, p_activo: !p.activo });
       if(r && r.error) throw r.error;
       toast(p.activo ? '⏸ Promoción en pausa' : '▶️ Promoción activada', '#10b981'); cyCargarPremios();
     }catch(e){ toast('❌ No se pudo cambiar el estado', '#ef4444'); }
@@ -7179,7 +7184,7 @@ window.cyConfirmarIngreso = function(nombre){
   async function eliminar(p, btn){
     btn.disabled = true;
     try{
-      var r = await supabaseClient.rpc('admin_eliminar_premio_qr', { p_clave: CLAVE_NIVEL2, p_id: p.id });
+      var r = await supabaseClient.rpc('admin_eliminar_premio_qr', { p_id: p.id });
       if(r && r.error) throw r.error;
       if(editando === p.id) limpiarForm();
       toast('🗑️ Promoción eliminada', '#10b981'); cyCargarPremios();

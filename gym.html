@@ -21,9 +21,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" onload="window.cyQrListo && window.cyQrListo()"></script>
 
 <style>
 /* ==========================================
@@ -3836,6 +3836,197 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
 .sc .sc-btn--wsp:hover{ background:rgba(37,211,102,.17) !important; }
 .sc .sc-btn--edit:hover{ background:rgba(251,191,36,.17) !important; }
 .sc .sc-btn--peligro:hover{ background:rgba(248,113,113,.17) !important; }
+/* ==========================================================================
+   v64 — CUADERNO DE CAJA
+   Hoja a pantalla completa en el celular, centrada en PC. Solo la lista
+   hace scroll; la cabecera y el mes quedan fijos.
+   ========================================================================== */
+#modalCuaderno{
+  --ins:#34d399; --ren:#60a5fa; --ade:#a78bfa; --deu:#fbbf24;
+  position:fixed; inset:0; z-index:100000; display:flex; align-items:flex-end; justify-content:center;
+  background:rgba(2,6,5,0); transition:background .22s ease;
+  font-family:inherit; color:#eef4f2;
+}
+#modalCuaderno[hidden]{ display:none !important; }
+#modalCuaderno.visible{ background:rgba(2,6,5,.78); }
+html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
+#modalCuaderno .cq-panel{
+  width:100%; max-width:560px; height:calc(100% - 14px); height:calc(100dvh - 14px);
+  display:flex; flex-direction:column; overflow:hidden;
+  background:#0a1512;
+  border:1px solid rgba(52,211,153,.18); border-bottom:0; border-radius:24px 24px 0 0;
+  box-shadow:0 -20px 50px -20px rgba(0,0,0,.8);
+  transform:translateY(24px); opacity:0; transition:transform .26s cubic-bezier(.2,.8,.2,1), opacity .2s ease;
+}
+#modalCuaderno.visible .cq-panel{ transform:none; opacity:1; }
+@media (min-width:700px){
+  #modalCuaderno{ align-items:center; padding:24px; }
+  #modalCuaderno .cq-panel{ height:min(860px,92vh); border-radius:24px; border-bottom:1px solid rgba(52,211,153,.18); }
+}
+
+/* Cabecera */
+#modalCuaderno .cq-head{ display:flex; align-items:center; gap:12px; padding:16px 14px 10px 16px; flex:none; }
+#modalCuaderno .cq-logo{
+  width:44px; height:44px; flex:none; border-radius:14px; display:grid; place-items:center; font-size:19px;
+  color:#02150d; background:linear-gradient(180deg,#34d399,#10b981);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35), 0 8px 18px -10px rgba(16,185,129,.9);
+}
+#modalCuaderno .cq-tit{ flex:1; min-width:0; }
+#modalCuaderno .cq-tit h3{ margin:0 !important; font-family:var(--cy-display) !important; font-size:25px !important; font-weight:700; line-height:1; letter-spacing:.3px; color:#eef4f2 !important; }
+#modalCuaderno .cq-tit small{ display:block; margin-top:3px; font-size:12.5px; color:#8da09a; }
+#modalCuaderno button{ font-family:inherit; -webkit-tap-highlight-color:transparent; cursor:pointer; }
+#modalCuaderno .cq-x{
+  width:42px !important; height:42px !important; min-height:0 !important; flex:none; margin:0 !important; padding:0 !important;
+  display:grid; place-items:center; border-radius:13px !important; font-size:18px !important;
+  color:#c9d6d1 !important; background:rgba(255,255,255,.06) !important; border:1px solid rgba(255,255,255,.1) !important; box-shadow:none !important;
+}
+#modalCuaderno .cq-x:active{ transform:scale(.94); }
+
+/* Mes */
+#modalCuaderno .cq-mesnav{
+  display:flex; align-items:center; gap:8px; margin:0 14px 10px; padding:5px; flex:none;
+  border-radius:15px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07);
+}
+#modalCuaderno .cq-mesnav b{ flex:1; text-align:center; font-family:var(--cy-display); font-size:20px; font-weight:700; letter-spacing:.3px; }
+#modalCuaderno .cq-mesnav button{
+  width:42px !important; height:38px !important; min-height:0 !important; margin:0 !important; padding:0 !important; border-radius:11px !important;
+  color:#34d399 !important; background:rgba(52,211,153,.1) !important; border:1px solid rgba(52,211,153,.22) !important; box-shadow:none !important; font-size:14px !important;
+}
+#modalCuaderno .cq-mesnav button:disabled{ opacity:.3; pointer-events:none; }
+#modalCuaderno .cq-mesnav button:active{ transform:scale(.94); }
+
+/* Cuerpo con scroll */
+#modalCuaderno .cq-cuerpo{
+  flex:1; min-height:0; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
+  padding:0 14px calc(18px + env(safe-area-inset-bottom,0px));
+}
+
+/* Estado (actualizando / sin conexión / pendientes) */
+#modalCuaderno .cq-estado:empty{ display:none; }
+#modalCuaderno .cq-estado{
+  display:flex; align-items:center; flex-wrap:wrap; gap:6px 8px; margin:0 0 10px; padding:8px 12px; border-radius:12px;
+  font-size:12.5px; font-weight:600; color:#8da09a; background:rgba(255,255,255,.04);
+}
+#modalCuaderno .cq-estado-carga i{ animation:cySpin .9s linear infinite; color:#34d399; }
+#modalCuaderno .cq-estado-error{ color:#fde68a; background:rgba(251,191,36,.1); }
+#modalCuaderno .cq-estado-pend{ color:#bfdbfe; background:rgba(96,165,250,.1); }
+#modalCuaderno .cq-estado button{
+  margin:0 0 0 auto !important; padding:5px 10px !important; min-height:0 !important; width:auto !important; border-radius:9px !important;
+  font-size:12px !important; font-weight:700; color:#02150d !important; background:#fbbf24 !important; border:0 !important; box-shadow:none !important;
+}
+
+/* Resumen del mes */
+#modalCuaderno .cq-total{
+  display:flex; align-items:flex-end; gap:12px; padding:14px 16px; border-radius:18px;
+  background:radial-gradient(120% 140% at 0% 0%,rgba(52,211,153,.2),rgba(52,211,153,.04) 60%);
+  border:1px solid rgba(52,211,153,.24);
+}
+#modalCuaderno .cq-total > div:first-child{ flex:1; min-width:0; }
+#modalCuaderno .cq-total span{ display:block; font-size:12.5px; font-weight:600; color:#8da09a; }
+#modalCuaderno .cq-total b{ display:block; margin-top:2px; font-family:var(--cy-display); font-size:38px; font-weight:700; line-height:1; color:#34d399; font-variant-numeric:tabular-nums; white-space:nowrap; }
+#modalCuaderno .cq-total-lado{ text-align:right; padding-left:12px; border-left:1px solid rgba(255,255,255,.08); }
+#modalCuaderno .cq-total-lado b{ font-size:24px; color:#eef4f2; }
+
+#modalCuaderno .cq-tipos{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin:8px 0 12px; }
+#modalCuaderno .cq-tipo{
+  --c:#34d399; position:relative; display:grid; grid-template-columns:auto 1fr; grid-template-rows:auto auto; column-gap:9px; align-items:center;
+  min-height:58px !important; width:auto !important; margin:0 !important; padding:9px 11px !important; text-align:left; border-radius:14px !important;
+  color:#eef4f2 !important; background:rgba(255,255,255,.035) !important; border:1px solid rgba(255,255,255,.08) !important; box-shadow:none !important;
+  transition:background .15s ease, border-color .15s ease, transform .1s ease;
+}
+#modalCuaderno .cq-tipo i{ grid-row:1 / span 2; width:32px; height:32px; border-radius:10px; display:grid; place-items:center; font-size:14px; color:var(--c); background:rgba(255,255,255,.05); }
+#modalCuaderno .cq-tipo b{ padding-right:24px; font-family:var(--cy-display); font-size:19px; font-weight:700; line-height:1.05; font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#modalCuaderno .cq-tipo span{ font-size:11.5px; font-weight:600; color:#8da09a; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+@media (max-width:389px){ #modalCuaderno .cq-tipo span{ white-space:normal; line-height:1.15; } }
+#modalCuaderno .cq-tipo em{
+  position:absolute; top:7px; right:8px; min-width:20px; padding:1px 6px; box-sizing:border-box; border-radius:8px; text-align:center;
+  font-style:normal; font-size:11px; font-weight:700; color:var(--c); background:rgba(255,255,255,.06);
+}
+#modalCuaderno .cq-tipo:active{ transform:scale(.97); }
+#modalCuaderno .cq-tipo.activo{ border-color:var(--c) !important; background:rgba(255,255,255,.07) !important; box-shadow:inset 0 0 0 1px var(--c) !important; }
+#modalCuaderno .cq-tipo.activo span{ color:#eef4f2; }
+#modalCuaderno .cq-t-ins{ --c:var(--ins); } #modalCuaderno .cq-t-ren{ --c:var(--ren); }
+#modalCuaderno .cq-t-ade{ --c:var(--ade); } #modalCuaderno .cq-t-deu{ --c:var(--deu); }
+
+/* Buscador */
+#modalCuaderno .cq-buscar{ position:relative; display:block; margin:0 0 4px; }
+#modalCuaderno .cq-buscar i{ position:absolute; left:15px; top:50%; transform:translateY(-50%); color:#5f716b; font-size:14px; pointer-events:none; }
+#modalCuaderno .cq-buscar input{
+  width:100% !important; min-height:46px !important; margin:0 !important; padding:0 14px 0 40px !important; box-sizing:border-box;
+  border-radius:13px !important; font-size:16px !important; color:#eef4f2 !important;
+  background:rgba(255,255,255,.04) !important; border:1px solid rgba(255,255,255,.09) !important; box-shadow:none !important; outline:none;
+}
+#modalCuaderno .cq-buscar input:focus{ border-color:rgba(52,211,153,.5) !important; background:rgba(52,211,153,.06) !important; }
+
+/* Filtro activo */
+#modalCuaderno .cq-filtro{
+  display:flex; align-items:center; gap:8px; margin:10px 0 0; padding:8px 8px 8px 12px; border-radius:12px;
+  font-size:12.5px; color:#c9d6d1; background:rgba(255,255,255,.04);
+}
+#modalCuaderno .cq-filtro span{ flex:1; min-width:0; }
+#modalCuaderno .cq-filtro button, #modalCuaderno .cq-vacio button{
+  margin:0 !important; width:auto !important; min-height:0 !important; padding:6px 11px !important; border-radius:9px !important;
+  font-size:12px !important; font-weight:700; color:#eef4f2 !important; background:rgba(255,255,255,.08) !important; border:1px solid rgba(255,255,255,.12) !important; box-shadow:none !important;
+}
+
+/* Días */
+#modalCuaderno .cq-dia{ content-visibility:auto; contain-intrinsic-size:auto 300px; }
+#modalCuaderno .cq-dia-h{
+  position:sticky; top:0; z-index:1; display:flex; align-items:center; justify-content:space-between; gap:8px;
+  margin:0 -14px; padding:12px 16px 8px; font-size:13px; color:#8da09a;
+  background:#0a1512; box-shadow:0 8px 10px -8px rgba(0,0,0,.7);
+}
+#modalCuaderno .cq-dia-h b{ color:#eef4f2; font-weight:700; }
+#modalCuaderno .cq-dia-t{ font-family:var(--cy-display); font-size:18px; font-weight:700; color:#34d399; font-variant-numeric:tabular-nums; white-space:nowrap; }
+#modalCuaderno .cq-dia-t small{ font-family:inherit; font-size:13px; color:#5f716b; }
+#modalCuaderno .cq-dia ul{
+  list-style:none; margin:0; padding:2px 12px; border-radius:16px;
+  background:rgba(255,255,255,.028); border:1px solid rgba(255,255,255,.06);
+}
+
+/* Movimiento */
+#modalCuaderno .cq-fila{ display:flex; align-items:center; gap:11px; padding:11px 0; border-top:1px solid rgba(255,255,255,.055); }
+#modalCuaderno .cq-fila:first-child{ border-top:0; }
+#modalCuaderno .cq-ico{
+  width:38px; height:38px; flex:none; border-radius:12px; display:grid; place-items:center; font-size:15px;
+  color:var(--c); background:rgba(255,255,255,.05); box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+}
+#modalCuaderno .cq-info{ flex:1; min-width:0; }
+#modalCuaderno .cq-info strong{ display:block; font-family:var(--cy-display); font-size:18px; font-weight:700; line-height:1.15; color:#f4fbf8; overflow-wrap:anywhere; }
+#modalCuaderno .cq-info small{ display:block; margin-top:2px; font-size:12.5px; line-height:1.35; color:#8da09a; overflow-wrap:anywhere; }
+#modalCuaderno .cq-con{ color:var(--c); font-weight:600; }
+#modalCuaderno .cq-ini{ color:#c4b5fd; }
+#modalCuaderno .cq-monto{ flex:none; text-align:right; max-width:46%; }
+#modalCuaderno .cq-monto b{ display:block; font-family:var(--cy-display); font-size:20px; font-weight:700; line-height:1.1; color:#34d399; font-variant-numeric:tabular-nums; white-space:nowrap; }
+#modalCuaderno .cq-monto > span{ display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:3px 6px; margin-top:3px; }
+#modalCuaderno .cq-monto time{ font-size:11.5px; color:#5f716b; font-variant-numeric:tabular-nums; }
+#modalCuaderno .cq-e{ font-style:normal; font-size:11px; font-weight:700; padding:2px 7px; border-radius:7px; white-space:nowrap; }
+#modalCuaderno .cq-e-ok{ color:#6ee7b7; background:rgba(52,211,153,.1); }
+#modalCuaderno .cq-e-deu{ color:#fecaca; background:rgba(248,113,113,.13); }
+#modalCuaderno .cq-e-pend{ color:#bfdbfe; background:rgba(96,165,250,.13); }
+
+/* Vacío, error y carga */
+#modalCuaderno .cq-vacio{ padding:42px 10px; text-align:center; color:#8da09a; }
+#modalCuaderno .cq-vacio i{ font-size:30px; color:#5f716b; }
+#modalCuaderno .cq-vacio p{ margin:10px 0 14px; font-size:14px; }
+#modalCuaderno .cq-sk{ position:relative; overflow:hidden; background:rgba(255,255,255,.04) !important; border-color:transparent !important; }
+#modalCuaderno .cq-total.cq-sk{ height:72px; box-sizing:border-box; }
+#modalCuaderno .cq-tipo.cq-sk{ min-height:58px; border-radius:14px; }
+#modalCuaderno .cq-fila.cq-sk{ height:44px; margin:8px 0; border-radius:12px; border:0; }
+#modalCuaderno .cq-sk::after{
+  content:""; position:absolute; inset:0; transform:translateX(-100%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent); animation:cqBrillo 1.2s ease-in-out infinite;
+}
+@keyframes cqBrillo{ to{ transform:translateX(100%); } }
+@media (max-width:360px){
+  #modalCuaderno .cq-total b{ font-size:32px; }
+  #modalCuaderno .cq-tipo b{ font-size:17px; }
+  #modalCuaderno .cq-ico{ display:none; }
+}
+@media (prefers-reduced-motion: reduce){
+  #modalCuaderno .cq-panel, #modalCuaderno{ transition:none; }
+  #modalCuaderno .cq-sk::after, #modalCuaderno .cq-estado-carga i{ animation:none; }
+}
 </style>
 </head>
 
@@ -3914,10 +4105,10 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
     <div class="cy-prow" id="cyPromoRow">
       <div id="btnAbrirCatalogo" class="cy-pbtn cy-sup" role="button" tabindex="0" onclick="abrirCatalogoModal()">
         <div class="cy-sup-th">
-          <img src="images/catalogo-thumb-1.png" alt="">
-          <img src="images/catalogo-thumb-2.png" alt="">
-          <img src="images/catalogo-thumb-3.png" alt="">
-          <img src="images/catalogo-thumb-4.png" alt="">
+          <img src="images/catalogo-thumb-1.jpg" alt="">
+          <img src="images/catalogo-thumb-2.jpg" alt="">
+          <img src="images/catalogo-thumb-3.jpg" alt="">
+          <img src="images/catalogo-thumb-4.jpg" alt="">
         </div>
         <div class="cy-ptxt"><div class="t1">Suplementos</div><div class="t2">Ver catálogo completo</div></div>
         <div class="cy-parrow" aria-hidden="true">›</div>
@@ -4327,7 +4518,7 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
 
       <!-- BOTÓN DEL CUADERNO DIGITAL AGREGADO -->
       <button type="button" class="btn-cuaderno" onclick="abrirCuadernoHistorial()">
-        <i class="fa-solid fa-book-open"></i> Ver cuaderno de inscripciones
+        <i class="fa-solid fa-book-open"></i> Cuaderno de caja
       </button>
 
     </div>
@@ -5050,6 +5241,80 @@ const SUPABASE_URL = "https://ygbiqnbygjbrmwyttkku.supabase.co";
 const SUPABASE_KEY = "sb_publishable_M9fPsgu2VkCyu9ro0ECx8A_no-0RLLt";
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// ===== Consultas que aguantan internet lento =====
+// Si la conexión se corta o tarda demasiado, reintenta solo (hasta 3 veces).
+// Un error de la base de datos (no de red) se devuelve tal cual, sin reintentar.
+async function cyRpcSeguro(nombre, args, opciones){
+  const o = Object.assign({ intentos: 3, espera: 15000 }, opciones || {});
+  let ultimo = null;
+  for (let i = 0; i < o.intentos; i++) {
+    if (i) await new Promise(r => setTimeout(r, i === 1 ? 700 : 1800));
+    const ctrl = window.AbortController ? new AbortController() : null;
+    const reloj = ctrl ? setTimeout(() => ctrl.abort(), o.espera) : null;
+    try {
+      let q = supabaseClient.rpc(nombre, args);
+      if (ctrl && q.abortSignal) q = q.abortSignal(ctrl.signal);
+      const res = await q;
+      if (!res.error || res.error.code) return Object.assign(res, { intento: i + 1 });
+      ultimo = res;
+    } catch (e) {
+      ultimo = { data: null, error: e };
+    } finally { if (reloj) clearTimeout(reloj); }
+  }
+  return Object.assign(ultimo || { data: null, error: new Error('Sin conexión') }, { intento: o.intentos });
+}
+
+// ===== CUADERNO DE CAJA: ningún pago se pierde =====
+// Cada movimiento se anota primero en el celular (cola) y luego se sube.
+// Si no hay internet, se reintenta solo; el cliente_id evita duplicados.
+const CY_CAJA_COLA = 'cy_caja_pendiente';
+function cyUuid(){
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  const b = new Uint8Array(16);
+  if (window.crypto && crypto.getRandomValues) crypto.getRandomValues(b);
+  else for (let i = 0; i < 16; i++) b[i] = Math.random() * 256 | 0;
+  b[6] = (b[6] & 15) | 64; b[8] = (b[8] & 63) | 128;
+  const h = Array.from(b, x => x.toString(16).padStart(2, '0')).join('');
+  return h.slice(0,8)+'-'+h.slice(8,12)+'-'+h.slice(12,16)+'-'+h.slice(16,20)+'-'+h.slice(20);
+}
+function cyCajaCola(){ try { return JSON.parse(localStorage.getItem(CY_CAJA_COLA)) || []; } catch(e){ return []; } }
+function cyCajaGuardarCola(c){ try { localStorage.setItem(CY_CAJA_COLA, JSON.stringify(c)); } catch(e){} }
+function cyCajaGuardar(mov){
+  const fila = Object.assign({}, mov, {
+    monto_ingreso: parseFloat(mov.monto_ingreso) || 0,
+    deuda_visual: parseFloat(mov.deuda_visual) || 0,
+    cliente_id: cyUuid(),
+    fecha_movimiento: new Date().toISOString()
+  });
+  const cola = cyCajaCola(); cola.push(fila); cyCajaGuardarCola(cola);
+  if (window.cyCuadernoInvalidar) window.cyCuadernoInvalidar();
+  cyCajaVaciarCola();
+}
+let _cyCajaSubiendo = null;
+function cyCajaVaciarCola(){
+  if (_cyCajaSubiendo) return _cyCajaSubiendo;
+  _cyCajaSubiendo = (async () => {
+    let subio = false;
+    for (let i = 0; i < 50; i++) {
+      const fila = cyCajaCola()[0];
+      if (!fila) break;
+      const { error } = await supabaseClient.from('historial_caja')
+        .upsert([fila], { onConflict: 'cliente_id', ignoreDuplicates: true });
+      // Un dato inválido (22xxx/23xxx) no se arregla reintentando: se descarta
+      if (error && !/^2[23]/.test(String(error.code || ''))) break;
+      if (error) console.error('Movimiento de caja descartado:', error, fila);
+      cyCajaGuardarCola(cyCajaCola().filter(f => f.cliente_id !== fila.cliente_id));
+      subio = true;
+    }
+    if (subio && window.cyCuadernoInvalidar) window.cyCuadernoInvalidar(true);
+  })().catch(e => console.warn('Caja sin conexión, se reintentará:', e))
+     .finally(() => { _cyCajaSubiendo = null; });
+  return _cyCajaSubiendo;
+}
+window.addEventListener('online', () => cyCajaVaciarCola());
+setInterval(() => { if (cyCajaCola().length) cyCajaVaciarCola(); }, 30000);
+setTimeout(() => { if (cyCajaCola().length) cyCajaVaciarCola(); }, 4000);
+
 // Los avisos de ingreso al celular (ntfy) los manda la base de datos al
 // guardarse cada asistencia; el canal es secreto y NO está en esta página.
 
@@ -5060,15 +5325,18 @@ let filtroEstadoActual = 'todos';
 window.yaProcesandoQR = false;
 window._qrLockTimeout = null;
 
-try {
-  new QRCode(document.getElementById("gymQR"), {
-    text: window.location.href + "?qr=1",
-    width: 240,
-    height: 240
-  });
-} catch (e) {
-  console.warn("No se pudo generar el QR de recepción:", e);
-}
+// La librería del QR carga sin frenar la pantalla (defer); al estar lista, dibuja el QR.
+window.cyQrListo = function(){
+  const caja = document.getElementById("gymQR");
+  if (!caja || caja.dataset.listo || !window.QRCode) return;
+  try {
+    new QRCode(caja, { text: location.origin + location.pathname + "?qr=1", width: 240, height: 240 });
+    caja.dataset.listo = "1";
+  } catch (e) {
+    console.warn("No se pudo generar el QR de recepción:", e);
+  }
+};
+window.cyQrListo();
 
 function fechaHoyISO(){
   const d = new Date();
@@ -5443,7 +5711,9 @@ window.guardarEdicionSocio = async function(){
   render();
 };
 
+let _renovando = false;
 window.guardarRenovacion = async function(){
+  if (_renovando) return;
   let tipo = document.getElementById("renTipo").value;
   let inicio = document.getElementById("renInicio").value;
   let fin = document.getElementById("renFin").value;
@@ -5484,45 +5754,42 @@ window.guardarRenovacion = async function(){
     textoTipoMemb = `${tipo} (Inicia: ${d}/${m}/${y})`;
   }
 
-  // 3. GUARDAR EN EL HISTORIAL LOCAL CON FECHA LOCAL CORREGIDA
-  let historialLocal = JSON.parse(localStorage.getItem('historial_caja_local')) || [];
+  // 3. GUARDAR EN SUPABASE (un solo toque: el botón se bloquea mientras guarda)
+  _renovando = true;
+  const btnRen = document.querySelector('#modalRenovar .btn-green');
+  if (btnRen) btnRen.disabled = true;
+  let errRen = null;
+  try {
+    const res = await supabaseClient
+      .from("socios")
+      .update({
+        tipo_memb: tipo,
+        inicio: inicio,
+        fecha_fin: fin,
+        dias_totales: dias,
+        dias_restantes: dias,
+        precio: precioNum
+      })
+      .eq("dni", socioRenovar);
+    errRen = res.error;
+  } catch (e) { errRen = e; }
+  _renovando = false;
+  if (btnRen) btnRen.disabled = false;
+  if (errRen) {
+    console.error("No se pudo renovar:", errRen);
+    mostrarToast("❌ No se guardó. Revisa el internet e inténtalo de nuevo", "#ef4444");
+    return;
+  }
 
-  let nuevoMovimiento = {
-    dni: dniBuscado,
-    nombre: nombreSocio,
-    tipo_memb: textoTipoMemb,
+  // 4. ANOTAR EL PAGO EN EL CUADERNO DE CAJA (solo si se guardó)
+  cyCajaGuardar({
+    dni: dniBuscado || '',
+    nombre: nombreSocio || '',
+    tipo_memb: textoTipoMemb || 'Membresía',
     concepto: esAdelanto ? "Adelanto de membresía" : "Renovación de membresía",
-    montoIngreso: precioNum,
-    montoVisualDeuda: 0,
-    fechaMovimiento: hoyLocalISO, // <--- Garantiza que siempre pertenezca a la caja de hoy
-    timestamp: Date.now()
-  };
-
-  historialLocal.push(nuevoMovimiento);
-  localStorage.setItem('historial_caja_local', JSON.stringify(historialLocal));
-  supabaseClient.from('historial_caja').insert([{
-  dni: nuevoMovimiento.dni || '',
-  nombre: nuevoMovimiento.nombre || '',
-  tipo_memb: nuevoMovimiento.tipo_memb || 'Membresía',
-  concepto: nuevoMovimiento.concepto || 'Movimiento de caja',
-  monto_ingreso: nuevoMovimiento.montoIngreso || 0,
-  deuda_visual: nuevoMovimiento.montoVisualDeuda || 0,
-  fecha_movimiento: new Date().toISOString()
-}]).then(() => {});
-
-
-  // 2. ACTUALIZAR EN SUPABASE
-  await supabaseClient
-    .from("socios")
-    .update({ 
-      tipo_memb: tipo,
-      inicio: inicio, 
-      fecha_fin: fin, 
-      dias_totales: dias,
-      dias_restantes: dias,
-      precio: precioNum 
-    })
-    .eq("dni", socioRenovar);
+    monto_ingreso: precioNum,
+    deuda_visual: 0
+  });
 
   cerrarModalRenovar();
   let msgToast = esAdelanto ? "⏩ Adelanto guardado con éxito" : "✅ Membresía renovada correctamente";
@@ -5609,29 +5876,14 @@ window.guardar = async function(){
       }
 
       let pagoRealHoy = precioVal - deudaVal;
-      let historialLocal = JSON.parse(localStorage.getItem('historial_caja_local')) || [];
-      
-      historialLocal.push({
-        dni: dni,
-        nombre: nombre,
+      cyCajaGuardar({
+        dni: dni || '',
+        nombre: nombre || '',
         tipo_memb: tipo || 'Membresía',
         concepto: 'Inscripción inicial',
-        montoIngreso: pagoRealHoy > 0 ? pagoRealHoy : 0,
-        montoVisualDeuda: deudaVal,
-        fechaMovimiento: new Date().toISOString(),
-        timestamp: Date.now()
+        monto_ingreso: pagoRealHoy > 0 ? pagoRealHoy : 0,
+        deuda_visual: deudaVal
       });
-
-      localStorage.setItem('historial_caja_local', JSON.stringify(historialLocal));
-      supabaseClient.from('historial_caja').insert([{
-  dni: dni || '',
-  nombre: nombre || '',
-  tipo_memb: tipo || 'Inscripción',
-  concepto: 'Inscripción inicial',
-  monto_ingreso: pagoRealHoy > 0 ? pagoRealHoy : 0,
-  deuda_visual: deudaVal,
-  fecha_movimiento: new Date().toISOString()
-}]).then(() => {});
 
     } catch (errCaja) {
       console.error("Error guardando en cuaderno local:", errCaja);
@@ -5791,6 +6043,11 @@ window.asistenciaNueva = async function(dni, diasRestantesPasados, socioConocido
   // Si el insert falló (ya sea por doble escaneo casi simultáneo, o porque
   // ya había marcado antes hoy), lo tratamos como "ya registrada" en vez de
   // mostrar un éxito falso.
+  if (resInsert && resInsert.error && resInsert.error.code !== '23505') {
+    console.error("No se pudo registrar la asistencia:", resInsert.error);
+    mostrarToast("❌ No se registró la asistencia. Revisa el internet e inténtalo de nuevo", "#ef4444");
+    return false;
+  }
   if (resInsert && resInsert.error) {
     console.warn("No se pudo registrar la asistencia (posiblemente ya registrada hoy, o doble escaneo casi simultáneo):", resInsert.error);
     mostrarTarjetaEstado("⚠️ ASISTENCIA YA REGISTRADA",
@@ -5903,9 +6160,20 @@ async function mostrarHistorial(){
   contenedorHistorial.innerHTML = html;
 }
 
+// Trae TODOS los socios en bloques de 1000 (Supabase entrega máximo 1000 por
+// consulta: pasando ese número, los demás no aparecían). Si falla el internet,
+// se conserva la lista que ya se tenía en vez de dejarla vacía.
 async function actualizarSocios(){
-  const { data } = await supabaseClient.from("socios").select("*");
-  dataGlobal = data || [];
+  const BLOQUE = 1000;
+  let todos = [];
+  for (let desde = 0; ; desde += BLOQUE) {
+    const { data, error } = await supabaseClient.from("socios").select("*")
+      .order("id", { ascending: true }).range(desde, desde + BLOQUE - 1);
+    if (error) { console.warn("No se pudo actualizar la lista de socios:", error); return dataGlobal; }
+    todos = todos.concat(data || []);
+    if (!data || data.length < BLOQUE) break;
+  }
+  dataGlobal = todos;
   return dataGlobal;
 }
 
@@ -6227,116 +6495,49 @@ window.enviarAvisoVencimiento = async function(dni){
   filtrarLista();
 };
 
+let _editandoDeuda = false;
 window.editarDeuda = async function(dni){
-  let n = prompt("Nueva deuda");
-  if(n===null) return;
-  let datosActualizar = { deuda:n };
+  if (_editandoDeuda) return;
+  const socio = (dataGlobal || []).find(s => String(s.dni) === String(dni));
+  const antes = parseFloat(socio && socio.deuda) || 0;
+  let n = prompt("Nueva deuda (S/)" + (antes > 0 ? "  — actual: " + antes : ""), antes > 0 ? String(antes) : "");
+  if (n === null) return;
+  n = String(n).trim().replace(",", ".").replace(/^s\/\s*/i, "");
+  const nueva = n === "" ? 0 : (/^\d+(\.\d+)?$/.test(n) ? parseFloat(n) : NaN);
+  if (isNaN(nueva) || nueva < 0) { mostrarToast("Escribe solo el monto, por ejemplo 20", "#f59e0b"); return; }
 
-  if(parseFloat(n) > 0){
-    datosActualizar.fecha_deuda = fechaHoyISO();
-  }else{
-    datosActualizar.fecha_deuda = null;
+  const datosActualizar = { deuda: String(nueva), fecha_deuda: nueva > 0 ? (antes > 0 && socio.fecha_deuda ? socio.fecha_deuda : fechaHoyISO()) : null };
+  _editandoDeuda = true;
+  let error = null;
+  try { ({ error } = await supabaseClient.from("socios").update(datosActualizar).eq("dni", dni)); } catch (e) { error = e; }
+  _editandoDeuda = false;
+  if (error) {
+    console.error("No se pudo guardar la deuda:", error);
+    mostrarToast("❌ No se guardó. Revisa el internet e inténtalo de nuevo", "#ef4444");
+    return;
   }
 
-  await supabaseClient.from("socios").update(datosActualizar).eq("dni",dni);
+  // Cuaderno de caja: lo que bajó la deuda es dinero cobrado hoy
+  if (socio && nueva !== antes) {
+    cyCajaGuardar({
+      dni: socio.dni || dni,
+      nombre: socio.nombre || '',
+      tipo_memb: socio.tipo_memb || 'Membresía',
+      concepto: nueva < antes ? (nueva === 0 ? "🎉 Canceló deuda pendiente" : "📉 Abono parcial a deuda") : "⚠️ Se le asignó nueva deuda",
+      monto_ingreso: nueva < antes ? antes - nueva : 0,
+      deuda_visual: nueva
+    });
+  }
+  mostrarToast(nueva < antes ? (nueva === 0 ? "✅ Deuda cancelada" : "✅ Abono registrado") : "✅ Deuda actualizada", "#10b981");
   await render();
 };
-// INTERCEPTOR COMPLETO DE CAJA (DEUDAS Y RENOVACIONES)
-(function() {
-  let dniSocioActivo = null;
-  let deudaAnteriorSocio = 0;
-  let socioActivoObj = null;
-
-  // Intercepta únicamente cuando le das clic a editar deuda
-  document.addEventListener('click', function(e) {
-    const botonDeuda = e.target.closest('[onclick*="editarDeuda"]');
-
-    if (botonDeuda) {
-      const match = botonDeuda.getAttribute('onclick').match(/editarDeuda\(['"]?([^'"]+)['"]?\)/);
-      if (match) {
-        dniSocioActivo = match[1];
-        const listaSocios = typeof dataGlobal !== 'undefined' ? dataGlobal : [];
-        socioActivoObj = listaSocios.find(s => s.dni === dniSocioActivo);
-        if (socioActivoObj) deudaAnteriorSocio = parseFloat(socioActivoObj.deuda || 0);
-      }
-    }
-  }, true);
-
-
-  // Interceptor del prompt para cuando cambias montos de deuda
-  const promptOriginal = window.prompt;
-  window.prompt = function(mensaje, valorPorDefecto) {
-    const resultado = promptOriginal.apply(this, arguments);
-    
-    if (dniSocioActivo && socioActivoObj && resultado !== null) {
-      const nuevaDeuda = parseFloat(resultado) || 0;
-      const ahora = new Date();
-      const tzoffset = ahora.getTimezoneOffset() * 60000;
-      const hoyLocalISO = (new Date(ahora.getTime() - tzoffset)).toISOString();
-
-      if (nuevaDeuda < deudaAnteriorSocio) {
-        const montoAbonado = deudaAnteriorSocio - nuevaDeuda;
-        const nuevoAcontecimiento = {
-          dni: socioActivoObj.dni,
-          nombre: socioActivoObj.nombre,
-          tipo_memb: socioActivoObj.tipo_memb,
-          concepto: nuevaDeuda === 0 ? `🎉 Canceló deuda pendiente` : `📉 Abono parcial a deuda`,
-          montoIngreso: montoAbonado,
-          montoVisualDeuda: nuevaDeuda,
-          diferenciaDeuda: montoAbonado,
-          fechaMovimiento: hoyLocalISO,
-          timestamp: ahora.getTime()
-        };
-        let historialLocal = JSON.parse(localStorage.getItem('historial_caja_local')) || [];
-        historialLocal.push(nuevoAcontecimiento);
-        localStorage.setItem('historial_caja_local', JSON.stringify(historialLocal));
-        supabaseClient.from('historial_caja').insert([{
-  dni: (typeof nuevoAcontecimiento !== 'undefined' && nuevoAcontecimiento.dni) ? nuevoAcontecimiento.dni : (typeof dniSocioActivo !== 'undefined' ? dniSocioActivo : ''),
-  nombre: (typeof nuevoAcontecimiento !== 'undefined' && nuevoAcontecimiento.nombre) ? nuevoAcontecimiento.nombre : '',
-  tipo_memb: (typeof nuevoAcontecimiento !== 'undefined' && nuevoAcontecimiento.tipo_memb) ? nuevoAcontecimiento.tipo_memb : 'Membresía',
-  concepto: (typeof nuevoAcontecimiento !== 'undefined' && nuevoAcontecimiento.concepto) ? nuevoAcontecimiento.concepto : 'Movimiento de caja',
-  monto_ingreso: (typeof nuevoAcontecimiento !== 'undefined' && nuevoAcontecimiento.montoIngreso) ? nuevoAcontecimiento.montoIngreso : 0,
-  deuda_visual: (typeof nuevoAcontecimiento !== 'undefined' && nuevoAcontecimiento.montoVisualDeuda) ? nuevoAcontecimiento.montoVisualDeuda : 0,
-  fecha_movimiento: new Date().toISOString()
-}]).then(() => {});
-
-      } else if (nuevaDeuda > deudaAnteriorSocio) {
-        const aumentoDeuda = nuevaDeuda - deudaAnteriorSocio;
-        const nuevoAcontecimiento = {
-          dni: socioActivoObj.dni,
-          nombre: socioActivoObj.nombre,
-          tipo_memb: socioActivoObj.tipo_memb,
-          concepto: `⚠️ Se le asignó nueva deuda`,
-          montoIngreso: 0, 
-          montoVisualDeuda: nuevaDeuda,
-          diferenciaDeuda: aumentoDeuda,
-          fechaMovimiento: hoyLocalISO,
-          timestamp: ahora.getTime()
-        };
-        let historialLocal = JSON.parse(localStorage.getItem('historial_caja_local')) || [];
-        historialLocal.push(nuevoAcontecimiento);
-        localStorage.setItem('historial_caja_local', JSON.stringify(historialLocal));
-        supabaseClient.from('historial_caja').insert([{
-  dni: (typeof nuevoAcontecimiento !== 'undefined' && nuevoAcontecimiento.dni) ? nuevoAcontecimiento.dni : (typeof dniSocioActivo !== 'undefined' ? dniSocioActivo : ''),
-  nombre: (typeof nuevoAcontecimiento !== 'undefined' && nuevoAcontecimiento.nombre) ? nuevoAcontecimiento.nombre : '',
-  tipo_memb: (typeof nuevoAcontecimiento !== 'undefined' && nuevoAcontecimiento.tipo_memb) ? nuevoAcontecimiento.tipo_memb : 'Membresía',
-  concepto: (typeof nuevoAcontecimiento !== 'undefined' && nuevoAcontecimiento.concepto) ? nuevoAcontecimiento.concepto : 'Movimiento de caja',
-  monto_ingreso: (typeof nuevoAcontecimiento !== 'undefined' && nuevoAcontecimiento.montoIngreso) ? nuevoAcontecimiento.montoIngreso : 0,
-  deuda_visual: (typeof nuevoAcontecimiento !== 'undefined' && nuevoAcontecimiento.montoVisualDeuda) ? nuevoAcontecimiento.montoVisualDeuda : 0,
-  fecha_movimiento: new Date().toISOString()
-}]).then(() => {});
-
-      }
-      dniSocioActivo = null;
-      socioActivoObj = null;
-    }
-    return resultado;
-  };
-})();
 
 window.eliminar = async function(dni){
   if(!confirm("¿Seguro que deseas eliminar permanentemente a este socio del sistema?")) return;
-  await supabaseClient.from("socios").delete().eq("dni",dni);
+  let error = null;
+  try { ({ error } = await supabaseClient.from("socios").delete().eq("dni",dni)); } catch (e) { error = e; }
+  if (error) { console.error("No se pudo eliminar:", error); mostrarToast("❌ No se eliminó. Revisa el internet", "#ef4444"); return; }
+  mostrarToast("✅ Socio eliminado", "#10b981");
   await render();
 };
 
@@ -6490,14 +6691,14 @@ window.buscarQR = async function(esPrimeraVez){
 
   // La vista pública no puede leer la tabla de socios: el servidor devuelve
   // solo los datos mínimos del socio si el teléfono Y el DNI coinciden.
-  const { data: socio, error } = await supabaseClient.rpc("consultar_socio_qr", { p_telefono: telefono, p_dni: dni });
+  const { data: socio, error } = await cyRpcSeguro("consultar_socio_qr", { p_telefono: telefono, p_dni: dni });
   let div = document.getElementById("qrResult");
   if(!div) return;
   const filaAccesos0 = document.getElementById("cyPromoRow");
   if (filaAccesos0) filaAccesos0.style.display = "";
 
   if (error) {
-    div.innerHTML = "<div class='card' style='text-align:center; color:#ef4444; font-weight:700;'>⚠️ Sin conexión. Intenta de nuevo.</div>";
+    div.innerHTML = "<div class='card qr-sinred' style='text-align:center; color:#ef4444; font-weight:700;'>⚠️ La señal está muy lenta o sin internet.<br><button type='button' class='qr-btn-principal' style='margin-top:14px;' onclick='this.disabled=true;buscarQR(" + (esPrimeraVez ? "true" : "false") + ")'><span class='icono-circulo'><i class='fa-solid fa-rotate-right'></i></span> Reintentar</button></div>";
     return;
   }
   if (socio && socio.bloqueado) {
@@ -6623,7 +6824,7 @@ window.confirmarAsistenciaQR = async function () {
     
     window._qrLockTimeout = setTimeout(() => {
       window.yaProcesandoQR = false;
-    }, 8000);
+    }, 60000);
 
     const div = document.getElementById("qrResult");
     if(div) div.innerHTML = `<div class="card" style="text-align:center; padding:30px;"><h2>⏳ Registrando asistencia...</h2></div>`;
@@ -6632,14 +6833,22 @@ window.confirmarAsistenciaQR = async function () {
 
     // 🚀 1. REGISTRAR ASISTENCIA — un solo viaje a Supabase (antes eran dos:
     // uno para revisar el estado del socio y otro para guardar la asistencia).
-    const { data: resultado, error: errorRpc } = await supabaseClient.rpc(
+    // Con internet lento se reintenta solo. Si un reintento responde "ya
+    // registrado", es porque el primer intento SÍ llegó: se muestra como éxito.
+    const { data: resultado, error: errorRpc, intento } = await cyRpcSeguro(
       "registrar_asistencia_qr",
       { p_telefono: (leerTelefonoSeguro() || "").replace(/\D/g,''), p_dni: socio.dni }
     );
 
     if (errorRpc || !resultado) {
       console.error("Error llamando a registrar_asistencia_qr:", errorRpc);
-      mostrarTarjetaEstado("⚠️ ERROR DE CONEXIÓN", "No se pudo registrar la asistencia. Intente escanear de nuevo.", "#ef4444");
+      mostrarTarjetaEstado("⚠️ SIN CONEXIÓN", "No se pudo registrar la asistencia: la señal está muy lenta.<br><br><button type='button' class='qr-btn-principal' onclick='this.disabled=true;confirmarAsistenciaQR()'><span class='icono-circulo'><i class='fa-solid fa-rotate-right'></i></span> Reintentar</button>", "#ef4444");
+      return;
+    }
+    if (!resultado.ok && resultado.motivo === "YA_REGISTRADO" && intento > 1) {
+      mostrarTarjetaEstado("ASISTENCIA REGISTRADA", `<b>${escaparHTML(resultado.nombre || socio.nombre)}</b><br><br>Tu asistencia de hoy quedó registrada.<br><br>💪 ¡A darle con todo hoy!`, "#10b981");
+      playSound("ACTIVO");
+      window.pendingQR = null;
       return;
     }
 
@@ -6739,6 +6948,7 @@ window.confirmarAsistenciaQR = async function () {
     window.pendingQR = null;
   } catch (error) {
     console.error(error);
+    mostrarTarjetaEstado("⚠️ SIN CONEXIÓN", "No se pudo registrar la asistencia.<br><br><button type='button' class='qr-btn-principal' onclick='this.disabled=true;confirmarAsistenciaQR()'><span class='icono-circulo'><i class='fa-solid fa-rotate-right'></i></span> Reintentar</button>", "#ef4444");
   } finally {
     clearTimeout(window._qrLockTimeout);
     window.yaProcesandoQR = false;
@@ -7023,244 +7233,306 @@ window.enviarInvitacionWhatsApp = function() {
     mostrarToast("🚀 Información completa enviada con promo de bienvenida", "#10b981");
   };
 };
-async function abrirCuadernoHistorial() {
-  let modal = document.getElementById('modalCuaderno');
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.id = 'modalCuaderno';
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.width = '100%';
-    modal.style.height = '100%';
-    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-    modal.style.display = 'flex';
-    modal.style.justifyContent = 'center';
-    modal.style.alignItems = 'center';
-    modal.style.zIndex = '9999';
-    modal.style.padding = '15px';
-    modal.style.boxSizing = 'border-box';
-    
-    modal.innerHTML = `
-      <div style="background: #1e1e24; width: 100%; max-width: 500px; height: 80vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 1px solid #2d2d37;">
-        <div style="padding: 15px; background: #25252b; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2d2d37;">
-          <h3 style="margin: 0; color: #fff; font-size: 16px;">📖 Cuaderno de Caja e Ingresos Reales</h3>
-          <button onclick="cerrarCuadernoHistorial()" style="background: none; border: none; color: #888; font-size: 20px; cursor: pointer; padding: 0 5px;">&times;</button>
-        </div>
-        <div id="contenidoCuaderno" style="flex: 1; overflow-y: auto; padding: 15px;">
-          <p style="color: #888; text-align: center;">Cargando flujos de caja...</p>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(modal);
+// =====================================================================
+// CUADERNO DE CAJA — por mes, con resumen, búsqueda y filtros
+// Una sola consulta por mes (cuaderno_caja). Lo ya visto se guarda en
+// memoria y en el celular: al abrir se muestra al instante y se actualiza
+// por detrás.
+// =====================================================================
+(function(){
+  const MESES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const DIAS = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const TIPOS = {
+    ins: { t:'Inscripciones', u:'Inscripción',   i:'fa-user-plus' },
+    ren: { t:'Renovaciones',  u:'Renovación',    i:'fa-rotate-right' },
+    ade: { t:'Adelantos',     u:'Adelanto',      i:'fa-forward' },
+    deu: { t:'Deudas cobradas', u:'Cobro de deuda', i:'fa-hand-holding-dollar' }
+  };
+  const CACHE_LS = 'cy_cuaderno_v1';
+  const cache = new Map();           // 'YYYY-MM' -> { filas, ts }
+  const st = { mes:null, tipo:null, q:'', pedido:0, abierto:false };
+  let el = null;
+
+  // Perú no cambia de hora: UTC-5 todo el año
+  const lima = (t) => new Date(new Date(t).getTime() - 5 * 3600e3);
+  const hoyLima = () => lima(Date.now()).toISOString().slice(0, 10);
+  const mesActual = () => hoyLima().slice(0, 7);
+  const sumarMes = (m, n) => { const [y, mm] = m.split('-').map(Number); const d = new Date(Date.UTC(y, mm - 1 + n, 1)); return d.toISOString().slice(0, 7); };
+  const finDeMes = (m) => { const [y, mm] = m.split('-').map(Number); return new Date(Date.UTC(y, mm, 0)).toISOString().slice(0, 10); };
+  const soles = (n) => 'S/ ' + (Math.round((+n || 0) * 100) / 100).toLocaleString('es-PE', { maximumFractionDigits: 2 });
+  const sinTildes = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  const esc = (s) => escaparHTML(s == null ? '' : String(s));
+
+  function tipoDe(concepto){
+    const c = sinTildes(concepto);
+    if (c.includes('inscrip')) return 'ins';
+    if (c.includes('adelanto')) return 'ade';
+    if (c.includes('cancelo') || c.includes('abono') || c.includes('deuda')) return 'deu';
+    return 'ren';
   }
 
-  modal.style.display = 'flex';
-  const contenedor = document.getElementById('contenidoCuaderno');
-  contenedor.innerHTML = '<p style="color: #888; text-align: center;">Calculando ingresos...</p>';
+  function normalizar(r, pendiente){
+    let plan = String(r.plan || r.tipo_memb || '').trim();
+    let inicia = r.inicia || null;
+    const m = plan.match(/\s*\(Inicia:\s*(\d{1,2})\/(\d{1,2})\/(\d{4})\)\s*$/i);
+    if (m) { plan = plan.slice(0, m.index).trim(); inicia = `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`; }
+    const l = lima(r.fecha || r.fecha_movimiento);
+    return {
+      dia: l.toISOString().slice(0, 10),
+      hora: l.toISOString().slice(11, 16),
+      ts: new Date(r.fecha || r.fecha_movimiento).getTime(),
+      dni: String(r.dni || ''),
+      nombre: String(r.nombre || '').trim() || 'Socio',
+      plan: plan || 'Membresía',
+      tipo: tipoDe(r.concepto),
+      cobro: sinTildes(r.concepto).includes('abono') ? 'Abono a deuda' : null,
+      monto: parseFloat(r.monto != null ? r.monto : r.monto_ingreso) || 0,
+      deuda: parseFloat(r.deuda != null ? r.deuda : r.deuda_visual) || 0,
+      inicia, pendiente: !!pendiente
+    };
+  }
 
-  try {
-    const clienteSupabase = typeof supabaseClient !== 'undefined' ? supabaseClient : (typeof supabase !== 'undefined' ? supabase : null);
-    if (!clienteSupabase) throw new Error("No se encontró la variable de inicialización de Supabase.");
+  // Pagos guardados en este celular que aún esperan internet
+  function pendientesDelMes(mes){
+    return (typeof cyCajaCola === 'function' ? cyCajaCola() : [])
+      .filter(f => (parseFloat(f.monto_ingreso) > 0 || f.concepto === 'Inscripción inicial'))
+      .map(f => normalizar(f, true))
+      .filter(f => f.dia.slice(0, 7) === mes);
+  }
 
-    const { data: socios, error } = await clienteSupabase.from('socios').select('*');
-    if (error) throw error;
+  function leerCacheLS(){ try { return JSON.parse(localStorage.getItem(CACHE_LS)); } catch(e){ return null; } }
+  function guardarCacheLS(mes, filas){ try { localStorage.setItem(CACHE_LS, JSON.stringify({ mes, ts: Date.now(), filas })); } catch(e){} }
 
-    const gruposPorFecha = {};
-
-    function registrarMovimiento(fechaBD, objetoMovimiento) {
-      if (!fechaBD) return;
-      
-      let d = new Date(fechaBD);
-      if (isNaN(d.getTime())) {
-        d = new Date(fechaBD.substring(0, 10) + 'T12:00:00');
-      }
-      const tzoffset = d.getTimezoneOffset() * 60000;
-      const fechaLocalISO = (new Date(d.getTime() - tzoffset)).toISOString();
-      const soloFecha = fechaLocalISO.substring(0, 10);
-
-      let fechaFormateada = soloFecha;
-      if (soloFecha.includes('-')) {
-        const partes = soloFecha.split('-');
-        if (partes.length === 3) fechaFormateada = `${partes[2]}/${partes[1]}/${partes[0]}`;
-      }
-
-      if (!gruposPorFecha[fechaFormateada]) gruposPorFecha[fechaFormateada] = [];
-      gruposPorFecha[fechaFormateada].push(objetoMovimiento);
-    }
-
-    let historialLocal = JSON.parse(localStorage.getItem('historial_caja_local')) || [];
-
-    // Traer los movimientos guardados en Supabase (renovaciones, adelantos, abonos y
-    // cancelaciones de deuda), para que se vean igual en cualquier dispositivo/navegador.
-    // Si la traemos con éxito, la usamos como ÚNICA fuente (evita duplicados que salían
-    // al mezclarla con localStorage, por pequeñas diferencias de milisegundos en la fecha
-    // entre ambos registros del mismo movimiento).
+  async function pedirMes(mes){
+    const ctrl = window.AbortController ? new AbortController() : null;
+    const t = ctrl ? setTimeout(() => ctrl.abort(), 20000) : null;
     try {
-      const { data: cajaRemota, error: errorCaja } = await clienteSupabase.from('historial_caja').select('*');
-      if (errorCaja) throw errorCaja;
-      historialLocal = (cajaRemota || []).map(r => ({
-        dni: r.dni,
-        nombre: r.nombre,
-        tipo_memb: r.tipo_memb,
-        concepto: r.concepto,
-        montoIngreso: parseFloat(r.monto_ingreso) || 0,
-        montoVisualDeuda: parseFloat(r.deuda_visual) || 0,
-        fechaMovimiento: r.fecha_movimiento,
-        timestamp: r.fecha_movimiento ? new Date(r.fecha_movimiento).getTime() : Date.now()
-      }));
-    } catch (e) {
-      console.error("No se pudo cargar historial_caja remoto, usando solo datos locales:", e);
-    }
+      let q = supabaseClient.rpc('cuaderno_caja', { p_desde: mes + '-01', p_hasta: finDeMes(mes) });
+      if (ctrl && q.abortSignal) q = q.abortSignal(ctrl.signal);
+      const { data, error } = await q;
+      if (error) throw error;
+      return (data || []).map(r => normalizar(r, false));
+    } finally { if (t) clearTimeout(t); }
+  }
 
-    // 1. PROCESAR SOCIOS DESDE SUPABASE (INSCRIPCIONES)
-    if (socios && socios.length > 0) {
-      socios.forEach(socio => {
-        const precioTotal = parseFloat(socio.precio) || 0;
-        const deudaActual = parseFloat(socio.deuda) || 0;
-
-        let fechaRegistroOriginal = socio.created_at || socio.inicio;
-        let timestampOriginal = fechaRegistroOriginal ? new Date(fechaRegistroOriginal).getTime() : Date.now();
-
-        const inicioSoloFecha = (socio.inicio || '').substring(0, 10);
-        const creacionSoloFecha = fechaRegistroOriginal ? fechaRegistroOriginal.substring(0, 10) : '';
-        
-        let notaInicioFuturo = '';
-        if (inicioSoloFecha && creacionSoloFecha && inicioSoloFecha > creacionSoloFecha) {
-          const p = inicioSoloFecha.split('-');
-          notaInicioFuturo = ` <span style="color:#a78bfa; font-size:10px;">(Inicia: ${p[2]}/${p[1]}/${p[0]})</span>`;
-        }
-
-        let deudaAlMomento = deudaActual;
-        const movsSocio = historialLocal.filter(h => String(h.dni || '').trim() === String(socio.dni || '').trim());
-        movsSocio.forEach(m => {
-          if (m.concepto && (m.concepto.includes("Canceló") || m.concepto.includes("Abono"))) deudaAlMomento += (m.montoIngreso || 0);
-          if (m.concepto && m.concepto.includes("asignó")) deudaAlMomento -= (m.diferenciaDeuda || 0);
-        });
-
-        if (deudaAlMomento < 0) deudaAlMomento = 0;
-        if (deudaAlMomento > precioTotal) deudaAlMomento = precioTotal;
-
-        if (deudaAlMomento > 0) {
-          const adelantoReal = precioTotal - deudaAlMomento;
-          registrarMovimiento(fechaRegistroOriginal, {
-            nombre: socio.nombre,
-            membresia: (socio.tipo_memb || 'Membresía') + notaInicioFuturo,
-            concepto: `Inscripción inicial`,
-            montoIngreso: adelantoReal > 0 ? adelantoReal : 0,
-            deudaVisual: deudaAlMomento,
-            timestamp: timestampOriginal
-          });
-        } else {
-          registrarMovimiento(fechaRegistroOriginal, {
-            nombre: socio.nombre,
-            membresia: (socio.tipo_memb || 'Membresía') + notaInicioFuturo,
-            concepto: `Inscripción inicial`,
-            montoIngreso: precioTotal,
-            deudaVisual: 0,
-            timestamp: timestampOriginal
-          });
-        }
-      });
-    }
-
-    // 2. PROCESAR HISTORIAL LOCAL (RENOVACIONES Y PAGOS)
-    historialLocal.forEach(movLocal => {
-      const concepto = movLocal.concepto || '';
-      
-      // FILTRO 1: Omitir inscripciones iniciales locales (evita duplicados)
-      if (concepto.toLowerCase().includes("inscripción") || concepto.toLowerCase().includes("inscripcion")) {
-        return; 
-      }
-
-      // FILTRO 2: Omitir registros fantasma o viejos con S/ 0
-      const monto = parseFloat(movLocal.montoIngreso || movLocal.precio || 0);
-      if (monto <= 0) {
-        return; 
-      }
-
-      if (movLocal.fechaMovimiento) {
-        registrarMovimiento(movLocal.fechaMovimiento, {
-          nombre: movLocal.nombre,
-          membresia: movLocal.tipo_memb || movLocal.plan || 'Membresía',
-          concepto: concepto || 'Renovación de membresía',
-          montoIngreso: monto,
-          deudaVisual: parseFloat(movLocal.montoVisualDeuda) || 0,
-          timestamp: movLocal.timestamp || Date.now()
-        });
-      }
+  // ---------- Interfaz ----------
+  function crear(){
+    el = {
+      raiz: document.getElementById('modalCuaderno'),
+      mes: document.getElementById('cqMes'),
+      prev: document.querySelector('#modalCuaderno [data-cq="prev"]'),
+      next: document.querySelector('#modalCuaderno [data-cq="next"]'),
+      resumen: document.getElementById('cqResumen'),
+      buscar: document.getElementById('cqBuscar'),
+      lista: document.getElementById('contenidoCuaderno'),
+      cuerpo: document.querySelector('#modalCuaderno .cq-cuerpo'),
+      estado: document.getElementById('cqEstado')
+    };
+    el.raiz.addEventListener('click', (e) => {
+      if (e.target === el.raiz) return cerrar();
+      const b = e.target.closest('[data-cq]');
+      if (!b) return;
+      const a = b.getAttribute('data-cq');
+      if (a === 'cerrar') cerrar();
+      else if (a === 'prev') irMes(sumarMes(st.mes, -1));
+      else if (a === 'next') irMes(sumarMes(st.mes, 1));
+      else if (a === 'reintentar') cargar(st.mes, true);
+      else if (a === 'tipo') { const v = b.getAttribute('data-v'); st.tipo = (st.tipo === v ? null : v); pintar(); }
+      else if (a === 'limpiar') { st.tipo = null; st.q = ''; el.buscar.value = ''; pintar(); }
     });
-
-    // 3. RENDERIZAR EN PANTALLA
-    const fechasOrdenadas = Object.keys(gruposPorFecha).sort((a, b) => {
-      const convertToDate = (f) => {
-        const p = f.split('/');
-        return new Date(`${p[2]}-${p[1]}-${p[0]}`);
-      };
-      return convertToDate(b) - convertToDate(a);
+    let tb = null;
+    el.buscar.addEventListener('input', () => {
+      clearTimeout(tb);
+      tb = setTimeout(() => { st.q = sinTildes(el.buscar.value.trim()); pintar(); }, 120);
     });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && st.abierto) cerrar(); });
+    window.addEventListener('popstate', () => { if (st.abierto) cerrar(true); });
+  }
 
-    let htmlCuaderno = '';
-    if (fechasOrdenadas.length === 0) {
-      contenedor.innerHTML = '<p style="color: #888; text-align: center;">No hay ingresos reales registrados.</p>';
+  function filasDelMes(mes){
+    const c = cache.get(mes);
+    const base = c ? c.filas : [];
+    const pend = pendientesDelMes(mes);
+    return pend.length ? pend.concat(base).sort((a, b) => b.ts - a.ts) : base;
+  }
+
+  function pintarResumen(filas){
+    const tot = { ins:[0,0], ren:[0,0], ade:[0,0], deu:[0,0] };
+    let total = 0, hoy = 0; const h = hoyLima();
+    filas.forEach(f => { total += f.monto; tot[f.tipo][0] += f.monto; tot[f.tipo][1]++; if (f.dia === h) hoy += f.monto; });
+    const esActual = st.mes === mesActual();
+    const dias = new Set(filas.filter(f => f.monto > 0).map(f => f.dia)).size;
+    el.resumen.innerHTML = `
+      <div class="cq-total">
+        <div><span>Total de ${MESES[+st.mes.slice(5) - 1]}</span><b>${soles(total)}</b></div>
+        <div class="cq-total-lado">${esActual
+          ? `<span>Hoy</span><b>${soles(hoy)}</b>`
+          : `<span>Promedio por día</span><b>${soles(dias ? Math.round(total / dias) : 0)}</b>`}</div>
+      </div>
+      <div class="cq-tipos" role="group" aria-label="Filtrar por tipo">
+        ${Object.keys(TIPOS).map(k => `
+          <button type="button" class="cq-tipo cq-t-${k}${st.tipo === k ? ' activo' : ''}" data-cq="tipo" data-v="${k}" aria-pressed="${st.tipo === k}">
+            <i class="fa-solid ${TIPOS[k].i}"></i>
+            <b>${soles(tot[k][0])}</b>
+            <span>${TIPOS[k].t}</span>
+            <em>${tot[k][1]}</em>
+          </button>`).join('')}
+      </div>`;
+  }
+
+  function nombreDia(d){
+    const h = hoyLima();
+    const ayer = lima(Date.now() - 864e5).toISOString().slice(0, 10);
+    const [y, m, dd] = d.split('-').map(Number);
+    const fecha = new Date(Date.UTC(y, m - 1, dd));
+    const txt = `${DIAS[fecha.getUTCDay()]} ${dd} ${MESES[m - 1].slice(0, 3)}`;
+    if (d === h) return `<b>Hoy</b> · ${txt}`;
+    if (d === ayer) return `<b>Ayer</b> · ${txt}`;
+    return `<b>${txt.charAt(0).toUpperCase() + txt.slice(1)}</b>`;
+  }
+
+  function fila(f){
+    const T = TIPOS[f.tipo];
+    let etiqueta;
+    if (f.pendiente) etiqueta = `<em class="cq-e cq-e-pend"><i class="fa-solid fa-cloud-arrow-up"></i> Por subir</em>`;
+    else if (f.tipo === 'deu') etiqueta = f.deuda > 0 ? `<em class="cq-e cq-e-deu">Aún debe ${soles(f.deuda)}</em>` : `<em class="cq-e cq-e-ok">Deuda saldada</em>`;
+    else if (f.deuda > 0) etiqueta = `<em class="cq-e cq-e-deu">Resta ${soles(f.deuda)}</em>`;
+    else etiqueta = `<em class="cq-e cq-e-ok">Completo</em>`;
+    const ini = f.inicia ? ` · <span class="cq-ini">Inicia ${f.inicia.slice(8,10)}/${f.inicia.slice(5,7)}</span>` : '';
+    return `<li class="cq-fila cq-t-${f.tipo}">
+      <span class="cq-ico" aria-hidden="true"><i class="fa-solid ${T.i}"></i></span>
+      <div class="cq-info">
+        <strong>${esc(f.nombre)}</strong>
+        <small><span class="cq-con">${f.cobro || T.u}</span> · ${esc(f.plan)}${ini}</small>
+      </div>
+      <div class="cq-monto">
+        <b>${f.monto > 0 ? '+ ' + soles(f.monto) : soles(0)}</b>
+        <span>${etiqueta}<time>${f.hora}</time></span>
+      </div>
+    </li>`;
+  }
+
+  function pintar(){
+    if (!el) return;
+    const mes = st.mes;
+    el.mes.textContent = MESES[+mes.slice(5) - 1].replace(/^./, c => c.toUpperCase()) + ' ' + mes.slice(0, 4);
+    el.next.disabled = mes >= mesActual();
+    el.prev.disabled = mes <= sumarMes(mesActual(), -36);
+    const c = cache.get(mes);
+    const todas = filasDelMes(mes);
+    if (!c && !todas.length) { el.resumen.innerHTML = ''; return; }
+    pintarResumen(todas);
+
+    let filas = todas;
+    if (st.tipo) filas = filas.filter(f => f.tipo === st.tipo);
+    if (st.q) filas = filas.filter(f => sinTildes(f.nombre).includes(st.q) || f.dni.includes(st.q));
+
+    if (!filas.length) {
+      el.lista.innerHTML = (st.tipo || st.q)
+        ? `<div class="cq-vacio"><i class="fa-solid fa-filter-circle-xmark"></i><p>Nada coincide con el filtro.</p><button type="button" data-cq="limpiar">Quitar filtro</button></div>`
+        : `<div class="cq-vacio"><i class="fa-solid fa-book-open"></i><p>Sin movimientos en este mes.</p></div>`;
       return;
     }
-
-    fechasOrdenadas.forEach(fecha => {
-      let totalDelDia = 0;
-      let filasSociosHTML = '';
-
-      gruposPorFecha[fecha].sort((a, b) => b.timestamp - a.timestamp);
-
-      gruposPorFecha[fecha].forEach(mov => {
-        totalDelDia += mov.montoIngreso;
-
-        let tagDeuda = '';
-        if (mov.concepto && (mov.concepto.includes("asignó") || (mov.deudaVisual > 0 && !mov.concepto.includes("Canceló") && !mov.concepto.includes("Abono")))) {
-          tagDeuda = ` <span style="color: #ef4444; background: rgba(239,68,68,0.1); padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-left: 5px; font-weight: bold;">Resta S/ ${mov.deudaVisual}</span>`;
-        } else if (mov.concepto && mov.concepto.includes("Canceló")) {
-          tagDeuda = ` <span style="color: #10b981; background: rgba(16,185,129,0.1); padding: 2px 6px; border-radius: 4px; font-size: 11px; margin-left: 5px; font-weight: bold;">Cobrado</span>`;
-        } else {
-          tagDeuda = ` <span style="color: #10b981; font-size: 11px; margin-left: 5px;">(Completo)</span>`;
-        }
-
-        filasSociosHTML += `
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 5px; border-bottom: 1px dashed #2d2d37;">
-            <div style="flex: 1; padding-right: 10px;">
-              <div style="color: #fff; font-weight: 500; font-size: 14px;">
-                ${escaparHTML(mov.nombre || 'Socio Anónimo')} ${tagDeuda}
-              </div>
-              <div style="color: #888; font-size: 11px; margin-top: 2px;">
-                ${escaparHTML(mov.membresia)} • <span style="color: #3b82f6;">${escaparHTML(mov.concepto)}</span>
-              </div>
-            </div>
-            <div style="text-align: right;">
-              <span style="${mov.montoIngreso > 0 ? 'color: #10b981;' : 'color: #ef4444;'} font-weight: bold; font-size: 14px;">
-                ${mov.montoIngreso > 0 ? '+ S/ ' + mov.montoIngreso : 'S/ 0'}
-              </span>
-            </div>
-          </div>
-        `;
-      });
-
-      htmlCuaderno += `
-        <div style="background: #25252b; padding: 8px 12px; margin-top: 15px; border-left: 4px solid #3b82f6; border-radius: 4px; display: flex; justify-content: space-between; align-items: center;">
-          <span style="font-weight: bold; color: #3b82f6; font-size: 13px;">📅 Fecha: ${fecha}</span>
-          <span style="font-weight: bold; color: #10b981; font-size: 13px; background: rgba(16,185,129,0.1); padding: 2px 8px; border-radius: 4px;">Total Neto: S/ ${totalDelDia}</span>
-        </div>
-        <div style="padding: 5px 0; margin-bottom: 10px;">
-          ${filasSociosHTML}
-        </div>
-      `;
+    const grupos = [];
+    let actual = null;
+    filas.forEach(f => {
+      if (!actual || actual.dia !== f.dia) { actual = { dia: f.dia, filas: [], total: 0 }; grupos.push(actual); }
+      actual.filas.push(f); actual.total += f.monto;
     });
-
-    contenedor.innerHTML = htmlCuaderno;
-
-  } catch (err) {
-    console.error("Error cargando cuaderno:", err);
-    contenedor.innerHTML = `<p style="color: #ef4444; text-align: center; font-size: 13px;">Error de sincronización.<br><span style="color:#666;">${err.message}</span></p>`;
+    const filtro = (st.tipo || st.q)
+      ? `<div class="cq-filtro"><span>${st.tipo ? TIPOS[st.tipo].t : 'Búsqueda'}: <b>${filas.length}</b> · ${soles(filas.reduce((s, f) => s + f.monto, 0))}</span><button type="button" data-cq="limpiar">Quitar filtro</button></div>`
+      : '';
+    el.lista.innerHTML = filtro + grupos.map(g => `
+      <section class="cq-dia">
+        <header class="cq-dia-h"><span>${nombreDia(g.dia)}</span><span class="cq-dia-t">${soles(g.total)} <small>· ${g.filas.length}</small></span></header>
+        <ul>${g.filas.map(fila).join('')}</ul>
+      </section>`).join('');
   }
-}
+
+  function estado(tipo, texto){
+    if (!el) return;
+    el.estado.className = 'cq-estado' + (tipo ? ' cq-estado-' + tipo : '');
+    el.estado.innerHTML = texto || '';
+    const pend = (typeof cyCajaCola === 'function') ? cyCajaCola().length : 0;
+    if (!texto && pend) {
+      el.estado.className = 'cq-estado cq-estado-pend';
+      el.estado.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> ${pend === 1 ? '1 pago espera' : pend + ' pagos esperan'} internet; se subirá${pend === 1 ? '' : 'n'} solo${pend === 1 ? '' : 's'}.`;
+    }
+  }
+
+  function esqueleto(){
+    el.resumen.innerHTML = `<div class="cq-total cq-sk"><div><span>&nbsp;</span><b>&nbsp;</b></div></div><div class="cq-tipos">${'<div class="cq-tipo cq-sk"></div>'.repeat(4)}</div>`;
+    el.lista.innerHTML = `<div class="cq-dia">${'<div class="cq-fila cq-sk"></div>'.repeat(5)}</div>`;
+  }
+
+  async function cargar(mes, forzar){
+    const pedido = ++st.pedido;
+    const c = cache.get(mes);
+    const fresco = c && (Date.now() - c.ts < 60000);
+    if (c || pendientesDelMes(mes).length) pintar(); else esqueleto();
+    if (fresco && !forzar) { estado(); return; }
+    estado('carga', '<i class="fa-solid fa-rotate"></i> Actualizando…');
+    if (window.cyCajaVaciarCola && cyCajaCola().length) { try { await cyCajaVaciarCola(); } catch(e){} }
+    try {
+      const filas = await pedirMes(mes);
+      cache.set(mes, { filas, ts: Date.now() });
+      if (mes === mesActual()) guardarCacheLS(mes, filas);
+      if (pedido !== st.pedido || st.mes !== mes) return;
+      pintar(); estado();
+    } catch (e) {
+      if (pedido !== st.pedido || st.mes !== mes) return;
+      console.error('Cuaderno:', e);
+      if (cache.get(mes)) {
+        estado('error', `<i class="fa-solid fa-wifi"></i> Sin conexión: mostrando lo último guardado. <button type="button" data-cq="reintentar">Reintentar</button>`);
+      } else {
+        el.resumen.innerHTML = '';
+        el.lista.innerHTML = `<div class="cq-vacio"><i class="fa-solid fa-wifi"></i><p>No se pudo cargar. Revisa el internet.</p><button type="button" data-cq="reintentar">Reintentar</button></div>`;
+        estado();
+      }
+    }
+  }
+
+  function irMes(mes){
+    if (mes > mesActual()) return;
+    st.mes = mes;
+    el.cuerpo.scrollTop = 0;
+    cargar(mes, false);
+    // Precarga el mes anterior para que pasar de mes sea instantáneo
+    const ant = sumarMes(mes, -1);
+    if (!cache.has(ant)) setTimeout(() => { if (st.abierto && !cache.has(ant)) pedirMes(ant).then(f => cache.set(ant, { filas: f, ts: Date.now() })).catch(() => {}); }, 900);
+  }
+
+  window.abrirCuadernoHistorial = function(){
+    if (!el) crear();
+    if (!cache.has(mesActual())) {
+      const ls = leerCacheLS();
+      if (ls && ls.mes === mesActual() && Array.isArray(ls.filas)) cache.set(ls.mes, { filas: ls.filas, ts: 0 });
+    }
+    st.abierto = true; st.tipo = null; st.q = ''; el.buscar.value = '';
+    el.raiz.hidden = false;
+    document.documentElement.classList.add('cq-abierto');
+    requestAnimationFrame(() => el.raiz.classList.add('visible'));
+    try { history.pushState({ cq: 1 }, ''); } catch(e){}
+    irMes(mesActual());
+  };
+
+  function cerrar(desdeHistorial){
+    if (!st.abierto) return;
+    st.abierto = false;
+    el.raiz.classList.remove('visible');
+    document.documentElement.classList.remove('cq-abierto');
+    setTimeout(() => { if (!st.abierto) el.raiz.hidden = true; }, 220);
+    if (!desdeHistorial && history.state && history.state.cq) { try { history.back(); } catch(e){} }
+  }
+  window.cerrarCuadernoHistorial = () => cerrar();
+
+  // Llamado al guardar un pago: el mes actual se vuelve a pedir
+  window.cyCuadernoInvalidar = function(){
+    const m = mesActual();
+    const c = cache.get(m); if (c) c.ts = 0;
+    if (st.abierto && st.mes === m) cargar(m, true);
+  };
+})();
 
 </script>
 <!-- Modal Dinámico para Precios de Invitación -->
@@ -7289,22 +7561,32 @@ async function abrirCuadernoHistorial() {
 
 
 <!-- ========================================== -->
-<!-- MODAL: CUADERNO DE INSCRIPCIONES Y PAGOS  -->
+<!-- CUADERNO DE CAJA (inscripciones y pagos)   -->
 <!-- ========================================== -->
-<div id="modalCuaderno" class="modal-overlay modal-backdrop" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1100; align-items: center; justify-content: center;">
-  <div class="modal-panel" style="background: #1e1e24; border: 2px solid #3b82f6; border-radius: 12px; padding: 20px; width: 95%; max-width: 500px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.5); color: #fff; font-family: sans-serif;">
-    
-    <!-- Cabecera del modal -->
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2d2d37; padding-bottom: 10px; margin-bottom: 15px;">
-      <h3 style="margin: 0; color: #3b82f6; font-size: 18px;">📖 Historial de Registro y Pagos</h3>
-      <button type="button" onclick="document.getElementById('modalCuaderno').style.display='none'" style="background: none; border: none; color: #aaa; font-size: 24px; cursor: pointer;">&times;</button>
+<div id="modalCuaderno" class="cq" role="dialog" aria-modal="true" aria-labelledby="cqTitulo" hidden>
+  <div class="cq-panel">
+    <header class="cq-head">
+      <span class="cq-logo" aria-hidden="true"><i class="fa-solid fa-book-open"></i></span>
+      <div class="cq-tit">
+        <h3 id="cqTitulo">Cuaderno de caja</h3>
+        <small>Inscripciones y pagos</small>
+      </div>
+      <button type="button" class="cq-x" data-cq="cerrar" aria-label="Cerrar cuaderno"><i class="fa-solid fa-xmark"></i></button>
+    </header>
+    <nav class="cq-mesnav" aria-label="Cambiar de mes">
+      <button type="button" data-cq="prev" aria-label="Mes anterior"><i class="fa-solid fa-chevron-left"></i></button>
+      <b id="cqMes" aria-live="polite"></b>
+      <button type="button" data-cq="next" aria-label="Mes siguiente"><i class="fa-solid fa-chevron-right"></i></button>
+    </nav>
+    <div class="cq-cuerpo">
+      <div id="cqEstado" class="cq-estado" role="status"></div>
+      <div id="cqResumen"></div>
+      <label class="cq-buscar">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input id="cqBuscar" type="search" placeholder="Buscar socio o DNI en este mes" autocomplete="off" enterkeyhint="search">
+      </label>
+      <div id="contenidoCuaderno" class="cq-lista"></div>
     </div>
-
-    <!-- Cuerpo con scroll tipo lista -->
-    <div id="contenidoCuaderno" style="flex: 1; overflow-y: auto; padding-right: 5px; font-size: 14px;">
-      <p style="color: #888; text-align: center;">Cargando historial...</p>
-    </div>
-    
   </div>
 </div>
 

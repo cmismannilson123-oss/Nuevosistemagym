@@ -67,3 +67,19 @@ Cada uso queda guardado en `public.cupones_uso` y manda un aviso al canal de ntf
 - **Ingreso → "Cupones usados hoy"**: se actualiza en vivo cuando un socio usa un cupón.
 - **Invitar → Cupones**: historial por mes con totales (`listar_cupones_usados`,
   `supabase/migrations/20261007010000_cupones_panel.sql`).
+
+## Cuaderno de caja
+
+Botón **Cuaderno de caja** (pestaña Lista). Muestra los ingresos de un mes a la vez:
+total del mes, lo de hoy, cuánto entró por inscripciones, renovaciones, adelantos y
+cobros de deuda (tocando cada uno se filtra), buscador por nombre o DNI, y los
+movimientos agrupados por día con su total.
+
+- Los datos vienen de una sola consulta por mes (`cuaderno_caja`,
+  `supabase/migrations/20261008000000_cuaderno.sql`), así carga rápido aunque el
+  internet sea lento y no tiene el límite de 1000 filas.
+- La inscripción muestra lo que se pagó **ese día** (antes se recalculaba con el precio
+  actual del socio y cambiaba al renovar).
+- **Ningún pago se pierde:** cada movimiento se guarda primero en el celular y luego se
+  sube. Sin internet, aparece como "Por subir" y se sube solo al volver la conexión,
+  sin duplicarse (`cliente_id`).

@@ -30,7 +30,7 @@
 // vieja y toma la nueva automáticamente.
 // ============================================================
 
-const CACHE_NAME = 'cy-fitness-gym-v63';
+const CACHE_NAME = 'cy-fitness-gym-v64';
 
 // Dominios externos de los que es seguro guardar copia (son archivos estáticos:
 // librerías, íconos, fuentes, fotos — nunca datos de socios). Cualquier petición
@@ -44,36 +44,18 @@ const HOSTS_EXTERNOS_CACHEABLES = [
   'fonts.gstatic.com'       // tipografía de marca (archivos)
 ];
 
+// Solo lo indispensable para que la pantalla abra (unos 300 KB). Las fotos del
+// catálogo y de fondo NO se descargan al instalar: con internet lento competían
+// con "Marcar asistencia" la primera vez que el socio escaneaba. Se guardan
+// solas la primera vez que se ven (ver el manejador 'fetch' de abajo).
 const ARCHIVOS_APP = [
   './',
   './gym.html',
   './images/logo-cy.png',
-  './images/catalogo-thumb-1.png',
-  './images/catalogo-thumb-2.png',
-  './images/catalogo-thumb-3.png',
-  './images/catalogo-thumb-4.png',
-  './images/promo-thumb.jpg',
-  './images/promo-renueva.jpg',
-  './images/catalogo-full-1.jpg',
-  './images/catalogo-full-2.jpg',
-  './images/catalogo-full-3.jpg',
-  './images/catalogo-full-4.jpg',
-  './images/catalogo-full-5.jpg',
-  './images/catalogo-full-6.jpg',
-  './images/catalogo-full-7.jpg',
-  './images/catalogo-full-8.jpg',
-  './images/catalogo-full-9.jpg',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css',
-  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+  'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js',
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
-  'https://images.unsplash.com/photo-1744551154623-4b5336e95c28?q=80&w=1400&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1744551154623-4b5336e95c28?q=80&w=900&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1744551154623-4b5336e95c28?q=80&w=500&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=500&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?q=80&w=600&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?q=80&w=500&auto=format&fit=crop',
-  'https://images.unsplash.com/photo-1556817411-92f5ec899a55?q=80&w=500&auto=format&fit=crop'
+  'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js'
 ];
 
 // Al instalarse: guarda una primera copia de la app y de las librerías/fotos

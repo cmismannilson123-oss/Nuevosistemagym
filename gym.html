@@ -3169,6 +3169,160 @@ html.tod-night{ --amb:129,140,248; --amb2:167,139,250; }
 html.qr-mode body{ background:radial-gradient(110% 46% at 50% 0%, rgba(var(--amb),.20), transparent 72%) no-repeat, var(--bg-deep) !important; }
 @media (prefers-reduced-motion: reduce){ .qr-hero-card .qr-logo-ring::before,.qr-hero-card .qr-btn-principal::after,.check-burst .conf i{ animation:none !important; } .check-burst .conf{ display:none; } }
 html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-card .qr-btn-principal::after{ animation-play-state:paused !important; }
+
+/* ==========================================================================
+   v54 — REDISEÑO PANTALLA QR (bienvenida + tarjeta del socio)
+   Una sola jerarquía: el socio (la gran mayoría de los escaneos) tiene la
+   acción protagonista; lo demás es secundario. Motivo común: un halo que
+   "respira" alrededor de la acción principal de cada pantalla.
+   ========================================================================== */
+:root{
+  --v54-menta:#a7f3d0; --v54-hueso:#eef4f1; --v54-gris:#9fb2ab; --v54-ambar:#f5b83d;
+}
+@keyframes v54Halo{
+  0%{ outline-color:rgba(52,211,153,.55); outline-offset:0; }
+  70%,100%{ outline-color:rgba(52,211,153,0); outline-offset:12px; }
+}
+
+/* ----- Bienvenida ----- */
+.qr-hero-fullbleed .qr-hero-content .qr-sub{
+  text-transform:none !important; font-size:16px !important; font-weight:500 !important;
+  color:#cfdcd6 !important; letter-spacing:.15px !important;
+}
+#qrOpcionesInicio{ display:flex !important; flex-direction:column; gap:12px !important; }
+#qrOpcionesInicio[style*="none"]{ display:none !important; }
+
+.cy-tile--socio{
+  min-height:108px !important; padding:16px 16px 16px 14px !important; border-radius:26px !important; gap:16px !important;
+  background:radial-gradient(130% 150% at 0% 0%, #19cf93 0%, #0c9d6c 46%, #076f4c 100%) !important;
+  border:1px solid rgba(167,243,208,.38) !important;
+  box-shadow:0 24px 42px -20px rgba(16,185,129,.9), inset 0 1px 0 rgba(255,255,255,.38), inset 0 -4px 0 rgba(0,0,0,.18) !important;
+  outline:2px solid transparent;
+  animation:cyRise .45s cubic-bezier(.2,.7,.2,1) 1.3s backwards, v54Halo 2.8s ease-out 2.4s infinite;
+}
+.cy-tile--socio .lbl-wiz b{
+  font-size:36px !important; line-height:.92 !important; letter-spacing:.2px !important;
+  text-transform:none !important; white-space:nowrap !important;
+}
+.cy-tile--socio .lbl-wiz small{ font-size:14px !important; font-weight:500 !important; opacity:.95 !important; }
+.cy-tile--socio .cy-ico{ width:72px !important; height:72px !important; border-radius:20px; background:rgba(2,40,26,.32); }
+.cy-tile--socio .cy-ico svg{ width:56px !important; height:56px !important; }
+.cy-tile--socio .flecha{
+  width:46px !important; height:46px !important; background:#f3fff9 !important; color:#077150;
+  font-size:16px !important; box-shadow:0 8px 16px -8px rgba(0,0,0,.55);
+}
+
+.cy-sec{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.cy-sec .cy-tile{
+  flex-direction:column; align-items:flex-start; justify-content:space-between; gap:14px !important;
+  min-height:152px !important; padding:14px 14px 16px !important; border-radius:22px !important;
+  background:linear-gradient(165deg, rgba(255,255,255,.10), rgba(255,255,255,.035)) !important;
+  -webkit-backdrop-filter:blur(14px) saturate(1.25); backdrop-filter:blur(14px) saturate(1.25);
+  border:1px solid rgba(255,255,255,.14) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 18px 32px -22px rgba(0,0,0,.9) !important;
+}
+.cy-sec .cy-tile:active{ background:linear-gradient(165deg, rgba(255,255,255,.14), rgba(255,255,255,.06)) !important; }
+.cy-sec .cy-ico{ width:54px !important; height:54px !important; border-radius:16px; box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 8px 18px -10px rgba(0,0,0,.7); }
+.cy-sec .cy-ico svg{ width:42px !important; height:42px !important; }
+.cy-tile--nuevo .cy-ico{ background:linear-gradient(150deg,#4f8cff,#1d4ed8); }
+.cy-tile--inscribir .cy-ico{ background:linear-gradient(150deg,#fbbf24,#ea580c); }
+.cy-sec .lbl-wiz{ gap:5px !important; }
+.cy-sec .lbl-wiz b{
+  font-size:23px !important; line-height:1 !important; letter-spacing:.2px !important;
+  text-transform:none !important; white-space:normal !important; text-shadow:none !important;
+}
+.cy-sec .lbl-wiz small{ font-size:12.5px !important; line-height:1.35; color:#b9c8c2; opacity:1 !important; }
+.cy-sec .flecha{ display:none !important; }
+.cy-sec .tile-promo{ top:12px !important; right:12px !important; left:auto !important; }
+.cy-tile:focus-visible{ outline:3px solid var(--v54-menta) !important; outline-offset:3px; }
+
+/* ----- Tarjeta del socio ----- */
+.qr-hero-card.cy-check{ text-align:left; padding:20px 18px 18px; }
+.cy-check .cyc-head{ display:flex; align-items:center; gap:14px; }
+.cy-check .qr-logo-ring{ width:72px !important; height:72px !important; margin:0 !important; flex:none; }
+.cy-check .qr-logo-ring .logo-cy{ width:50px !important; height:50px !important; }
+.cy-check .cyc-hola{ min-width:0; display:flex; flex-direction:column; align-items:flex-start; }
+.cy-check .cyc-hola small{ font-size:14px; color:var(--v54-gris); font-weight:500; }
+.cy-check .qr-titulo{
+  font-family:var(--cy-display) !important; font-size:38px !important; line-height:.95 !important;
+  letter-spacing:.2px !important; margin:2px 0 8px !important; color:#fff !important; text-wrap:balance; overflow-wrap:anywhere;
+}
+.cy-check .qr-badge{ font-size:12px; padding:4px 11px; }
+
+.cy-check .cyc-stats{
+  display:grid; grid-template-columns:1.15fr 1fr 1fr; margin:18px 0 0;
+  border-top:1px solid rgba(255,255,255,.08); padding-top:14px;
+}
+.cy-check .cyc-stats > div{ min-width:0; padding:0 10px; border-left:1px solid rgba(255,255,255,.08); }
+.cy-check .cyc-stats > div:first-child{ padding-left:0; border-left:0; }
+.cy-check .cyc-stats span{ display:block; font-size:12px; color:var(--v54-gris); font-weight:500; margin-bottom:3px; }
+.cy-check .cyc-stats b{
+  display:block; font-family:var(--cy-display); font-size:24px; font-weight:700; line-height:1.05; color:var(--v54-hueso);
+  overflow-wrap:anywhere; font-variant-numeric:tabular-nums;
+}
+.cy-check .cyc-stats b i{ font-style:normal; color:var(--v54-gris); font-size:.75em; }
+.cy-check .cyc-stats .warn b{ color:var(--v54-ambar); }
+.cy-check .cyc-bar{ height:6px; margin:14px 0 0; border-radius:6px; background:rgba(255,255,255,.07); overflow:hidden; }
+.cy-check .cyc-bar i{
+  display:block; height:100%; border-radius:inherit; transform-origin:left; transform:scaleX(var(--p));
+  background:linear-gradient(90deg, #0fa774, #5eead4);
+  animation:v54Fill .9s cubic-bezier(.2,.7,.2,1) .35s backwards;
+}
+@keyframes v54Fill{ from{ transform:scaleX(0); } }
+.cy-check .cyc-deuda{
+  margin:14px 0 0; padding:10px 12px; border-radius:12px; font-size:13px; line-height:1.4; font-weight:600;
+  color:#fde3a7; background:rgba(245,184,61,.1); border:1px solid rgba(245,184,61,.3);
+}
+.cy-check .cyc-deuda i{ color:var(--v54-ambar); margin-right:4px; }
+
+.qr-hero-card.cy-check .cyc-btn{
+  margin-top:20px; min-height:68px; border-radius:20px; padding:10px 18px 10px 10px; justify-content:flex-start;
+  font-family:var(--cy-display); font-size:25px; font-weight:800; letter-spacing:.2px; color:#02150d;
+  outline:2px solid transparent; animation:v54Halo 2.8s ease-out 1.2s infinite;
+}
+.qr-hero-card.cy-check .cyc-btn{ font-family:var(--cy-display) !important; border-radius:20px !important; }
+.qr-hero-card.cy-check .cyc-btn .lbl{ text-align:left; font-family:var(--cy-display) !important; }
+.qr-hero-card.cy-check .cyc-btn .icono-circulo{
+  width:48px; height:48px; border-radius:14px; font-size:24px; overflow:hidden; background:rgba(2,40,26,.2);
+}
+.cy-check .cyc-scan{
+  position:absolute; left:6px; right:6px; top:10%; height:2px; border-radius:2px; pointer-events:none;
+  background:linear-gradient(90deg, transparent, #f0fff8, transparent); box-shadow:0 0 8px #f0fff8;
+  animation:v54Scan 2.2s ease-in-out .8s infinite;
+}
+@keyframes v54Scan{ 0%,100%{ transform:translateY(0); opacity:0; } 12%,88%{ opacity:.95; } 50%{ transform:translateY(34px); } }
+.qr-hero-card.cy-check .cyc-btn.is-loading{ animation:none; }
+.cy-check .cyc-btn.is-loading .cyc-scan{ display:none; }
+.cy-check .qr-secure-line{ justify-content:center; }
+
+@media (max-width:370px){
+  .cy-tile--socio .lbl-wiz b{ font-size:31px !important; }
+  .cy-sec .lbl-wiz b{ font-size:21px !important; }
+  .cy-check .cyc-stats b{ font-size:21px; }
+  .cy-check .qr-titulo{ font-size:33px !important; }
+}
+@media (max-width:390px){
+  .qr-hero-card.cy-check .cyc-btn{ font-size:22px; white-space:nowrap; }
+  .cy-tile--socio .lbl-wiz small{ font-size:13px !important; }
+}
+/* Pantallas bajas: logo y título más compactos para que las 3 opciones entren sin scroll */
+@media (max-height:820px){
+  .qr-hero-content{ padding-top:2vh !important; }
+  .qr-hero-content .qr-logo-ring{ width:100px !important; height:100px !important; margin-bottom:10px !important; }
+  .qr-hero-content .qr-logo-ring .logo-cy{ width:72px !important; height:72px !important; }
+  .qr-hero-content .qr-titulo{ font-size:40px !important; }
+  .qr-hero-fullbleed .qr-hero-content .qr-sub{ margin-top:6px !important; font-size:15px !important; }
+  .qr-hero-fullbleed .qr-hero-content .qr-hero-divider{ margin:10px auto 16px !important; }
+  .cy-tile--socio{ min-height:96px !important; }
+  .cy-sec .cy-tile{ min-height:126px !important; gap:10px !important; }
+  .cy-sec .cy-ico{ width:48px !important; height:48px !important; }
+  .cy-sec .cy-ico svg{ width:38px !important; height:38px !important; }
+}
+@media (prefers-reduced-motion: reduce){
+  .cy-tile--socio, .qr-hero-card.cy-check .cyc-btn{ animation:none !important; }
+  .cy-check .cyc-scan{ display:none; }
+  .cy-check .cyc-bar i{ animation:none; }
+}
 </style>
 </head>
 
@@ -3277,7 +3431,7 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
     <div class="qr-hero-content">
       <div class="qr-logo-ring"><span class="logo-cy"></span></div>
       <h2 class="qr-titulo" style="font-size:26px; line-height:1.2;"><span class="tl tl1">C&amp;Y</span><span class="tl tl2 accent">FITNESS</span><span class="tl tl3">GYM</span></h2>
-      <p class="qr-sub" style="margin-top:12px; font-size:15px; font-weight:600; color:#e2e8f0;">TU MEJOR VERSIÓN<br>EMPIEZA AQUÍ 💪</p>
+      <p class="qr-sub" style="margin-top:12px;">Tu mejor versión empieza aquí</p>
       <div class="qr-hero-divider"></div>
 
       <!-- Bifurcación: socio existente vs. persona nueva que solo quiere conocer -->
@@ -3316,9 +3470,10 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
               </g>
             </svg>
           </span>
-          <span class="lbl-wiz"><b>SOY SOCIO</b><small>Registrar asistencia</small></span>
-          <span class="flecha">→</span>
+          <span class="lbl-wiz"><b>Soy socio</b><small>Marca tu asistencia de hoy</small></span>
+          <span class="flecha" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
         </button>
+        <div class="cy-sec">
         <button type="button" id="btnPrimeraVezQR" class="qr-btn-principal cy-tile cy-tile--nuevo">
           <span class="cy-ico">
             <svg class="cy-wave" viewBox="0 0 64 64" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -3337,8 +3492,7 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
               </g>
             </svg>
           </span>
-          <span class="lbl-wiz"><b>NUEVO / QUIERO CONOCER EL GYM</b><small>Ver planes y servicios</small></span>
-          <span class="flecha">→</span>
+          <span class="lbl-wiz"><b>Conocer el gym</b><small>Planes, horarios y servicios</small></span>
         </button>
 
         <button type="button" id="btnInscribirseQR" class="qr-btn-principal cy-tile cy-tile--inscribir">
@@ -3353,10 +3507,10 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
               </path>
             </svg>
           </span>
-          <span class="lbl-wiz"><b>QUIERO INSCRIBIRME</b><small>Reserva tu lugar y gana un premio</small></span>
-          <span class="flecha">→</span>
+          <span class="lbl-wiz"><b>Inscribirme</b><small>Reserva tu lugar y gana un premio</small></span>
           <span class="tile-promo" id="tilePromo" style="display:none;">🔥 PROMO</span>
         </button>
+        </div>
       </div>
 
       <button type="button" id="promoTeaser" class="promo-teaser" style="display:none;" onclick="cyAbrirInscripcion()">
@@ -3406,7 +3560,6 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
       </button>
 
       <div class="qr-secure-line"><i class="fa-solid fa-lock"></i> Registro seguro y rápido</div>
-      <div style="text-align:center; color:#64748b; font-size:9.5px; font-weight:700; letter-spacing:1px; margin-top:14px; text-transform:uppercase; border-top:1px solid rgba(148,163,184,.15); padding-top:14px;">C&amp;Y Fitness Gym &bull; Fuerza &bull; Disciplina &bull; Resultados</div>
     </div>
   </div>
 
@@ -5886,23 +6039,40 @@ window.buscarQR = async function(esPrimeraVez){
   // SI PASA TODAS LAS VALIDACIONES -> MUESTRA EL BOTÓN DE REGISTRO
   window.pendingQR = socio;
 
+  // Datos reales del plan para la tarjeta (vence en, asistencias usadas)
+  const _hoy = new Date(); _hoy.setHours(0,0,0,0);
+  const _fin = new Date((socio.fecha_fin || "") + "T00:00:00");
+  const diasVence = isNaN(_fin) ? null : Math.max(0, Math.round((_fin - _hoy) / 86400000));
+  const textoVence = diasVence === null ? "—" : diasVence === 0 ? "Hoy" : diasVence === 1 ? "1 día" : diasVence + " días";
+  const totalAsis = Number(socio.dias_totales) || 0;
+  const usadasAsis = totalAsis ? Math.max(0, totalAsis - (Number(socio.dias_restantes) || 0)) : 0;
+  const fraccion = totalAsis ? Math.min(1, usadasAsis / totalAsis) : 0;
+  const deudaNum = parseFloat(socio.deuda || 0);
+  const nombreCorto = String(socio.nombre || "").trim().split(/\s+/).slice(0, 2).join(" ");
+
   div.innerHTML = `
-  <div class="qr-hero-card">
-    <div class="qr-logo-ring"><span class="logo-cy"></span></div>
-    <h2 class="qr-titulo">${escaparHTML(socio.nombre)}</h2>
-    <div class="qr-badge"><i class="dot"></i> Socio Activo</div>
-    <p class="qr-sub">Presiona el botón para registrar<br>tu asistencia de hoy</p>
-
-    <button class="qr-btn-principal" onclick="confirmarAsistenciaQR()">
-      <span class="icono-circulo"><i class="fa-solid fa-fingerprint"></i><b class="spin" aria-hidden="true"></b></span><span class="lbl">Marcar Asistencia</span><span class="flecha">→</span>
-    </button>
-
-    <div class="qr-features">
-      <div class="f"><div class="ic"><i class="fa-solid fa-shield-halved"></i></div><div class="t">Registra tu asistencia</div></div>
-      <div class="f"><div class="ic"><i class="fa-solid fa-chart-simple"></i></div><div class="t">Mantén tu progreso</div></div>
-      <div class="f"><div class="ic"><i class="fa-solid fa-dumbbell"></i></div><div class="t">Tu esfuerzo cuenta</div></div>
-      <div class="f"><div class="ic"><i class="fa-solid fa-heart"></i></div><div class="t">Más cerca de tus metas</div></div>
+  <div class="qr-hero-card cy-check">
+    <div class="cyc-head">
+      <div class="qr-logo-ring"><span class="logo-cy"></span></div>
+      <div class="cyc-hola">
+        <small>Hola,</small>
+        <h2 class="qr-titulo">${escaparHTML(nombreCorto)}</h2>
+        <div class="qr-badge"><i class="dot"></i> Socio activo</div>
+      </div>
     </div>
+
+    <div class="cyc-stats">
+      <div><span>Plan</span><b>${escaparHTML(socio.tipo_memb || "—")}</b></div>
+      <div class="${diasVence !== null && diasVence <= 5 ? 'warn' : ''}"><span>Vence en</span><b>${textoVence}</b></div>
+      <div><span>Asistencias</span><b>${totalAsis ? usadasAsis + '<i>/' + totalAsis + '</i>' : '—'}</b></div>
+    </div>
+    ${totalAsis ? `<div class="cyc-bar" role="progressbar" aria-label="Asistencias usadas" aria-valuemin="0" aria-valuemax="${totalAsis}" aria-valuenow="${usadasAsis}"><i style="--p:${fraccion}"></i></div>` : ''}
+    ${deudaNum > 0 ? `<div class="cyc-deuda"><i class="fa-solid fa-circle-exclamation"></i> Tienes S/ ${escaparHTML(socio.deuda)} pendiente. Págalo en recepción.</div>` : ''}
+
+    <button class="qr-btn-principal cyc-btn" onclick="confirmarAsistenciaQR()">
+      <span class="icono-circulo"><i class="fa-solid fa-fingerprint"></i><span class="cyc-scan" aria-hidden="true"></span><b class="spin" aria-hidden="true"></b></span>
+      <span class="lbl">Marcar asistencia</span>
+    </button>
 
     <div class="qr-secure-line"><i class="fa-solid fa-lock"></i> Registro seguro y rápido</div>
   </div>`;

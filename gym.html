@@ -860,147 +860,61 @@ audio{
 /* =======================================================
    NUEVO COMPROBANTE / VOUCHER PREMIUM FORMAL Y ELEGANTE
    ======================================================= */
-#voucher {
-  background: linear-gradient(to bottom, #fcfbf7, #ffffff);
-  color: #1e293b;
-  padding: 40px;
-  width: 480px;
-  border-radius: 8px;
-  border: 1px solid #d4af37;
-  outline: 4px solid #fcfbf7;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-  font-family: 'Times New Roman', Times, serif, Arial;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: -9999;
-  opacity: 0;
-  pointer-events: none;
+#voucher{
+  position:fixed; top:0; left:0; z-index:-9999; opacity:0; pointer-events:none;
+  width:480px; box-sizing:border-box; overflow:hidden; border-radius:22px;
+  background:#fbfaf6; color:#14201c; font-family:'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  border:1px solid #e3dccb;
 }
-
-#voucher::before{
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 360px;
-  height: 360px;
-  transform: translate(-50%, -50%);
-  background-image: url(images/logo-cy.png);
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  opacity: 0.06;
-  filter: grayscale(1);
+#voucher .vc-top{
+  position:relative; padding:30px 28px 92px; text-align:center;
+  background:linear-gradient(160deg,#0f2a22 0%,#08130f 70%);
 }
-
-#voucher .header-container {
-  text-align: center;
-  border-bottom: 2px solid #d4af37;
-  padding-bottom: 20px;
-  margin-bottom: 25px;
+#voucher .vc-top::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:4px; background:linear-gradient(90deg,#10b981,#34d399,#d4af37); }
+#voucher .vc-marca{ font-family:'Barlow Condensed','Arial Narrow',sans-serif; font-size:40px; font-weight:800; letter-spacing:1px; color:#f4fbf8; line-height:1; }
+#voucher .vc-marca span{ color:#34d399; }
+#voucher .vc-sub{ margin-top:6px; font-size:12.5px; color:#9fc7b8; letter-spacing:.4px; }
+#voucher .vc-logo{
+  position:relative; z-index:2; width:148px; height:148px; margin:-80px auto 0; border-radius:50%;
+  background:#ffffff; display:flex; align-items:center; justify-content:center; box-sizing:border-box;
+  border:6px solid #10b981; outline:5px solid #fbfaf6; box-shadow:0 14px 28px rgba(8,19,15,.35);
 }
-
-#voucher .gym-icon-box {
-  font-size: 45px;
-  color: #111827;
-  margin-bottom: 5px;
+#voucher .vc-logo img{ width:122px; height:122px; object-fit:contain; display:block; }
+#voucher .vc-cuerpo{ padding:14px 30px 8px; }
+#voucher .vc-titulo{
+  text-align:center; font-family:'Barlow Condensed','Arial Narrow',sans-serif; font-size:24px; font-weight:700;
+  color:#0f2a22; letter-spacing:.4px; margin-bottom:18px;
 }
-
-#voucher h1 {
-  text-align: center;
-  font-size: 34px;
-  font-weight: bold;
-  color: #111827;
-  margin: 0;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+#voucher .vc-et{ display:block; font-size:11.5px; font-weight:600; color:#6b7c75; margin-bottom:3px; }
+#voucher .vc-socio{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; padding-bottom:16px; border-bottom:1px solid #e7e1d2; }
+#voucher .vc-nombre{ font-family:'Barlow Condensed','Arial Narrow',sans-serif; font-size:30px; font-weight:700; line-height:1.05; color:#0b1412; }
+#voucher .vc-dni{ margin-top:4px; font-size:13.5px; color:#475a53; }
+#voucher .vc-sello{
+  flex:none; margin-top:6px; padding:5px 12px; border:2.5px solid #0f9b6c; border-radius:9px; transform:rotate(-8deg);
+  font-family:'Barlow Condensed','Arial Narrow',sans-serif; font-size:20px; font-weight:800; letter-spacing:1px; text-transform:uppercase; color:#0f9b6c;
 }
-
-#voucher .subtitle {
-  text-align: center;
-  font-size: 11px;
-  letter-spacing: 5px;
-  margin-top: 8px;
-  color: #64748b;
-  text-transform: uppercase;
-  font-family: Arial, sans-serif;
+#voucher .vc-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px; }
+#voucher .vc-grid > div{ padding:12px 14px; border-radius:14px; background:#ffffff; border:1px solid #e7e1d2; }
+#voucher .vc-grid b{ display:block; font-size:16px; font-weight:700; color:#0b1412; }
+#voucher .vc-grid .vc-monto{ background:#0f2a22; border-color:#0f2a22; }
+#voucher .vc-grid .vc-monto .vc-et{ color:#9fc7b8; }
+#voucher .vc-grid .vc-monto b{ font-family:'Barlow Condensed','Arial Narrow',sans-serif; font-size:32px; line-height:1; color:#34d399; }
+#voucher .vc-meta{ display:grid; grid-template-columns:1.2fr 1.2fr 1fr; gap:10px; margin-top:14px; }
+#voucher .vc-meta b{ display:block; font-size:12.5px; font-weight:700; color:#22332d; }
+#voucher .vc-meta .vc-activo{ color:#0f9b6c; }
+#voucher .vc-corte{ position:relative; margin:20px -30px 18px; border-top:2px dashed #d9d0bb; }
+#voucher .vc-corte::before, #voucher .vc-corte::after{ content:""; position:absolute; top:-12px; width:22px; height:22px; border-radius:50%; background:#0f2a22; }
+#voucher .vc-corte::before{ left:-11px; } #voucher .vc-corte::after{ right:-11px; }
+#voucher .vc-pol-t{ font-size:12.5px; font-weight:700; color:#0f2a22; margin-bottom:8px; }
+#voucher .vc-pol ol{ margin:0; padding-left:18px; font-size:10.5px; line-height:1.55; color:#475a53; text-align:left; }
+#voucher .vc-pol li{ margin-bottom:5px; padding-left:2px; }
+#voucher .vc-pie{
+  display:flex; align-items:center; gap:14px; margin-top:16px; padding:16px 26px; background:#0f2a22; color:#d7ebe3;
 }
-
-#voucher h2 {
-  text-align: center;
-  font-size: 15px;
-  color: #111827;
-  font-weight: bold;
-  margin: 20px 0 10px 0;
-  text-transform: uppercase;
-  letter-spacing: 3px;
-  font-family: Arial, sans-serif;
-}
-
-#voucher .info-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 25px;
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-}
-
-#voucher .info-table td {
-  padding: 12px 10px;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-#voucher .info-table td.label-col {
-  font-weight: bold;
-  color: #475569;
-  width: 35%;
-  text-transform: uppercase;
-  font-size: 12px;
-  letter-spacing: 1px;
-}
-
-#voucher .info-table td.value-col {
-  color: #0f172a;
-  font-weight: 600;
-}
-
-#voucher .policy-box {
-  margin-top: 25px;
-  padding: 20px;
-  background: #fbfaf5;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px;
-  font-size: 11px;
-  line-height: 1.6;
-  color: #334155;
-  text-align: justify;
-  font-family: Arial, sans-serif;
-}
-
-#voucher .policy-title {
-  font-weight: bold;
-  color: #111827;
-  text-align: center;
-  margin-bottom: 12px;
-  letter-spacing: 1px;
-  font-size: 12px;
-}
-
-#voucher .footer-divider {
-  margin-top: 30px;
-  border: none;
-  border-top: 1px dashed #d4af37;
-}
-
-#voucher .footer-text {
-  margin-top: 20px;
-  text-align: center;
-  font-size: 12px;
-  line-height: 1.8;
-  color: #64748b;
-  font-family: Arial, sans-serif;
-}
+#voucher .vc-pie-logo{ width:48px; height:48px; flex:none; box-sizing:border-box; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; border:2px solid #10b981; }
+#voucher .vc-pie-logo img{ width:40px; height:40px; object-fit:contain; }
+#voucher .vc-pie b{ display:block; font-family:'Barlow Condensed','Arial Narrow',sans-serif; font-size:19px; color:#ffffff; }
+#voucher .vc-pie span{ display:block; margin-top:2px; font-size:11.5px; color:#9fc7b8; }
 
 /* FILTROS DE LISTA MODERNOS */
 .list-filter-container {
@@ -4673,72 +4587,61 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
 </div>
 
 <div id="voucher">
-  <div class="header-container">
-    <div class="gym-icon-box"><span class="logo-cy" style="width:64px;height:64px;filter:grayscale(1);"></span></div>
-    <h1>C&Y FITNESS GYM</h1>
-    <div class="subtitle">Fuerza • Disciplina • Salud</div>
+  <div class="vc-top">
+    <div class="vc-marca">C&amp;Y <span>FITNESS</span> GYM</div>
+    <div class="vc-sub">Huancavelica, Perú</div>
   </div>
-  
-  <h2>Comprobante de Pago Oficial</h2>
-  
-  <table class="info-table">
-    <tr>
-      <td class="label-col">Socio:</td>
-      <td class="value-col" id="vNombre"></td>
-    </tr>
-    <tr>
-      <td class="label-col">DNI / ID:</td>
-      <td class="value-col" id="vDni"></td>
-    </tr>
-    <tr>
-      <td class="label-col">Membresía:</td>
-      <td class="value-col" id="vTipo"></td>
-    </tr>
-    <tr>
-  <td class="label-col">Monto Pagado:</td>
-  <td class="value-col" id="vPrecio"></td>
-</tr>
-    <tr>
-      <td class="label-col">Fecha Inicio:</td>
-      <td class="value-col" id="vInicio"></td>
-    </tr>
-    <tr>
-      <td class="label-col">Vencimiento:</td>
-      <td class="value-col" id="vFin"></td>
-    </tr>
-    <tr>
-      <td class="label-col">Estado:</td>
-      <td class="value-col" style="color: #15803d; font-weight: bold;">ACTIVO</td>
-    </tr>
-    <tr>
-      <td class="label-col">Código Doc:</td>
-      <td class="value-col" id="vCodigo" style="font-family: monospace; font-size: 13px;"></td>
-    </tr>
-    <tr>
-      <td class="label-col">Emisión:</td>
-      <td class="value-col" id="vFecha" style="font-size: 13px; color: #475569;"></td>
-    </tr>
-  </table>
+  <div class="vc-logo"><img src="images/logo-cy.png" alt="C&amp;Y Fitness Gym"></div>
 
-  <div class="policy-box">
-    <div class="policy-title">TÉRMINOS Y POLÍTICAS DEL ESTABLECIMIENTO</div>
-    1. Al decidir inscribirse en C&Y FITNESS GYM, el socio declara haber leído, comprendido y aceptado todos los términos, conditions, normas internas y políticas de uso del gimnasio.<br><br>
-    2. No se aceptan reembolsos bajo ninguna circunstancia por abandono voluntario, inasistencias, arrepentimiento, motivos personales, causas ajenas al gimnasio o cualquier otra índole relacionada a la decisión del usuario de no continuar asistiendo.<br><br>
-    3. Vencida la membresía, el servicio se da por finalizado sin derecho a reactivación, reposición de días o extensión por inasistencia, abandono o no uso del mismo por parte del usuario. Toda renovación requiere la contratación de un nuevo plan vigente.<br><br>
-    4. Es de carácter obligatorio devolver discos, mancuernas y demás implementos a su lugar correspondiente después de su uso. El incumplimiento podrá generar sanciones disciplinarias como amonestación, suspensión temporal o nulidad definitiva de la membresía sin derecho a reembolso.<br><br>
-    5. El uso de toalla personal y desodorante es obligatorio para todos los socios dentro de las instalaciones.<br><br>
-    6. Limpiar adecuadamente el calzado antes del ingreso al gimnasio es obligatorio.<br><br>
-    7. El uso correcto y responsable de los servicios higiénicos es indispensable.<br><br>
-    8. El uso de máquinas, equipos e implementos del gimnasio debe realizarse de manera correcta y responsable. Todo daño ocasionado por uso indebido generará la obligación de reparar, reponer o asumir el costo del bien afectado.<br><br>
-    9. El respeto hacia todos los socios, entrenadores y personal del gimnasio es obligatorio dentro de las instalaciones.
+  <div class="vc-cuerpo">
+    <div class="vc-titulo">Comprobante de pago</div>
+
+    <div class="vc-socio">
+      <div>
+        <span class="vc-et">Socio</span>
+        <div class="vc-nombre" id="vNombre"></div>
+        <div class="vc-dni">DNI <span id="vDni"></span></div>
+      </div>
+      <div class="vc-sello">&#10003; Pagado</div>
+    </div>
+
+    <div class="vc-grid">
+      <div class="vc-monto"><span class="vc-et">Monto pagado</span><b id="vPrecio"></b></div>
+      <div><span class="vc-et">Membresía</span><b id="vTipo"></b></div>
+      <div><span class="vc-et">Inicio</span><b id="vInicio"></b></div>
+      <div><span class="vc-et">Vence</span><b id="vFin"></b></div>
+    </div>
+
+    <div class="vc-meta">
+      <div><span class="vc-et">Código</span><b id="vCodigo"></b></div>
+      <div><span class="vc-et">Emitido</span><b id="vFecha"></b></div>
+      <div><span class="vc-et">Estado</span><b class="vc-activo">Membresía activa</b></div>
+    </div>
+
+    <div class="vc-corte"></div>
+
+    <div class="vc-pol">
+      <div class="vc-pol-t">Términos y políticas del establecimiento</div>
+      <ol>
+        <li>Al decidir inscribirse en C&Y FITNESS GYM, el socio declara haber leído, comprendido y aceptado todos los términos, condiciones, normas internas y políticas de uso del gimnasio.</li>
+        <li>No se aceptan reembolsos bajo ninguna circunstancia por abandono voluntario, inasistencias, arrepentimiento, motivos personales, causas ajenas al gimnasio o cualquier otra índole relacionada a la decisión del usuario de no continuar asistiendo.</li>
+        <li>Vencida la membresía, el servicio se da por finalizado sin derecho a reactivación, reposición de días o extensión por inasistencia, abandono o no uso del mismo por parte del usuario. Toda renovación requiere la contratación de un nuevo plan vigente.</li>
+        <li>Es de carácter obligatorio devolver discos, mancuernas y demás implementos a su lugar correspondiente después de su uso. El incumplimiento podrá generar sanciones disciplinarias como amonestación, suspensión temporal o nulidad definitiva de la membresía sin derecho a reembolso.</li>
+        <li>El uso de toalla personal y desodorante es obligatorio para todos los socios dentro de las instalaciones.</li>
+        <li>Limpiar adecuadamente el calzado antes del ingreso al gimnasio es obligatorio.</li>
+        <li>El uso correcto y responsable de los servicios higiénicos es indispensable.</li>
+        <li>El uso de máquinas, equipos e implementos del gimnasio debe realizarse de manera correcta y responsable. Todo daño ocasionado por uso indebido generará la obligación de reparar, reponer o asumir el costo del bien afectado.</li>
+        <li>El respeto hacia todos los socios, entrenadores y personal del gimnasio es obligatorio dentro de las instalaciones.</li>
+      </ol>
+    </div>
   </div>
-  
-  <hr class="footer-divider">
-  
-  <div class="footer-text">
-    <b>📍 Huancavelica - Perú</b><br>
-    <b>📲 WhatsApp:</b> 927 885 791<br><br>
-    <span style="font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8;">Documento emitido automáticamente por Gym PRO System<br><b>C&Y FITNESS GYM</b></span>
+
+  <div class="vc-pie">
+    <div class="vc-pie-logo"><img src="images/logo-cy.png" alt=""></div>
+    <div>
+      <b>Gracias por entrenar con nosotros</b>
+      <span>Huancavelica, Perú &nbsp;|&nbsp; WhatsApp 927 885 791</span>
+    </div>
   </div>
 </div>
 
@@ -5274,15 +5177,16 @@ async function enviarReciboPremium(){
     document.getElementById("vNombre").innerText = nombre;
     document.getElementById("vDni").innerText = dni;
     document.getElementById("vTipo").innerText = tipo;
-    document.getElementById("vPrecio").innerText = "S/ " + precio;
-    document.getElementById("vInicio").innerText = inicio;
-    document.getElementById("vFin").innerText = fin;
+    document.getElementById("vPrecio").innerText = "S/ " + (precio || "0");
+    const fechaPe = (iso) => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ""); return m ? m[3] + "/" + m[2] + "/" + m[1] : (iso || "—"); };
+    document.getElementById("vInicio").innerText = fechaPe(inicio);
+    document.getElementById("vFin").innerText = fechaPe(fin);
 
     const ahora = new Date();
     const fechaCodigo = ahora.getFullYear().toString() + String(ahora.getMonth()+1).padStart(2,"0") + String(ahora.getDate()).padStart(2,"0");
     const numero = String(Date.now()).slice(-4);
     document.getElementById("vCodigo").innerText = "CY-" + fechaCodigo + "-" + numero;
-    document.getElementById("vFecha").innerText = new Date().toLocaleString();
+    document.getElementById("vFecha").innerText = new Date().toLocaleString("es-PE", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit", hour12:false, timeZone:"America/Lima" });
 
     let voucher = document.getElementById("voucher");
     voucher.style.opacity = "1";

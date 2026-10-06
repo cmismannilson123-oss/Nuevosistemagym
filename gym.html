@@ -3262,6 +3262,7 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
 }
 .cy-check .cyc-stats b i{ font-style:normal; color:var(--v54-gris); font-size:.75em; }
 .cy-check .cyc-stats .warn b{ color:var(--v54-ambar); }
+.cy-check .cyc-stats .largo b{ font-size:17px; line-height:1.12; overflow-wrap:break-word; }
 .cy-check .cyc-bar{ height:6px; margin:14px 0 0; border-radius:6px; background:rgba(255,255,255,.07); overflow:hidden; }
 .cy-check .cyc-bar i{
   display:block; height:100%; border-radius:inherit; transform-origin:left; transform:scaleX(var(--p));
@@ -3299,6 +3300,8 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
   .cy-tile--socio .lbl-wiz b{ font-size:31px !important; }
   .cy-sec .lbl-wiz b{ font-size:21px !important; }
   .cy-check .cyc-stats b{ font-size:21px; }
+  .cy-check .cyc-stats .largo b{ font-size:15px; }
+  .cy-check .cyc-stats{ grid-template-columns:1.3fr 1fr .95fr; }
   .cy-check .qr-titulo{ font-size:33px !important; }
 }
 @media (max-width:390px){
@@ -3322,6 +3325,158 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
   .cy-tile--socio, .qr-hero-card.cy-check .cyc-btn{ animation:none !important; }
   .cy-check .cyc-scan{ display:none; }
   .cy-check .cyc-bar i{ animation:none; }
+}
+
+/* ==========================================================================
+   v55 — CUPONES DEL SOCIO: tickets, hoja de confirmación y fiesta
+   Invitado = menta (amistad, igual que la marca); Descuento = oro (dinero).
+   ========================================================================== */
+.cyc-cupones{ display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:10px; margin-top:16px; text-align:left; }
+.cup{
+  --cup-c:#5eead4; --cup-fondo:#0b131b;
+  --cup-borde:rgba(94,234,212,.38); --cup-tinte:rgba(94,234,212,.16); --cup-sombra:rgba(94,234,212,.45); --cup-raya:rgba(94,234,212,.35);
+  position:relative; display:flex; flex-direction:column; min-width:0; border-radius:18px; overflow:hidden; isolation:isolate;
+  border:1px solid var(--cup-borde);
+  background:linear-gradient(160deg, var(--cup-tinte) 0%, rgba(0,0,0,0) 72%), var(--cup-fondo);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07), 0 14px 26px -18px var(--cup-sombra);
+}
+.cup--dto{ --cup-c:#fbbf24; --cup-borde:rgba(251,191,36,.4); --cup-tinte:rgba(251,191,36,.17); --cup-sombra:rgba(251,191,36,.45); --cup-raya:rgba(251,191,36,.35); }
+.cup-top{ padding:13px 12px 10px; display:flex; flex-direction:column; gap:3px; flex:1 1 auto; }
+.cup-ic{
+  width:34px; height:34px; border-radius:11px; display:grid; place-items:center; margin-bottom:5px;
+  color:#04241d; background:var(--cup-c); font-size:15px; box-shadow:0 6px 14px -6px var(--cup-c);
+}
+.cup-big{
+  font-family:var(--cy-display); font-weight:800; font-size:40px; line-height:.86; letter-spacing:-.5px;
+  background:linear-gradient(180deg,#fff3c4 0%,#fbbf24 55%,#f59e0b 100%); -webkit-background-clip:text; background-clip:text; color:transparent;
+  margin-bottom:4px;
+}
+.cup-t{ font-family:var(--cy-display); font-weight:700; font-size:19px; line-height:1.02; color:#f4fbf8; }
+.cup-s{ font-size:11.5px; line-height:1.35; color:#a9bcb5; font-weight:500; }
+/* Corte troquelado entre el cupón y su talón */
+.cup-cut{ position:relative; height:0; margin:0 14px; border-top:2px dashed var(--cup-raya); }
+.cup-cut::before,.cup-cut::after{
+  content:""; position:absolute; top:-9px; width:16px; height:16px; border-radius:50%;
+  background:#0a111a; box-shadow:inset 0 0 0 1px var(--cup-borde);
+}
+.cup-cut::before{ left:-23px; } .cup-cut::after{ right:-23px; }
+.cup-bot{ padding:10px 10px 11px; min-height:64px; display:flex; flex-direction:column; justify-content:center; }
+.cup-btn{
+  width:100%; min-height:42px; border:0; border-radius:12px; cursor:pointer; position:relative;
+  font-family:var(--cy-display) !important; font-weight:800; font-size:18px; letter-spacing:.2px;
+  color:#05201a; background:linear-gradient(180deg, rgba(255,255,255,.35) 0%, rgba(255,255,255,0) 100%), var(--cup-c);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.5), 0 8px 16px -10px var(--cup-c);
+  transition:transform .12s ease; -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+}
+.cup--dto .cup-btn{ color:#2a1900; }
+.cup-btn:active{ transform:scale(.96); }
+.cup-btn:focus-visible{ outline:2px solid #fff; outline-offset:2px; }
+.cup-btn.cargando{ color:transparent; pointer-events:none; }
+.cup-btn.cargando::after{
+  content:""; position:absolute; left:50%; top:50%; width:18px; height:18px; margin:-9px 0 0 -9px; border-radius:50%;
+  border:2.5px solid rgba(0,0,0,.25); border-top-color:#05201a; animation:cySpin .7s linear infinite;
+}
+/* Brillo lento sobre los cupones disponibles */
+.cup.is-disponible::after{
+  content:""; position:absolute; inset:-20% auto -20% 0; width:40%; z-index:2; pointer-events:none;
+  background:linear-gradient(100deg, transparent, rgba(255,255,255,.16), transparent);
+  transform:translateX(-160%) skewX(-16deg); animation:v55Brillo 5.5s ease-in-out 2s infinite;
+}
+.cup--dto.is-disponible::after{ animation-delay:3.2s; }
+@keyframes v55Brillo{ 0%,70%{ transform:translateX(-160%) skewX(-16deg); } 100%{ transform:translateX(330%) skewX(-16deg); } }
+
+.cup-nota{ margin:0; font-size:11.5px; line-height:1.35; color:#a9bcb5; }
+.cup-nota b{ display:block; font-size:12.5px; color:#f4fbf8; margin-bottom:2px; }
+.cup.is-usado .cup-top{ opacity:.75; }
+.cup-sello{
+  position:absolute; top:12px; right:7px; z-index:3; padding:1px 7px; border-radius:6px;
+  font-family:var(--cy-display); font-weight:800; font-size:14px; letter-spacing:1px; text-transform:uppercase;
+  color:var(--cup-c); border:2.5px solid var(--cup-c); transform:rotate(-12deg); opacity:.95;
+  background:rgba(11,19,27,.7);
+}
+.cup.is-vencido{ filter:grayscale(1); opacity:.6; }
+.cup.recien{ animation:v55Golpe .4s ease-out .32s; }
+.cup.recien .cup-sello{ animation:v55Sello .5s cubic-bezier(.2,1.5,.4,1) both; }
+@keyframes v55Sello{ 0%{ opacity:0; transform:rotate(-12deg) scale(2.6); } 100%{ opacity:.95; transform:rotate(-12deg) scale(1); } }
+@keyframes v55Golpe{ 0%,100%{ transform:none; } 30%{ transform:translateY(2px) scale(.985); } 60%{ transform:translateY(-1px); } }
+
+/* Hoja inferior */
+.cup-hoja-fondo{
+  position:fixed; inset:0; z-index:10040; display:flex; align-items:flex-end; justify-content:center;
+  background:rgba(2,6,8,.6); opacity:0; pointer-events:none; transition:opacity .22s ease;
+  -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
+}
+.cup-hoja-fondo.abierta{ opacity:1; pointer-events:auto; }
+.cup-hoja{
+  --cup-c:#5eead4;
+  width:100%; max-width:460px; margin:0 10px calc(10px + env(safe-area-inset-bottom,0px)); padding:22px 20px 16px; border-radius:24px;
+  background:linear-gradient(180deg,#111c26,#0a121a); border:1px solid rgba(255,255,255,.1); text-align:center;
+  box-shadow:0 -10px 50px rgba(0,0,0,.6); transform:translateY(40px); transition:transform .28s cubic-bezier(.2,.8,.2,1);
+}
+.cup-hoja-fondo.abierta .cup-hoja{ transform:none; }
+.cup-hoja-fondo.dto .cup-hoja{ --cup-c:#fbbf24; }
+.cup-hoja-fondo.error .cup-hoja{ --cup-c:#f87171; }
+.cup-hoja-ic{
+  width:60px; height:60px; margin:0 auto 12px; border-radius:18px; display:grid; place-items:center; font-size:24px;
+  color:#05201a; background:var(--cup-c); box-shadow:0 10px 24px -10px var(--cup-c);
+}
+.cup-hoja-ic span{ font-family:var(--cy-display); font-weight:800; font-size:24px; color:#2a1900; }
+.cup-hoja-fondo.ok .cup-hoja-ic{ animation:v55Pop .5s cubic-bezier(.2,1.5,.4,1); }
+@keyframes v55Pop{ from{ transform:scale(.4); } }
+.cup-hoja h3{ margin:0 0 6px; font-family:var(--cy-display) !important; font-size:26px; line-height:1.05; color:#fff; }
+.cup-hoja p{ margin:0 auto 18px; max-width:34ch; font-size:14.5px; line-height:1.5; color:#b6c6c0; }
+.cup-hoja-acc{ display:flex; flex-direction:column; gap:8px; }
+.cup-hoja-acc button{
+  min-height:50px; border-radius:14px; border:0; cursor:pointer; font-family:var(--cy-display) !important; font-weight:800; font-size:19px;
+}
+.cup-h-si{ color:#05201a; background:var(--cup-c); }
+.cup-hoja-fondo.dto .cup-h-si{ color:#2a1900; }
+.cup-h-no{ color:#b6c6c0; background:rgba(255,255,255,.06); }
+.cup-hoja-acc button:focus-visible{ outline:2px solid #fff; outline-offset:2px; }
+
+/* Fiesta a pantalla completa */
+.cup-fiesta{ position:fixed; inset:0; z-index:10050; pointer-events:none; overflow:hidden; }
+.cup-fiesta .flash{ position:absolute; inset:0; background:radial-gradient(circle at 50% 62%, rgba(255,255,255,.28), transparent 60%); animation:v55Flash .7s ease-out forwards; }
+@keyframes v55Flash{ to{ opacity:0; } }
+.cup-fiesta .gl{
+  position:absolute; bottom:-130px; left:var(--x); width:48px; height:60px; will-change:transform;
+  animation:v55Sube var(--t) cubic-bezier(.3,.1,.4,1) var(--d) both;
+}
+.cup-fiesta .gl::before{
+  content:""; position:absolute; inset:0; border-radius:50% 50% 47% 47% / 56% 56% 44% 44%;
+  background:radial-gradient(circle at 32% 28%, rgba(255,255,255,.8) 0 7%, rgba(255,255,255,0) 30%), var(--c);
+  box-shadow:inset -6px -8px 14px rgba(0,0,0,.2);
+}
+.cup-fiesta .gl::after{ content:""; position:absolute; left:50%; top:58px; margin-left:-4px; border:4px solid transparent; border-bottom:6px solid var(--c); transform:rotate(180deg); }
+.cup-fiesta .gl i{ position:absolute; left:50%; top:66px; width:1.5px; height:52px; background:rgba(255,255,255,.45); }
+@keyframes v55Sube{
+  0%{ transform:translate3d(0,0,0) rotate(0); }
+  50%{ transform:translate3d(var(--w),-62vh,0) rotate(5deg); }
+  100%{ transform:translate3d(calc(var(--w) * -1),-130vh,0) rotate(-5deg); }
+}
+.cup-fiesta .mc{
+  position:absolute; top:-60px; left:var(--x); color:var(--c); font-size:30px; will-change:transform;
+  filter:drop-shadow(0 4px 6px rgba(0,0,0,.4));
+  animation:v55Cae var(--t) cubic-bezier(.45,.05,.6,1) var(--d) both;
+}
+@keyframes v55Cae{ to{ transform:translate3d(0,118vh,0) rotate(var(--r)); } }
+.cup-fiesta .sp{
+  position:absolute; top:-30px; left:var(--x); width:8px; height:13px; border-radius:2px; background:var(--c); will-change:transform;
+  animation:v55Papel var(--t) linear var(--d) both;
+}
+.cup-fiesta .sp.larga{ width:5px; height:36px; border-radius:3px; }
+@keyframes v55Papel{
+  0%{ transform:translate3d(0,0,0) rotate(0) rotateX(0); }
+  50%{ transform:translate3d(calc(var(--dx) / 2),55vh,0) rotate(calc(var(--r) / 2)) rotateX(180deg); }
+  100%{ transform:translate3d(var(--dx),112vh,0) rotate(var(--r)) rotateX(360deg); opacity:.7; }
+}
+
+@media (max-width:370px){
+  .cup-t{ font-size:17px; } .cup-big{ font-size:34px; } .cup-btn{ font-size:16px; }
+}
+@media (prefers-reduced-motion: reduce){
+  .cup.is-disponible::after,.cup.recien,.cup.recien .cup-sello,.cup-hoja-fondo.ok .cup-hoja-ic{ animation:none !important; }
+  .cup-hoja,.cup-hoja-fondo{ transition:none; }
 }
 </style>
 </head>
@@ -5983,6 +6138,8 @@ window.buscarQR = async function(esPrimeraVez){
   }
 
   socio.dni = dni;
+  window.cyCupones = socio.cupones || {};
+  window.cyFinSocio = socio.fecha_fin;
   guardarTelefonoSeguro(telefono);
   if (esPrimeraVez) guardarCredencialNavegador(telefono, dni);
   let estado = estadoSocio(socio);
@@ -6062,7 +6219,7 @@ window.buscarQR = async function(esPrimeraVez){
     </div>
 
     <div class="cyc-stats">
-      <div><span>Plan</span><b>${escaparHTML(socio.tipo_memb || "—")}</b></div>
+      <div class="${String(socio.tipo_memb || '').trim().length > 11 ? 'largo' : ''}"><span>Plan</span><b>${escaparHTML(socio.tipo_memb || "—")}</b></div>
       <div class="${diasVence !== null && diasVence <= 5 ? 'warn' : ''}"><span>Vence en</span><b>${textoVence}</b></div>
       <div><span>Asistencias</span><b>${totalAsis ? usadasAsis + '<i>/' + totalAsis + '</i>' : '—'}</b></div>
     </div>
@@ -6073,6 +6230,7 @@ window.buscarQR = async function(esPrimeraVez){
       <span class="icono-circulo"><i class="fa-solid fa-fingerprint"></i><span class="cyc-scan" aria-hidden="true"></span><b class="spin" aria-hidden="true"></b></span>
       <span class="lbl">Marcar asistencia</span>
     </button>
+    ${window.cyCuponesBloque ? cyCuponesBloque(socio.cupones) : ''}
 
     <div class="qr-secure-line"><i class="fa-solid fa-lock"></i> Registro seguro y rápido</div>
   </div>`;
@@ -6192,6 +6350,7 @@ window.confirmarAsistenciaQR = async function () {
         </div>
 
         <div class="stagger-item ok-foot" style="animation-delay:.3s;">¡A darle con todo hoy!</div>
+        ${window.cyCuponesBloque ? cyCuponesBloque(window.cyCupones) : ''}
 
         <div class="qr-secure-line stagger-item" style="animation-delay:.35s;"><i class="fa-solid fa-lock"></i> Registro seguro y rápido</div>
 
@@ -7590,6 +7749,184 @@ window.cyConfirmarIngreso = function(nombre){
 /* v52: tinte ambiental según la hora del dispositivo (mañana / tarde / noche). Solo cambia colores. */
 (function(){ try{ var h=new Date().getHours(), c=document.documentElement.classList;
   c.add(h>=5&&h<12 ? "tod-am" : (h>=19||h<5) ? "tod-night" : "tod-pm"); }catch(e){} })();
+</script>
+<script>
+/* ==========================================================================
+   v55 — CUPONES DEL SOCIO (pase de invitado + 10% por pago anticipado)
+   Las reglas viven en el servidor (consultar_socio_qr / usar_cupon_qr).
+   Aquí solo se pinta el estado y se anima el uso. No toca el flujo de
+   asistencia: el estado llega en la misma consulta del QR y nada de esto
+   hace pedidos de red hasta que el socio presiona "Usar".
+   ========================================================================== */
+(function(){
+  var MESES = ['ene','feb','mar','abr','may','jun','jul','ago','set','oct','nov','dic'];
+  function dm(iso){ // '2026-10-21' -> '21/10'
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ''); return m ? m[3] + '/' + m[2] : '';
+  }
+  function diaMes(iso){ // '2026-11-01' -> '1 nov'
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ''); return m ? (+m[3]) + ' ' + MESES[+m[2] - 1] : '';
+  }
+  function cuando(ts){
+    try { return new Date(ts).toLocaleString('es-PE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'America/Lima' }); }
+    catch(e){ return ''; }
+  }
+  function ticket(tipo, c){
+    var e = c.estado, inv = tipo === 'invitado';
+    var top = inv
+      ? '<span class="cup-ic" aria-hidden="true"><i class="fa-solid fa-user-plus"></i></span>' +
+        '<b class="cup-t">Pase de invitado</b><small class="cup-s">Trae a un amigo gratis una vez al mes.</small>'
+      : '<span class="cup-big">10%</span>' +
+        '<b class="cup-t">Pago anticipado</b><small class="cup-s">Renueva tu plan hasta el ' + dm(c.hasta) + '.</small>';
+    var bot;
+    if (e === 'disponible') {
+      bot = '<button type="button" class="cup-btn" data-cupon="' + tipo + '">' + (inv ? 'Usar pase' : 'Usar 10%') + '</button>';
+    } else if (e === 'usado') {
+      bot = '<p class="cup-nota"><b>Usado ' + cuando(c.usado_en) + '</b>' +
+        (inv ? 'Nuevo pase el ' + diaMes(c.proximo) + '.' : 'Renueva en recepción hasta el ' + dm(c.hasta) + '.') + '</p>';
+    } else {
+      bot = '<p class="cup-nota"><b>Vencido</b>Se activa de nuevo al renovar.</p>';
+    }
+    return '<div class="cup cup--' + (inv ? 'inv' : 'dto') + ' is-' + e + '" data-tipo="' + tipo + '">' +
+      '<div class="cup-top">' + top + '</div>' +
+      '<div class="cup-cut" aria-hidden="true"></div>' +
+      '<div class="cup-bot">' + bot + '</div>' +
+      (e === 'usado' ? '<span class="cup-sello" aria-hidden="true">Usado</span>' : '') +
+    '</div>';
+  }
+  function interior(c){
+    c = c || {}; var h = '';
+    if (c.invitado) h += ticket('invitado', c.invitado);
+    if (c.descuento) h += ticket('descuento', c.descuento);
+    return h;
+  }
+  window.cyCuponesBloque = function(c){
+    var h = interior(c);
+    return h ? '<div class="cyc-cupones">' + h + '</div>' : '';
+  };
+  function repintar(recien){
+    document.querySelectorAll('.cyc-cupones').forEach(function(box){
+      box.innerHTML = interior(window.cyCupones);
+      if (recien) { var t = box.querySelector('.cup[data-tipo="' + recien + '"]'); if (t) t.classList.add('recien'); }
+    });
+  }
+
+  /* ---------- Hoja inferior (confirmar / resultado) ---------- */
+  var hoja, resolver;
+  function abrirHoja(o){
+    if (!hoja) {
+      hoja = document.createElement('div');
+      hoja.className = 'cup-hoja-fondo';
+      hoja.innerHTML = '<div class="cup-hoja" role="dialog" aria-modal="true" aria-labelledby="cupHojaT">' +
+        '<div class="cup-hoja-ic" aria-hidden="true"></div><h3 id="cupHojaT"></h3><p></p>' +
+        '<div class="cup-hoja-acc"><button type="button" class="cup-h-si"></button><button type="button" class="cup-h-no"></button></div></div>';
+      document.body.appendChild(hoja);
+      hoja.addEventListener('click', function(e){ if (e.target === hoja) cerrar(false); });
+      hoja.querySelector('.cup-h-si').addEventListener('click', function(){ cerrar(true); });
+      hoja.querySelector('.cup-h-no').addEventListener('click', function(){ cerrar(false); });
+    }
+    hoja.querySelector('.cup-hoja-ic').innerHTML = o.icono;
+    hoja.querySelector('h3').textContent = o.titulo;
+    hoja.querySelector('p').textContent = o.texto;
+    var si = hoja.querySelector('.cup-h-si'), no = hoja.querySelector('.cup-h-no');
+    si.textContent = o.si; no.textContent = o.no || ''; no.style.display = o.no ? '' : 'none';
+    hoja.className = 'cup-hoja-fondo ' + (o.clase || '');
+    hoja.offsetWidth; hoja.classList.add('abierta');
+    setTimeout(function(){ try { si.focus({ preventScroll:true }); } catch(e){} }, 50);
+    return new Promise(function(r){ resolver = r; });
+  }
+  function cerrar(v){
+    if (!hoja) return;
+    hoja.classList.remove('abierta');
+    var r = resolver; resolver = null; if (r) r(v);
+  }
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && hoja && hoja.classList.contains('abierta')) cerrar(false); });
+
+  /* ---------- Fiesta: globos, mancuernas y serpentinas ---------- */
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function fiesta(){
+    if (reduce) return;
+    var capa = document.createElement('div'); capa.className = 'cup-fiesta'; capa.setAttribute('aria-hidden', 'true');
+    var colores = ['#34d399', '#10b981', '#fbbf24', '#f59e0b', '#ffffff', '#e11d48', '#5eead4'];
+    var h = '', i, x, c;
+    for (i = 0; i < 9; i++) { // globos que suben
+      x = 4 + i * 11 + Math.random() * 5; c = colores[i % colores.length];
+      h += '<span class="gl" style="--x:' + x + '%;--c:' + c + ';--d:' + (Math.random() * .5).toFixed(2) + 's;--t:' + (2.6 + Math.random() * .9).toFixed(2) + 's;--w:' + (Math.random() * 30 - 15).toFixed(0) + 'px"><i></i></span>';
+    }
+    for (i = 0; i < 8; i++) { // mancuernas que caen girando
+      x = Math.random() * 92; c = colores[(i + 2) % colores.length];
+      h += '<span class="mc" style="--x:' + x.toFixed(1) + '%;--c:' + c + ';--d:' + (Math.random() * .6).toFixed(2) + 's;--t:' + (1.9 + Math.random() * .9).toFixed(2) + 's;--r:' + (Math.random() > .5 ? 540 : -540) + 'deg"><i class="fa-solid fa-dumbbell"></i></span>';
+    }
+    for (i = 0; i < 34; i++) { // serpentinas y papel picado
+      x = Math.random() * 100; c = colores[i % colores.length];
+      h += '<span class="sp' + (i % 3 === 0 ? ' larga' : '') + '" style="--x:' + x.toFixed(1) + '%;--c:' + c + ';--d:' + (Math.random() * .7).toFixed(2) + 's;--t:' + (1.8 + Math.random() * 1.2).toFixed(2) + 's;--r:' + (Math.random() * 720 - 360).toFixed(0) + 'deg;--dx:' + (Math.random() * 80 - 40).toFixed(0) + 'px"></span>';
+    }
+    capa.innerHTML = '<span class="flash"></span>' + h;
+    document.body.appendChild(capa);
+    setTimeout(function(){ capa.remove(); }, 4200);
+  }
+
+  /* ---------- Usar cupón ---------- */
+  var ocupado = false;
+  function finSocio(){ return dm(window.cyFinSocio); }
+  document.addEventListener('click', async function(e){
+    var b = e.target.closest && e.target.closest('.cup-btn[data-cupon]');
+    if (!b || ocupado) return;
+    var tipo = b.getAttribute('data-cupon'), inv = tipo === 'invitado';
+    var c = (window.cyCupones || {})[tipo]; if (!c) return;
+
+    var sigue = await abrirHoja(inv ? {
+      clase: 'inv', icono: '<i class="fa-solid fa-user-plus"></i>',
+      titulo: '¿Usar tu pase de invitado ahora?',
+      texto: 'Hazlo frente a recepción. Tienes 1 pase por mes y no se acumula.',
+      si: 'Sí, usar ahora', no: 'Ahora no'
+    } : {
+      clase: 'dto', icono: '<span>10%</span>',
+      titulo: '¿Usar tu 10% de descuento?',
+      texto: 'Se aplica al renovar o reservar tu plan en recepción hasta el ' + dm(c.hasta) + '. Úsalo frente a recepción.',
+      si: 'Sí, usar ahora', no: 'Ahora no'
+    });
+    if (!sigue) return;
+
+    ocupado = true;
+    b.disabled = true; b.classList.add('cargando');
+    try {
+      var tel = (leerTelefonoSeguro() || '').replace(/\D/g, ''), dni = (leerDniSeguro() || '').replace(/\D/g, '');
+      var r = await supabaseClient.rpc('usar_cupon_qr', { p_telefono: tel, p_dni: dni, p_tipo: tipo });
+      var d = r && r.data;
+      if (r.error || !d) throw r.error || new Error('sin respuesta');
+      if (d.cupones) window.cyCupones = d.cupones;
+      if (d.ok) {
+        repintar(tipo);
+        fiesta();
+        setTimeout(function(){
+          abrirHoja(inv ? {
+            clase: 'inv ok', icono: '<i class="fa-solid fa-champagne-glasses"></i>',
+            titulo: '¡Pase de invitado usado!',
+            texto: 'Muéstrale esta pantalla a recepción: tu invitado entra gratis hoy.',
+            si: 'Listo'
+          } : {
+            clase: 'dto ok', icono: '<i class="fa-solid fa-champagne-glasses"></i>',
+            titulo: '¡Cupón de 10% usado!',
+            texto: 'Acércate a recepción para renovar o reservar tu membresía antes de tu fecha de vencimiento (' + finSocio() + ').',
+            si: 'Entendido'
+          });
+        }, reduce ? 0 : 900);
+      } else {
+        repintar();
+        var t = { USADO: 'Este cupón ya fue usado.', VENCIDO: 'Este cupón ya venció. Se activa de nuevo al renovar.',
+                  NO_APLICA: 'Este cupón no aplica a tu plan.', BLOQUEADO: 'Demasiados intentos. Espera 15 minutos.',
+                  NO_ENCONTRADO: 'No pudimos verificar tus datos. Vuelve a escanear el QR.' }[d.motivo] || 'No se pudo usar el cupón.';
+        abrirHoja({ clase: 'error', icono: '<i class="fa-solid fa-circle-exclamation"></i>', titulo: 'No se pudo usar', texto: t, si: 'Entendido' });
+      }
+    } catch (err) {
+      console.warn('usar_cupon_qr:', err);
+      b.disabled = false; b.classList.remove('cargando');
+      abrirHoja({ clase: 'error', icono: '<i class="fa-solid fa-wifi"></i>', titulo: 'Sin conexión', texto: 'Revisa tu internet e inténtalo otra vez.', si: 'Entendido' });
+    } finally {
+      ocupado = false;
+    }
+  });
+})();
 </script>
 <script>
 /* v51: feedback visual al registrar asistencia (no altera la lógica: solo marca el botón como "cargando") */

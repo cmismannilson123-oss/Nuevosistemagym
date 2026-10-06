@@ -51,3 +51,17 @@ confirmar su DNI.
 
 Para agregar más personal, repite los pasos 1 y 4. Para quitarle el acceso a alguien:
 `delete from public.staff where user_id = (select id from auth.users where email = '...');`
+
+## Cupones del socio (pantalla del QR)
+
+Aparecen debajo de "Marcar asistencia" (y también en la pantalla de asistencia registrada).
+Las reglas las calcula la base de datos (`supabase/migrations/20261007000000_cupones.sql`);
+el estado llega en la misma consulta del QR, así que no hace más lento el registro.
+
+| Cupón | Quién lo tiene | Vigencia |
+|---|---|---|
+| **Pase de invitado** | Socios activos cuyo plan no es interdiario | 1 por mes calendario (no se acumula) |
+| **10% por pago anticipado** | Planes que mencionan "mes" o "personalizado", excepto interdiario | Hasta un día antes del vencimiento; una vez por periodo. Se reactiva al renovar |
+
+Cada uso queda guardado en `public.cupones_uso` (el personal puede consultarlo) y manda un
+aviso al canal de ntfy.

@@ -8553,9 +8553,12 @@ window.cyConfirmarIngreso = function(nombre){
     b.disabled = true; b.classList.add('cargando');
     try {
       var tel = (leerTelefonoSeguro() || '').replace(/\D/g, ''), dni = (leerDniSeguro() || '').replace(/\D/g, '');
-      var r = await supabaseClient.rpc('usar_cupon_qr', { p_telefono: tel, p_dni: dni, p_tipo: tipo });
+      // Con internet lento se reintenta solo; si el reintento dice "ya usado",
+      // es porque el primer intento sí llegó: se muestra como usado con éxito.
+      var r = await cyRpcSeguro('usar_cupon_qr', { p_telefono: tel, p_dni: dni, p_tipo: tipo });
       var d = r && r.data;
       if (r.error || !d) throw r.error || new Error('sin respuesta');
+      if (!d.ok && d.motivo === 'USADO' && r.intento > 1) d.ok = true;
       if (d.cupones) window.cyCupones = d.cupones;
       if (d.ok) {
         repintar(tipo);

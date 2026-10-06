@@ -1,0 +1,4 @@
+# Netlify: el QR impreso puede apuntar a la raíz, a index.html o a gym.html.
+# Todas abren la app (los parámetros como ?qr=1 se conservan).
+/            /gym.html  200
+/index.html  /gym.html  200

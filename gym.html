@@ -3726,6 +3726,108 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
 .sc .sc-grande:active{ transform:scale(.98) !important; }
 .sc-nota{ margin:12px 0 0; font-size:13px; font-weight:600; color:#fca5a5; }
 .sc-nota i{ margin-right:5px; }
+
+/* ==========================================================================
+   v59 — REGISTRO: formulario por secciones + lista de espera armonizada
+   ========================================================================== */
+.rg-sec{ margin-top:16px; padding-top:14px; border-top:1px solid rgba(255,255,255,.06); }
+.rg .aviso-premio + .rg-sec, .rg h3 + .rg-sec{ border-top:0; padding-top:0; margin-top:10px; }
+.rg-sec-t{ display:flex; align-items:center; gap:9px; margin-bottom:12px; font-family:var(--cy-display); font-size:19px; font-weight:700; color:#eef4f1; letter-spacing:.2px; }
+.rg-sec-t span{
+  width:24px; height:24px; border-radius:8px; display:grid; place-items:center; font-size:14px; font-weight:800;
+  color:#04120d; background:#34d399;
+}
+.rg .rg-f{ display:block; margin:0 0 12px !important; padding:0 !important; }
+.rg .rg-f > span{ display:block; margin:0 0 6px 2px; font-size:12.5px; font-weight:600; color:#9fb2ab; letter-spacing:.1px; text-transform:none; }
+.rg input{
+  width:100% !important; min-height:48px !important; margin:0 !important; padding:0 14px !important; border-radius:13px !important;
+  font-size:15.5px !important; color:#f1f7f4 !important; background:rgba(4,10,10,.55) !important;
+  border:1px solid rgba(255,255,255,.1) !important; box-shadow:none !important; box-sizing:border-box;
+  transition:border-color .15s ease, box-shadow .15s ease !important;
+}
+.rg input::placeholder{ color:#5f726c !important; }
+.rg input:focus{ outline:none; border-color:#34d399 !important; box-shadow:0 0 0 3px rgba(52,211,153,.18) !important; }
+.rg input[type="date"]{ color-scheme:dark; }
+.rg-pre{ position:relative; }
+.rg-pre b{
+  position:absolute; left:1px; top:1px; bottom:1px; width:46px; display:grid; place-items:center; z-index:1; pointer-events:none;
+  font-family:var(--cy-display); font-size:16px; font-weight:700; color:#9fb2ab; border-right:1px solid rgba(255,255,255,.08);
+}
+.rg .rg-pre input{ padding-left:56px !important; }
+.rg-2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.rg-chips{ display:flex; flex-wrap:wrap; align-items:center; gap:7px; margin:-2px 0 14px; }
+.rg-chips-t{ font-size:12.5px; font-weight:600; color:#9fb2ab; margin-right:2px; }
+.rg-chips button{
+  min-height:34px !important; margin:0 !important; padding:0 12px !important; border-radius:10px !important;
+  font-size:13px !important; font-weight:600 !important; letter-spacing:.1px !important; color:#cfdcd6 !important;
+  background:rgba(255,255,255,.05) !important; border:1px solid rgba(255,255,255,.1) !important; box-shadow:none !important; filter:none !important;
+}
+.rg-chips button:hover{ transform:none !important; background:rgba(255,255,255,.09) !important; }
+.rg-chips button:active{ transform:scale(.96) !important; }
+.rg-chips button.on{ color:#04120d !important; background:#34d399 !important; border-color:#34d399 !important; }
+#tab2 .card .rg-chips button{ width:auto !important; flex:0 0 auto !important; display:inline-flex !important; align-items:center; justify-content:center; text-transform:none !important; }
+.rg-resumen{
+  margin:2px 0 0; padding:10px 12px; border-radius:12px; font-size:13px; line-height:1.4; color:#b9f5dc;
+  background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.2);
+}
+.rg-resumen i{ margin-right:5px; color:#34d399; }
+.rg-resumen b{ color:#fff; }
+.rg-resumen.mal{ color:#fecaca; background:rgba(239,68,68,.1); border-color:rgba(239,68,68,.3); }
+.rg-resumen.mal i{ color:#f87171; }
+
+/* Acciones */
+#tab2 .card .rg-acc{ grid-template-columns:1fr !important; gap:10px !important; margin-top:18px !important; }
+#tab2 .card .rg-acc button{
+  min-height:54px !important; border-radius:15px !important; gap:10px !important; margin:0 !important;
+  font-family:var(--cy-display) !important; font-size:20px !important; font-weight:800 !important; letter-spacing:.3px !important; text-transform:none !important;
+}
+#tab2 .card .rg-acc .cy-act-save{
+  color:#02150d !important; background:linear-gradient(180deg,#22d3a0 0%,#0d9b6c 100%) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35), 0 10px 20px -12px rgba(16,185,129,.95) !important;
+}
+#tab2 .card .rg-acc .cy-act-wa{
+  color:#6ee7a0 !important; background:rgba(37,211,102,.08) !important; border:1px solid rgba(37,211,102,.4) !important; box-shadow:none !important;
+}
+#tab2 .card .rg-acc .cy-act-wa i{ color:#25d366 !important; }
+
+/* Aviso de premio del prospecto elegido */
+.rg .aviso-premio{
+  margin:6px 0 4px !important; padding:11px 13px !important; border-radius:13px !important; font-size:13.5px !important; font-weight:600 !important;
+  color:#fde3a7 !important; background:rgba(245,184,61,.1) !important; border:1px solid rgba(245,184,61,.35) !important;
+}
+
+/* Lista de espera */
+#cardPendientes h3{ align-items:center; }
+.pend-wrap .pend-item{
+  position:relative; overflow:hidden; padding:13px 50px 13px 18px !important; border-radius:16px !important; gap:12px !important;
+  background:linear-gradient(180deg, rgba(250,204,21,.06), rgba(250,204,21,.015)), #0b1416 !important;
+  border:1px solid rgba(250,204,21,.22) !important; box-shadow:none !important; filter:none !important;
+}
+.pend-wrap .pend-item::before{ content:""; position:absolute; left:0; top:13px; bottom:13px; width:4px; border-radius:0 4px 4px 0; background:#facc15; box-shadow:0 0 12px #facc15; }
+.pend-wrap .pend-item:hover{ transform:none !important; }
+.pend-wrap .pend-item.sel{ border-color:#34d399 !important; background:linear-gradient(180deg, rgba(52,211,153,.12), rgba(52,211,153,.03)), #0b1416 !important; box-shadow:0 0 0 1px #34d399 !important; }
+.pend-wrap .pend-item.sel::before{ background:#34d399; box-shadow:0 0 12px #34d399; }
+.pend-av{
+  width:44px !important; height:44px !important; font-family:var(--cy-display); font-size:22px !important; font-weight:700 !important;
+  color:#facc15 !important; background:rgba(250,204,21,.12) !important; border:1px solid rgba(250,204,21,.4) !important; box-shadow:none !important;
+}
+.pend-item.sel .pend-av{ color:#34d399 !important; background:rgba(52,211,153,.12) !important; border-color:rgba(52,211,153,.45) !important; }
+.pend-info strong{ font-family:var(--cy-display); font-size:20px !important; font-weight:700; color:#f4fbf8; line-height:1.05 !important; }
+.pend-info small{ display:flex; flex-wrap:wrap; gap:4px 12px; font-size:12.5px !important; color:#9fb2ab !important; font-variant-numeric:tabular-nums; }
+.pend-info small i{ color:#25d366; }
+.pend-premio{
+  margin-top:4px !important; padding:4px 9px !important; border-radius:9px !important; font-size:12px !important; font-weight:600 !important;
+  color:#fde3a7 !important; background:rgba(245,184,61,.12) !important; border:1px solid rgba(245,184,61,.35); line-height:1.3;
+}
+.pend-premio.promo{ color:#fed7aa !important; background:rgba(249,115,22,.14) !important; border-color:rgba(249,115,22,.45) !important; }
+.pend-go{ display:none; }
+.pend-wrap .pend-x{
+  left:auto !important; right:10px !important; top:10px !important; width:32px !important; height:32px !important; border-radius:10px !important;
+  color:#9fb2ab !important; background:rgba(255,255,255,.05) !important; border:1px solid rgba(255,255,255,.1) !important; box-shadow:none !important;
+  font-size:13px !important;
+}
+.pend-wrap .pend-x.conf{ color:#fff !important; background:#dc2626 !important; border-color:#dc2626 !important; }
+@media (max-width:370px){ .rg-2{ grid-template-columns:1fr; } }
 </style>
 </head>
 
@@ -4258,21 +4360,50 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
       <div id="pendLista" class="pend-lista"><div class="pend-vacio">Cargando…</div></div>
       <div id="pendHint" class="pend-hint" style="display:none;">↕ Desliza dentro del cuadro para ver a los demás</div>
     </div>
-    <div class="card">
+    <div class="card rg">
       <h3><i class="fa-solid fa-user-plus"></i> Registrar nuevo socio</h3>
       <div id="avisoPremio" class="aviso-premio" style="display:none;"></div>
-      <input id="dni" placeholder="DNI">
-      <input id="nombre" placeholder="Nombre completo">
-      <input id="telefono" placeholder="WhatsApp (Ej: 927885791)">
-      <input id="tipo_memb" placeholder="Tipo de membresía (Ej: Mensual)">
-      <input id="precio" type="number" placeholder="Precio en Soles (Ej: 80)">
-      <label>Fecha de Inicio</label>
-      <input id="inicio" type="date">
-      <label>Fecha de Vencimiento</label>
-      <input id="fin" type="date">
-      <input id="deuda" placeholder="Deuda inicial (S/ 0 si no tiene)">
-      <div class="cy-action-row">
-        <button class="qr-btn-principal cy-act-save" onclick="guardar()"><i class="fa-solid fa-floppy-disk"></i><span>Guardar Socio</span></button>
+
+      <section class="rg-sec">
+        <div class="rg-sec-t"><span>1</span>Datos del socio</div>
+        <label class="rg-f"><span>DNI</span><input id="dni" inputmode="numeric" autocomplete="off" placeholder="8 dígitos"></label>
+        <label class="rg-f"><span>Nombre completo</span><input id="nombre" autocomplete="off" placeholder="Nombres y apellidos"></label>
+        <label class="rg-f"><span>WhatsApp</span><div class="rg-pre"><b>+51</b><input id="telefono" type="tel" inputmode="numeric" autocomplete="off" placeholder="927885791"></div></label>
+      </section>
+
+      <section class="rg-sec">
+        <div class="rg-sec-t"><span>2</span>Membresía</div>
+        <label class="rg-f"><span>Plan</span><input id="tipo_memb" autocomplete="off" placeholder="Escribe o elige un plan"></label>
+        <div class="rg-chips" role="group" aria-label="Planes frecuentes">
+          <button type="button" data-plan="1 mes">1 mes</button>
+          <button type="button" data-plan="1 mes interdiario">Interdiario</button>
+          <button type="button" data-plan="1 mes personalizado">Personalizado</button>
+          <button type="button" data-plan="1 mes estudiante">Estudiante</button>
+        </div>
+        <div class="rg-2">
+          <label class="rg-f"><span>Inicio</span><input id="inicio" type="date"></label>
+          <label class="rg-f"><span>Vence</span><input id="fin" type="date"></label>
+        </div>
+        <div class="rg-chips rg-dur" role="group" aria-label="Duración rápida">
+          <span class="rg-chips-t">Duración</span>
+          <button type="button" data-dur="15d">15 días</button>
+          <button type="button" data-dur="1m">1 mes</button>
+          <button type="button" data-dur="2m">2 meses</button>
+          <button type="button" data-dur="3m">3 meses</button>
+        </div>
+        <p class="rg-resumen" id="rgResumen" hidden></p>
+      </section>
+
+      <section class="rg-sec">
+        <div class="rg-sec-t"><span>3</span>Pago</div>
+        <div class="rg-2">
+          <label class="rg-f"><span>Precio</span><div class="rg-pre"><b>S/</b><input id="precio" type="number" inputmode="decimal" min="0" placeholder="80"></div></label>
+          <label class="rg-f"><span>Deuda inicial</span><div class="rg-pre"><b>S/</b><input id="deuda" type="number" inputmode="decimal" min="0" placeholder="0"></div></label>
+        </div>
+      </section>
+
+      <div class="cy-action-row rg-acc">
+        <button class="qr-btn-principal cy-act-save" onclick="guardar()"><i class="fa-solid fa-floppy-disk"></i><span>Guardar socio</span></button>
         <button class="btn-whatsapp cy-act-wa" onclick="enviarReciboPremium()"><i class="fa-brands fa-whatsapp"></i><span>Enviar comprobante</span></button>
       </div>
     </div>
@@ -5509,6 +5640,7 @@ window.guardar = async function(){
     document.getElementById("nombre").value = "";
     document.getElementById("telefono").value = "";
     document.getElementById("tipo_memb").value = "";
+    document.getElementById("precio").value = "";
     document.getElementById("inicio").value = "";
     document.getElementById("fin").value = "";
     document.getElementById("deuda").value = "";
@@ -7538,9 +7670,12 @@ window.cyConfirmarIngreso = function(nombre){
       var av = document.createElement('span'); av.className = 'pend-av'; av.textContent = (p.nombre||'?').trim().charAt(0).toUpperCase();
       var info = document.createElement('span'); info.className = 'pend-info';
       var n = document.createElement('strong'); n.textContent = p.nombre;
-      var d = document.createElement('small'); d.textContent = 'DNI ' + p.dni + ' · WhatsApp ' + p.whatsapp;
+      var d = document.createElement('small');
+      var d1 = document.createElement('span'); d1.textContent = 'DNI ' + p.dni;
+      var d2 = document.createElement('span'); d2.innerHTML = '<i class="fa-brands fa-whatsapp"></i> '; d2.appendChild(document.createTextNode(p.whatsapp || ''));
+      d.appendChild(d1); d.appendChild(d2);
       info.appendChild(n); info.appendChild(d);
-      if(p.premio){ var esPromo = p.premio !== DEFECTO; var pr = document.createElement('span'); pr.className = 'pend-premio' + (esPromo ? ' promo' : ''); pr.textContent = (esPromo ? '🔥 PROMO: ' : '🎁 ') + p.premio; info.appendChild(pr); }
+      if(p.premio){ var esPromo = p.premio !== DEFECTO; var pr = document.createElement('span'); pr.className = 'pend-premio' + (esPromo ? ' promo' : ''); pr.textContent = (esPromo ? '🔥 Promo: ' : '🎁 ') + p.premio; info.appendChild(pr); }
       var go = document.createElement('i'); go.className = 'fa-solid fa-chevron-right pend-go';
       b.appendChild(av); b.appendChild(info); b.appendChild(go);
       b.addEventListener('click', function(){ elegir(p); });
@@ -8257,6 +8392,58 @@ window.cyConfirmarIngreso = function(nombre){
         .subscribe();
       var btn = $('btnActualizar'); if (btn) btn.addEventListener('click', function(){ window.cyCargarCuponesHoy(); });
     } catch (e) {}
+  });
+})();
+</script>
+<script>
+/* ==========================================================================
+   v59 — REGISTRO: atajos de plan y duración + resumen en vivo.
+   Solo llenan los campos; guardar() sigue igual.
+   ========================================================================== */
+(function(){
+  if (document.documentElement.classList.contains('qr-mode')) return;
+  function $(id){ return document.getElementById(id); }
+  function iso(d){ return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function hoy(){ return iso(new Date()); }
+  function sumar(isoIni, dur){
+    var d = new Date(isoIni + 'T00:00:00'), n = parseInt(dur, 10);
+    if (/d$/.test(dur)) d.setDate(d.getDate() + n); else d.setMonth(d.getMonth() + n);
+    return iso(d);
+  }
+  function marcar(grupo, attr, valor){
+    document.querySelectorAll('.rg-chips [' + attr + ']').forEach(function(b){ b.classList.toggle('on', b.getAttribute(attr) === valor); });
+  }
+  function resumen(){
+    var r = $('rgResumen'); if (!r) return;
+    var ini = $('inicio').value, fin = $('fin').value, plan = ($('tipo_memb').value || '').toLowerCase();
+    if (!ini || !fin) { r.hidden = true; return; }
+    var dias = Math.round((new Date(fin + 'T00:00:00') - new Date(ini + 'T00:00:00')) / 86400000);
+    r.hidden = false;
+    if (dias <= 0) { r.className = 'rg-resumen mal'; r.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> La fecha de vencimiento debe ser posterior al inicio.'; return; }
+    var asis = plan.indexOf('interdiario') !== -1 ? 15 : dias;
+    r.className = 'rg-resumen';
+    r.innerHTML = '<i class="fa-solid fa-circle-info"></i> Membresía de <b>' + dias + ' días</b> con <b>' + asis + ' asistencias</b>.';
+  }
+  document.addEventListener('click', function(e){
+    var b = e.target.closest && e.target.closest('.rg-chips button'); if (!b) return;
+    if (b.dataset.plan) {
+      $('tipo_memb').value = b.dataset.plan; marcar('plan', 'data-plan', b.dataset.plan);
+    } else if (b.dataset.dur) {
+      if (!$('inicio').value) $('inicio').value = hoy();
+      $('fin').value = sumar($('inicio').value, b.dataset.dur); marcar('dur', 'data-dur', b.dataset.dur);
+    }
+    resumen();
+  });
+  document.addEventListener('input', function(e){
+    var id = e.target && e.target.id;
+    if (id === 'tipo_memb') marcar('plan', 'data-plan', e.target.value);
+    if (id === 'fin' || id === 'inicio') marcar('dur', 'data-dur', '');
+    if (id === 'inicio' || id === 'fin' || id === 'tipo_memb') resumen();
+  });
+  // Al guardarse (los campos se vacían), limpiar el resumen y los atajos
+  document.addEventListener('click', function(e){
+    if (!(e.target.closest && e.target.closest('.cy-act-save'))) return;
+    setTimeout(function(){ if (!$('inicio').value) { marcar('plan', 'data-plan', ''); marcar('dur', 'data-dur', ''); resumen(); } }, 1500);
   });
 })();
 </script>

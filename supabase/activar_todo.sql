@@ -270,13 +270,12 @@ create trigger tr_notificar_asistencia
 after insert on public.historial_asistencia
 for each row execute function public._notificar_asistencia();
 insert into public.staff (user_id, nombre) select id, 'Administrador' from auth.users where lower(email) = 'fitnessgym21@gmail.com' on conflict (user_id) do nothing;
-create temp table _s as select telefono, dni, (select count(*) from public.socios) as total from public.socios where telefono ~ '^[0-9]{6,15}$' and dni ~ '^[0-9]{6,12}$' limit 1;
-grant select on _s to anon, authenticated;
+select set_config('prueba.tel', telefono, true), set_config('prueba.dni', dni, true), set_config('prueba.total', (select count(*) from public.socios)::text, true) from public.socios where telefono ~ '^[0-9]{6,15}$' and dni ~ '^[0-9]{6,12}$' limit 1;
 set local role anon;
 do $$ begin
 if (select count(*) from public.socios) + (select count(*) from public.historial_caja) + (select count(*) from public.historial_asistencia) <> 0 then raise exception 'FALLO 1: el publico todavia ve datos'; end if;
-if (public.consultar_socio_qr((select telefono from _s), (select dni from _s)) ->> 'nombre') is null then raise exception 'FALLO 2: consulta QR con datos correctos'; end if;
-if public.consultar_socio_qr((select telefono from _s), '11111111') is not null then raise exception 'FALLO 3: consulta QR con DNI malo'; end if;
+if (public.consultar_socio_qr(current_setting('prueba.tel'), current_setting('prueba.dni')) ->> 'nombre') is null then raise exception 'FALLO 2: consulta QR con datos correctos'; end if;
+if public.consultar_socio_qr(current_setting('prueba.tel'), '11111111') is not null then raise exception 'FALLO 3: consulta QR con DNI malo'; end if;
 begin perform public.registrar_asistencia_publica('1'); raise exception 'FALLO 4: funcion vieja sigue publica'; exception when insufficient_privilege then null; end;
 begin perform public.listar_prospectos_qr(); raise exception 'FALLO 5: prospectos publicos'; exception when insufficient_privilege then null; end;
 end $$;
@@ -289,7 +288,7 @@ set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"ed41f1ce-fdc4-4536-802e-6c5c85950d58","role":"authenticated"}', true);
 do $$ begin
 if not public.es_staff() then raise exception 'FALLO 7: fitnessgym21 no quedo como administrador'; end if;
-if (select count(*) from public.socios) <> (select total from _s) then raise exception 'FALLO 8: el administrador no ve todos los socios'; end if;
+if (select count(*) from public.socios) <> current_setting('prueba.total')::bigint then raise exception 'FALLO 8: el administrador no ve todos los socios'; end if;
 perform count(*) from public.admin_listar_premios_qr();
 perform count(*) from public.listar_prospectos_qr();
 end $$;

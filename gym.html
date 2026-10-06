@@ -3478,6 +3478,53 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
   .cup.is-disponible::after,.cup.recien,.cup.recien .cup-sello,.cup-hoja-fondo.ok .cup-hoja-ic{ animation:none !important; }
   .cup-hoja,.cup-hoja-fondo{ transition:none; }
 }
+
+/* ==========================================================================
+   v56 — PANEL: cupones usados (hoy + historial del mes)
+   ========================================================================== */
+.seg{ grid-template-columns:repeat(3, minmax(0,1fr)) !important; }
+.seg-b{ font-size:14px !important; gap:6px !important; padding:0 6px !important; white-space:nowrap; }
+@media (max-width:380px){ .seg-b{ font-size:13px !important; } .seg-b i{ display:none; } }
+
+#cardCuponesHoy h3{ display:flex; align-items:center; gap:8px; }
+.cupc-n{
+  margin-left:auto; min-width:28px; height:28px; padding:0 8px; border-radius:14px; display:inline-grid; place-items:center;
+  font-family:var(--cy-display); font-size:16px; font-weight:800; color:#2a1900; background:#fbbf24;
+}
+.cupc-ic{
+  width:42px; height:42px; flex:none; border-radius:13px; display:grid; place-items:center; font-size:16px;
+}
+.cupc-ic.inv{ color:#04241d; background:#5eead4; }
+.cupc-ic.dto{ color:#2a1900; background:#fbbf24; }
+.cupc-plan{
+  display:inline-block; margin-left:6px; padding:1px 7px; border-radius:8px; font-size:11px;
+  color:#a9bcb5; background:rgba(255,255,255,.06); vertical-align:1px;
+}
+.cupc-hora{ flex:none; font-size:13px; font-weight:700; color:var(--cy-text, #eef4f1); font-variant-numeric:tabular-nums; }
+.cupc-hora i{ margin-right:5px; color:var(--cy-mute, #6b7b75); }
+.cupc-item.nuevo{ animation:v56Nuevo 2.4s ease-out; border-radius:12px; }
+@keyframes v56Nuevo{ 0%{ background:rgba(251,191,36,.28); } 100%{ background:transparent; } }
+
+.cupm-nav{ display:flex; align-items:center; gap:10px; margin-bottom:12px; }
+.cupm-nav h3{ flex:1; margin:0 !important; text-align:center; }
+.cupm-nav .pend-refresh{ margin:0 !important; }
+.cupm-nav .pend-refresh:disabled{ opacity:.3; cursor:default; }
+.cupm-tot{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px; }
+.cupm-t{
+  display:grid; grid-template-columns:auto 1fr; grid-template-rows:auto auto; column-gap:10px; align-items:center;
+  padding:12px; border-radius:16px; border:1px solid rgba(255,255,255,.08); background:rgba(255,255,255,.04);
+}
+.cupm-t i{ grid-row:span 2; width:36px; height:36px; border-radius:11px; display:grid; place-items:center; font-size:14px; }
+.cupm-t.inv i{ color:#04241d; background:#5eead4; }
+.cupm-t.dto i{ color:#2a1900; background:#fbbf24; }
+.cupm-t b{ font-family:var(--cy-display); font-size:28px; line-height:1; color:#fff; font-variant-numeric:tabular-nums; }
+.cupm-t span{ font-size:12px; color:#a9bcb5; line-height:1.2; }
+.cupm-dia{
+  margin:14px 2px 2px; font-size:12.5px; font-weight:700; color:#8da09a; text-transform:capitalize;
+  padding-bottom:6px; border-bottom:1px solid rgba(255,255,255,.06);
+}
+.cupm-dia:first-child{ margin-top:2px; }
+@media (prefers-reduced-motion: reduce){ .cupc-item.nuevo{ animation:none; } }
 </style>
 </head>
 
@@ -3992,6 +4039,11 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
       <button id="btnActualizar" onclick="actualizarSistema()" style="width:100%;padding:16px;margin-top:0;margin-bottom:15px;border:none;border-radius:50px;background:linear-gradient(90deg,#3b82f6,#2563eb);color:white;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 6px 20px rgba(37,99,235,.3);transition:.3s;"><i class="fa-solid fa-rotate"></i> Actualizar sistema</button>
       <div id="historial"></div>
     </div>
+
+    <div class="card" id="cardCuponesHoy">
+      <h3><i class="fa-solid fa-ticket"></i> Cupones usados hoy <span class="cupc-n" id="cuponesHoyN" hidden></span></h3>
+      <div id="cuponesHoy"><div class="pend-vacio">Cargando…</div></div>
+    </div>
   </div>
 
   <div id="tab2" class="panel">
@@ -4054,6 +4106,7 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
     <div class="seg" role="tablist" aria-label="Invitar o Premios">
       <button type="button" id="segEnviar" class="seg-b on" role="tab" aria-selected="true" onclick="cyInvTab('enviar')"><i class="fa-solid fa-paper-plane"></i> Invitar</button>
       <button type="button" id="segPremios" class="seg-b" role="tab" aria-selected="false" onclick="cyInvTab('premios')"><i class="fa-solid fa-gift"></i> Premios QR</button>
+      <button type="button" id="segCupones" class="seg-b" role="tab" aria-selected="false" onclick="cyInvTab('cupones')"><i class="fa-solid fa-ticket"></i> Cupones</button>
     </div>
     <div id="invPanelEnviar">
     <div class="card">
@@ -4101,6 +4154,20 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
           <button type="button" class="pend-refresh" onclick="cyCargarPremios(true)" aria-label="Actualizar promociones"><i class="fa-solid fa-rotate"></i></button>
         </h3>
         <div id="premLista" class="prem-lista"><div class="pend-vacio">Cargando…</div></div>
+      </div>
+    </div>
+    <div id="invPanelCupones" style="display:none;">
+      <div class="card">
+        <div class="cupm-nav">
+          <button type="button" class="pend-refresh" onclick="cyCuponesMesMover(-1)" aria-label="Mes anterior"><i class="fa-solid fa-chevron-left"></i></button>
+          <h3 id="cupMesTitulo">Cupones del mes</h3>
+          <button type="button" class="pend-refresh" id="cupMesSig" onclick="cyCuponesMesMover(1)" aria-label="Mes siguiente"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <div class="cupm-tot">
+          <div class="cupm-t inv"><i class="fa-solid fa-user-plus"></i><b id="cupTotInv">0</b><span>Pases de invitado</span></div>
+          <div class="cupm-t dto"><i class="fa-solid fa-percent"></i><b id="cupTotDto">0</b><span>Descuentos 10%</span></div>
+        </div>
+        <div id="cupMesLista"><div class="pend-vacio">Cargando…</div></div>
       </div>
     </div>
   </div>
@@ -7422,12 +7489,15 @@ window.cyConfirmarIngreso = function(nombre){
 
   /* Sub-pestañas Invitar / Premios */
   window.cyInvTab = function(t){
-    var premios = (t === 'premios');
-    $('invPanelEnviar').style.display = premios ? 'none' : 'block';
+    var premios = (t === 'premios'), cupones = (t === 'cupones'), enviar = !premios && !cupones;
+    $('invPanelEnviar').style.display = enviar ? 'block' : 'none';
     $('invPanelPremios').style.display = premios ? 'block' : 'none';
-    $('segEnviar').classList.toggle('on', !premios); $('segPremios').classList.toggle('on', premios);
-    $('segEnviar').setAttribute('aria-selected', String(!premios)); $('segPremios').setAttribute('aria-selected', String(premios));
+    if($('invPanelCupones')) $('invPanelCupones').style.display = cupones ? 'block' : 'none';
+    [['segEnviar', enviar], ['segPremios', premios], ['segCupones', cupones]].forEach(function(x){
+      var el = $(x[0]); if(!el) return; el.classList.toggle('on', x[1]); el.setAttribute('aria-selected', String(x[1]));
+    });
     if(premios){ prepararForm(); cyCargarPremios(); iniciarTimer(); } else { detenerTimer(); }
+    if(cupones && window.cyCargarCuponesMes) window.cyCargarCuponesMes();
   };
 
   function pintarEstilos(){
@@ -7925,6 +7995,109 @@ window.cyConfirmarIngreso = function(nombre){
     } finally {
       ocupado = false;
     }
+  });
+})();
+</script>
+<script>
+/* ==========================================================================
+   v56 — PANEL: cupones usados (hoy en "Ingreso" + historial del mes en "Invitar")
+   Lee listar_cupones_usados (solo personal) y se actualiza en vivo.
+   ========================================================================== */
+(function(){
+  if (document.documentElement.classList.contains('qr-mode')) return;
+  var fmtDia = new Intl.DateTimeFormat('en-CA', { timeZone:'America/Lima' });
+  function hoyLima(){ return fmtDia.format(new Date()); }
+  var MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Setiembre','Octubre','Noviembre','Diciembre'];
+  var DIAS = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  var NOMBRE = { invitado:'Pase de invitado', descuento:'10% por pago anticipado' };
+  function $(id){ return document.getElementById(id); }
+  function hora(ts){ return new Date(ts).toLocaleTimeString('es-PE', { hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'America/Lima' }); }
+  function fila(c, nuevo){
+    var inv = c.tipo === 'invitado', nom = c.nombre || ('DNI ' + c.dni);
+    return '<div class="act-item cupc-item' + (nuevo ? ' nuevo' : '') + '">' +
+      '<div class="cupc-ic ' + (inv ? 'inv' : 'dto') + '" aria-hidden="true"><i class="fa-solid ' + (inv ? 'fa-user-plus' : 'fa-percent') + '"></i></div>' +
+      '<div class="act-main"><div class="act-name">' + escaparHTML(nom) + '</div>' +
+      '<div class="act-meta">' + escaparHTML(NOMBRE[c.tipo] || c.tipo) + (c.plan ? ' <span class="cupc-plan">' + escaparHTML(String(c.plan).trim()) + '</span>' : '') + '</div></div>' +
+      '<span class="cupc-hora"><i class="fa-regular fa-clock"></i>' + hora(c.usado_en) + '</span></div>';
+  }
+  async function traer(desde, hasta){
+    var r = await supabaseClient.rpc('listar_cupones_usados', { p_desde: desde, p_hasta: hasta });
+    if (r.error) throw r.error;
+    return r.data || [];
+  }
+
+  /* ----- Hoy (pestaña Ingreso) ----- */
+  var vistos = null;
+  window.cyCargarCuponesHoy = async function(){
+    var box = $('cuponesHoy'), n = $('cuponesHoyN'); if (!box) return;
+    try {
+      var h = hoyLima(), data = await traer(h, h);
+      if (!data.length) { box.innerHTML = '<div class="pend-vacio">Nadie usó cupones hoy todavía.</div>'; }
+      else box.innerHTML = data.map(function(c){ return fila(c, vistos && !vistos.has(c.id)); }).join('');
+      vistos = new Set(data.map(function(c){ return c.id; }));
+      if (n) { n.textContent = data.length; n.hidden = !data.length; }
+    } catch (e) {
+      box.innerHTML = '<div class="pend-vacio">No se pudo cargar. Toca "Actualizar sistema".</div>';
+    }
+  };
+
+  /* ----- Mes (pestaña Invitar → Cupones) ----- */
+  var mes = hoyLima().slice(0, 7); // 'YYYY-MM'
+  function rango(m){
+    var y = +m.slice(0, 4), mm = +m.slice(5, 7), ult = new Date(Date.UTC(y, mm, 0)).getUTCDate();
+    return [m + '-01', m + '-' + String(ult).padStart(2, '0')];
+  }
+  window.cyCuponesMesMover = function(d){
+    var y = +mes.slice(0, 4), mm = +mes.slice(5, 7) + d;
+    if (mm < 1) { mm = 12; y--; } if (mm > 12) { mm = 1; y++; }
+    var nuevo = y + '-' + String(mm).padStart(2, '0');
+    if (nuevo > hoyLima().slice(0, 7)) return;
+    mes = nuevo; window.cyCargarCuponesMes();
+  };
+  window.cyCargarCuponesMes = async function(){
+    var box = $('cupMesLista'); if (!box) return;
+    $('cupMesTitulo').textContent = MESES[+mes.slice(5, 7) - 1] + ' ' + mes.slice(0, 4);
+    var sig = $('cupMesSig'); if (sig) sig.disabled = mes >= hoyLima().slice(0, 7);
+    box.innerHTML = '<div class="pend-vacio">Cargando…</div>';
+    try {
+      var r = rango(mes), data = await traer(r[0], r[1]);
+      $('cupTotInv').textContent = data.filter(function(c){ return c.tipo === 'invitado'; }).length;
+      $('cupTotDto').textContent = data.filter(function(c){ return c.tipo === 'descuento'; }).length;
+      if (!data.length) { box.innerHTML = '<div class="pend-vacio">No se usaron cupones este mes.</div>'; return; }
+      var html = '', dia = '';
+      data.forEach(function(c){
+        var d = fmtDia.format(new Date(c.usado_en));
+        if (d !== dia) {
+          dia = d; var f = new Date(d + 'T12:00:00');
+          html += '<div class="cupm-dia">' + (d === hoyLima() ? 'Hoy' : DIAS[f.getDay()] + ' ' + (+d.slice(8, 10))) + '</div>';
+        }
+        html += fila(c, false);
+      });
+      box.innerHTML = html;
+    } catch (e) {
+      box.innerHTML = '<div class="pend-vacio">No se pudo cargar el historial.</div>';
+    }
+  };
+
+  /* ----- Arranque y tiempo real (solo con sesión del personal) ----- */
+  var t = null;
+  function alCambiar(){
+    clearTimeout(t);
+    t = setTimeout(function(){
+      window.cyCargarCuponesHoy();
+      var p = $('invPanelCupones'); if (p && p.style.display !== 'none') window.cyCargarCuponesMes();
+    }, 300);
+  }
+  document.addEventListener('DOMContentLoaded', async function(){
+    try {
+      var s = await supabaseClient.auth.getSession();
+      if (!s.data || !s.data.session) return;
+      window.cyCargarCuponesHoy();
+      supabaseClient.channel('cupones-realtime')
+        .on('postgres_changes', { event:'INSERT', schema:'public', table:'cupones_uso' }, alCambiar)
+        .subscribe();
+      var btn = $('btnActualizar'); if (btn) btn.addEventListener('click', function(){ window.cyCargarCuponesHoy(); });
+    } catch (e) {}
   });
 })();
 </script>

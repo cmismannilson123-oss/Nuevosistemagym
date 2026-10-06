@@ -3888,6 +3888,40 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
 .ig-ok-top .sc-id span{ margin:0 0 2px; font-size:12.5px; font-weight:600; color:#34d399; }
 .ig-ok .sc-stats .ig-ok-plan{ font-size:17px; line-height:1.1; overflow-wrap:break-word; }
 @media (prefers-reduced-motion: reduce){ .ig-ok,.ig-ok-check,.ig-refresh.girando i{ animation:none; } }
+
+/* ==========================================================================
+   v62 — Colores que distinguen y armonizan
+   Misma luminosidad y saturación para todos; cada acción conserva su tono.
+   ========================================================================== */
+/* Registro: guardar (turquesa→azul) y comprobante (verde WhatsApp), lado a lado */
+#tab2 .card .rg-acc{ grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+#tab2 .card .rg-acc .cy-act-save{
+  color:#fff !important; border:0 !important;
+  background:linear-gradient(135deg,#14b8a6 0%,#0284c7 100%) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 10px 20px -12px rgba(2,132,199,.95) !important;
+}
+#tab2 .card .rg-acc .cy-act-save i{ color:#fff !important; }
+#tab2 .card .rg-acc .cy-act-wa{
+  color:#fff !important; border:0 !important;
+  background:linear-gradient(135deg,#2be36f 0%,#15a34a 100%) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 10px 20px -12px rgba(22,163,74,.95) !important;
+}
+#tab2 .card .rg-acc .cy-act-wa i{ color:#fff !important; }
+#tab2 .card .rg-acc button{ font-size:17.5px !important; gap:8px !important; padding:0 8px !important; white-space:nowrap; }
+#tab2 .card .rg-acc button span{ white-space:nowrap !important; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+@media (max-width:370px){ #tab2 .card .rg-acc{ grid-template-columns:1fr !important; } }
+
+/* Botones de la tarjeta de socio: tinte propio por acción */
+.sc .sc-btn--deuda{ background:rgba(96,165,250,.11) !important; border-color:rgba(96,165,250,.34) !important; color:#bfdbfe !important; }
+.sc .sc-btn--adel{ background:rgba(167,139,250,.11) !important; border-color:rgba(167,139,250,.34) !important; color:#ddd6fe !important; }
+.sc .sc-btn--wsp{ background:rgba(37,211,102,.1) !important; border-color:rgba(37,211,102,.34) !important; color:#bbf7d0 !important; }
+.sc .sc-btn--edit{ background:rgba(251,191,36,.1) !important; border-color:rgba(251,191,36,.34) !important; color:#fde68a !important; }
+.sc .sc-btn--peligro{ background:rgba(248,113,113,.1) !important; border-color:rgba(248,113,113,.34) !important; color:#fecaca !important; }
+.sc .sc-btn--deuda:hover{ background:rgba(96,165,250,.18) !important; }
+.sc .sc-btn--adel:hover{ background:rgba(167,139,250,.18) !important; }
+.sc .sc-btn--wsp:hover{ background:rgba(37,211,102,.17) !important; }
+.sc .sc-btn--edit:hover{ background:rgba(251,191,36,.17) !important; }
+.sc .sc-btn--peligro:hover{ background:rgba(248,113,113,.17) !important; }
 </style>
 </head>
 
@@ -4467,7 +4501,7 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
 
       <div class="cy-action-row rg-acc">
         <button class="qr-btn-principal cy-act-save" onclick="guardar()"><i class="fa-solid fa-floppy-disk"></i><span>Guardar socio</span></button>
-        <button class="btn-whatsapp cy-act-wa" onclick="enviarReciboPremium()"><i class="fa-brands fa-whatsapp"></i><span>Enviar comprobante</span></button>
+        <button class="btn-whatsapp cy-act-wa" onclick="enviarReciboPremium()" title="Enviar comprobante por WhatsApp" aria-label="Enviar comprobante por WhatsApp"><i class="fa-brands fa-whatsapp"></i><span>Comprobante</span></button>
       </div>
     </div>
   </div>
@@ -6091,7 +6125,7 @@ function mostrarLista(data){
     let urlWsp = telfLimpio ? `https://wa.me/${telfLimpio}?text=${msjWsp}` : '#';
 
     const accionPrincipal = estado === "ACTIVO"
-      ? `<button class="sc-btn" onclick="editarDeuda(${jsAttr(s.dni)})" title="Gestionar deuda"><i class="fa-solid fa-money-bill-wave ic-deuda"></i><span>Deuda</span></button>`
+      ? `<button class="sc-btn sc-btn--deuda" onclick="editarDeuda(${jsAttr(s.dni)})" title="Gestionar deuda"><i class="fa-solid fa-money-bill-wave ic-deuda"></i><span>Deuda</span></button>`
       : `<button class="sc-btn sc-btn--renovar" onclick="renovar(${jsAttr(s.dni)})" title="Renovar membresía"><i class="fa-solid fa-rotate"></i><span>Renovar</span></button>`;
 
     html += `
@@ -6099,9 +6133,9 @@ function mostrarLista(data){
       ${c.html}
       <footer class="sc-acc">
         ${accionPrincipal}
-        <button class="sc-btn" onclick="adelantarMembresia(${jsAttr(s.dni)})" title="Adelantar membresía"><i class="fa-solid fa-forward ic-adel"></i><span>Adelantar</span></button>
-        <button class="sc-btn" onclick="${telfLimpio ? `window.open(${jsAttr(urlWsp)}, '_blank')` : "mostrarToast('⚠️ Socio sin número válido', '#f59e0b')"}" title="Abrir WhatsApp"><i class="fa-brands fa-whatsapp ic-wsp"></i><span>WhatsApp</span></button>
-        <button class="sc-btn" onclick="abrirModalEditarSocio(${jsAttr(s.dni)})" title="Editar datos del socio"><i class="fa-solid fa-pen-to-square ic-edit"></i><span>Editar</span></button>
+        <button class="sc-btn sc-btn--adel" onclick="adelantarMembresia(${jsAttr(s.dni)})" title="Adelantar membresía"><i class="fa-solid fa-forward ic-adel"></i><span>Adelantar</span></button>
+        <button class="sc-btn sc-btn--wsp" onclick="${telfLimpio ? `window.open(${jsAttr(urlWsp)}, '_blank')` : "mostrarToast('⚠️ Socio sin número válido', '#f59e0b')"}" title="Abrir WhatsApp"><i class="fa-brands fa-whatsapp ic-wsp"></i><span>WhatsApp</span></button>
+        <button class="sc-btn sc-btn--edit" onclick="abrirModalEditarSocio(${jsAttr(s.dni)})" title="Editar datos del socio"><i class="fa-solid fa-pen-to-square ic-edit"></i><span>Editar</span></button>
         <button class="sc-btn sc-btn--peligro" onclick="eliminar(${jsAttr(s.dni)})" title="Eliminar socio"><i class="fa-solid fa-trash-can"></i><span>Eliminar</span></button>
       </footer>
     </article>`;

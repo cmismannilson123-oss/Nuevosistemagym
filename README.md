@@ -97,3 +97,13 @@ movimientos agrupados por día con su total.
 - **Voz en recepción:** con el panel abierto, anuncia los ingresos por QR.
 - ntfy sigue funcionando en paralelo; para apagarlo:
   `delete from public.admin_config where clave = 'ntfy_topic';`
+
+## Voz natural (IA)
+
+La voz de bienvenida y los anuncios usan voz neuronal (OpenAI `gpt-4o-mini-tts`) a través
+de la Edge Function `cy-voz` (solo personal). Cada frase se guarda en el bucket privado
+`voz` y en el celular: lo que se repite suena al instante y sin costo. Sin internet o sin
+clave, se usa la voz del celular.
+
+Para activarla: crear una clave en platform.openai.com (API keys, con saldo) y guardarla en
+Supabase → Edge Functions → Secrets como `OPENAI_API_KEY`.

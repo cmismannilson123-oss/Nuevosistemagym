@@ -4203,6 +4203,12 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 #cyAvisos .av-chip--mio > button{ all:unset; padding:9px 4px 9px 12px; cursor:pointer; }
 #cyAvisos .av-chip--mio .av-chip-x{ padding:9px 8px; color:#f9a8d4; }
 @media (prefers-reduced-motion: reduce){ #cyAvisos .av-play.sonando{ animation:none; } }
+
+/* v73 — estado de la voz natural (IA) */
+#cyAvisos .av-estado{ margin:0; display:flex; align-items:center; gap:8px; padding:9px 11px; border-radius:11px; font-size:13px; font-weight:600; line-height:1.35; color:#cfdcd6; background:rgba(255,255,255,.05); }
+#cyAvisos .av-estado:empty{ display:none; }
+#cyAvisos .av-estado.ok{ color:#ddd6fe; background:linear-gradient(90deg,rgba(167,139,250,.18),rgba(236,72,153,.12)); }
+#cyAvisos .av-estado.mal{ color:#fde68a; background:rgba(251,191,36,.12); }
 </style>
 </head>
 
@@ -8041,6 +8047,7 @@ window.enviarInvitacionWhatsApp = function() {
     </section>
     <div class="av-sub">
       <label class="av-check"><input type="checkbox" id="avVozIntentos" checked> <span>Avisar también cuando alguien con la membresía vencida o agotada intenta ingresar</span></label>
+      <p class="av-estado" id="avVozEstado"></p>
       <label class="av-campo"><span>Voz</span>
         <select id="avVozSel" aria-label="Elegir voz"></select>
       </label>
@@ -8163,12 +8170,12 @@ window.enviarInvitacionWhatsApp = function() {
     if (RE_HOMBRE.test(v.name + ' ' + (v.voiceURI || ''))) p -= 40;
     if (/google/i.test(v.name)) p += 8;           // voces de Google: las más naturales
     if (/natural|neural|enhanced|premium/i.test(v.name)) p += 10;
-    if (v.localService) p += 3;                   // funciona sin internet
+    if (!v.localService) p += 6;                  // voces de red: más naturales
     return p;
   }
   function vozElegida(){
     const vs = vocesEs(); if (!vs.length) return null;
-    const guardada = leer(LS.vozNombre, '');
+    const g = leer(LS.vozNombre, ''), guardada = g.startsWith('dev:') ? g.slice(4) : '';
     return vs.find(v => v.name === guardada) || vs.slice().sort((a, b) => puntaje(b) - puntaje(a))[0];
   }
 
@@ -8211,29 +8218,126 @@ window.enviarInvitacionWhatsApp = function() {
     });
     return out;
   }
-  let hablando = false;
-  function hablar(texto, op){
-    op = op || {};
-    if (!tieneVoz || !texto) return false;
-    const v = vozElegida();
-    const decir = () => {
-      trozos(paraVoz(texto)).forEach((frase, i, arr) => {
-        const u = new SpeechSynthesisUtterance(frase);
+  // =====================================================================
+  // MOTOR DE VOZ
+  // 1) Voz natural (IA): la Edge Function "cy-voz" genera voz neuronal con
+  //    instrucciones de estilo (cálida, natural, entonación y pausas humanas).
+  //    Cada frase se guarda en el servidor y en el celular: lo que se repite
+  //    (la bienvenida de los socios de siempre) suena al instante.
+  // 2) Si no hay internet o no hay clave de IA: voz del celular, con ajustes
+  //    neutros (los ajustes extremos son los que la hacen sonar robótica).
+  // El timbre suena mientras llega el audio, así la espera no se nota.
+  // =====================================================================
+  const IA = { estado: null, motivo: '' };
+  const VOCES_IA = { marin: 'Marin · natural y cálida (recomendada)', coral: 'Coral · amable y alegre', nova: 'Nova · juvenil y clara', shimmer: 'Shimmer · suave', sage: 'Sage · serena' };
+  const eleccion = () => leer(LS.vozNombre, '');
+  const usarIA = () => IA.estado === true && !eleccion().startsWith('dev:');
+  const vozIA = () => { const g = eleccion(); return g.startsWith('ia:') && VOCES_IA[g.slice(3)] ? g.slice(3) : 'marin'; };
+  async function comprobarIA(forzar){
+    if (IA.estado !== null && !forzar) return IA.estado;
+    try {
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (!session) return false;
+      const r = await fetch(SUPABASE_URL + '/functions/v1/cy-voz', { method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + session.access_token, apikey: SUPABASE_KEY },
+        body: JSON.stringify({ probar: true }) });
+      const j = await r.json().catch(() => ({}));
+      IA.estado = !!(r.ok && j.ia); IA.motivo = IA.estado ? '' : 'sin_clave';
+    } catch(e){ IA.estado = null; }   // sin internet: se vuelve a intentar luego
+    return IA.estado === true;
+  }
+  async function huella(s){
+    const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+    return Array.from(new Uint8Array(d), x => x.toString(16).padStart(2, '0')).join('');
+  }
+  async function audioIA(texto, tipo){
+    const voz = vozIA();
+    const url = 'https://voz.cy-fitness.local/' + voz + '/' + tipo + '/' + (await huella(texto)) + '.mp3';
+    let cache = null;
+    try { cache = await caches.open('cy-voz-v1'); const r = await cache.match(url); if (r) return await r.arrayBuffer(); } catch(e){}
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) throw new Error('sin sesión');
+    const ctrl = new AbortController(); const reloj = setTimeout(() => ctrl.abort(), 7000);
+    let r;
+    try {
+      r = await fetch(SUPABASE_URL + '/functions/v1/cy-voz', { method: 'POST', signal: ctrl.signal,
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + session.access_token, apikey: SUPABASE_KEY },
+        body: JSON.stringify({ texto, voz, tipo }) });
+    } finally { clearTimeout(reloj); }
+    if (!r.ok) {
+      const e = await r.json().catch(() => ({}));
+      if (['sin_clave', 'clave_invalida', 'sin_saldo_o_limite'].includes(e.error)) { IA.estado = false; IA.motivo = e.error; }
+      throw new Error(e.error || ('HTTP ' + r.status));
+    }
+    const buf = await r.arrayBuffer();
+    try { if (cache) cache.put(url, new Response(buf.slice(0), { headers: { 'Content-Type': 'audio/mpeg' } })); } catch(e){}
+    return buf;
+  }
+  function contexto(){
+    ctxAudio = ctxAudio || new (window.AudioContext || window.webkitAudioContext)();
+    if (ctxAudio.state === 'suspended') ctxAudio.resume().catch(() => {});
+    return ctxAudio;
+  }
+  // El celular solo deja sonar audio después de un toque: se "despierta" con el primero
+  document.addEventListener('pointerdown', () => { try { contexto(); } catch(e){} }, { capture: true, passive: true });
+
+  let fuente = null;
+  async function reproducir(buf){
+    const c = contexto();
+    const ab = await c.decodeAudioData(buf.slice(0));
+    return new Promise((ok) => {
+      const s = c.createBufferSource(); s.buffer = ab;
+      s.connect(c.destination);
+      s.onended = () => { if (fuente === s) fuente = null; ok(); };
+      fuente = s; s.start();
+    });
+  }
+  function hablarCelular(t){
+    return new Promise((ok) => {
+      if (!tieneVoz) return ok();
+      const v = vozElegida();
+      const frases = t.length <= 220 ? [t] : trozos(t);   // corto = una sola frase, fluida
+      frases.forEach((f, i) => {
+        const u = new SpeechSynthesisUtterance(f);
         if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'es-US';
-        u.rate = op.rate || 0.93;     // pausado y claro
-        u.pitch = op.pitch || 1.12;   // cálido y amable, sin chillar
-        u.volume = 1;                 // fuerte y claro
-        if (i === arr.length - 1) u.onend = u.onerror = () => { hablando = false; pintarAnuncio(); };
+        u.rate = 1; u.pitch = 1; u.volume = 1;            // natural: sin forzar tono ni velocidad
+        if (i === frases.length - 1) u.onend = u.onerror = () => ok();
         speechSynthesis.speak(u);
       });
-    };
-    hablando = true; pintarAnuncio();
-    if (speechSynthesis.paused) speechSynthesis.resume();
-    const espera = op.timbre === false ? 0 : timbre(op.largo);
-    if (espera) setTimeout(decir, espera); else decir();
+      if (speechSynthesis.paused) speechSynthesis.resume();
+    });
+  }
+  const pausa = (ms) => new Promise(r => setTimeout(r, ms));
+  let hablando = false, turno = 0, cola = Promise.resolve();
+  function hablar(texto, op){
+    op = op || {};
+    if (!texto) return false;
+    const mio = turno;
+    cola = cola.then(async () => {
+      if (mio !== turno) return;
+      hablando = true; pintarAnuncio();
+      const t = paraVoz(texto);
+      let audio = null;
+      if (IA.estado === null) await Promise.race([comprobarIA(), pausa(1500)]);
+      if (usarIA()) audio = audioIA(t, op.tipo || 'anuncio').catch(e => { console.warn('Voz IA no disponible, se usa la del celular:', e.message); return null; });
+      const espera = op.timbre === false ? 0 : timbre(op.largo);
+      await pausa(espera ? espera + 60 : 0);
+      const buf = audio ? await audio : null;
+      for (let vez = 0; vez < (op.repetir ? 2 : 1) && mio === turno; vez++) {
+        if (vez) await pausa(900);
+        if (buf) { try { await reproducir(buf); continue; } catch(e){} }
+        await hablarCelular(t);
+      }
+    }).catch(() => {}).then(() => { if (mio === turno) { hablando = false; pintarAnuncio(); } });
     return true;
   }
-  function detener(){ if (tieneVoz) speechSynthesis.cancel(); hablando = false; pintarAnuncio(); }
+  function detener(){
+    turno++;
+    try { if (fuente) fuente.stop(); } catch(e){}
+    fuente = null;
+    if (tieneVoz) speechSynthesis.cancel();
+    hablando = false; pintarAnuncio();
+  }
   if (tieneVoz) { try { speechSynthesis.getVoices(); speechSynthesis.addEventListener('voiceschanged', () => llenarVoces()); } catch(e){} }
 
   // ¿Bienvenida o bienvenido? Según el primer nombre (nombres comunes en Perú).
@@ -8278,14 +8382,14 @@ window.enviarInvitacionWhatsApp = function() {
   function alIngresar(dni, nombre, metodo){
     if (!vozActiva() || String(metodo || '').toUpperCase() !== 'QR') return;
     if (!unaVez('i' + dni, 120000)) return;
-    hablar(saludo(nombreDe(dni, nombre)).frase);
+    hablar(saludo(nombreDe(dni, nombre)).frase, { tipo: 'saludo' });
   }
   function alIntentar(dni, nombre, motivo){
     // Llega en vivo y por push: se avisa una vez. La base ya separa los reintentos (10 s).
     if (!unaVez('t' + dni + motivo, 9000)) return;
     const n = nombreDe(dni, nombre);
     mostrarToast('⛔ ' + (capital(n) || 'Un socio') + ' intentó ingresar — ' + (MOTIVO_TXT[motivo] || 'no puede ingresar'), '#ef4444');
-    if (vozActiva() && avisarIntentos()) hablar(saludo(n).frase + ' ' + (MOTIVO_VOZ[motivo] || MOTIVO_VOZ.DEUDA));
+    if (vozActiva() && avisarIntentos()) hablar(saludo(n).frase + ' ' + (MOTIVO_VOZ[motivo] || MOTIVO_VOZ.DEUDA), { tipo: 'aviso' });
   }
   document.addEventListener('cy-ingreso', (e) => { const f = e.detail || {}; alIngresar(f.dni, f.nombre, f.metodo); });
   document.addEventListener('cy-intento', (e) => { const f = e.detail || {}; alIntentar(f.dni, f.nombre, f.motivo); });
@@ -8329,8 +8433,7 @@ window.enviarInvitacionWhatsApp = function() {
     detener();
     const conTimbre = $('avTimbre').checked;
     escribir(LS.timbre, conTimbre ? '1' : '0');
-    const texto = $('avRepetir').checked ? t + '\n' + t : t;
-    hablar(texto, { timbre: conTimbre, largo: true, rate: 0.9 });
+    hablar(t, { tipo: 'anuncio', timbre: conTimbre, largo: true, repetir: $('avRepetir').checked });
     nota('');
   }
 
@@ -8338,10 +8441,19 @@ window.enviarInvitacionWhatsApp = function() {
   function llenarVoces(){
     const sel = $('avVozSel'); if (!sel) return;
     const vs = vocesEs().sort((a, b) => puntaje(b) - puntaje(a));
-    const actual = vozElegida();
-    if (!vs.length) { sel.innerHTML = '<option>Voz del celular</option>'; sel.disabled = true; return; }
-    sel.disabled = false;
-    sel.innerHTML = vs.map((v, i) => `<option value="${escaparHTML(v.name)}"${actual && v.name === actual.name ? ' selected' : ''}>${i === 0 ? '★ ' : ''}${escaparHTML(v.name)} (${escaparHTML(v.lang)})</option>`).join('');
+    const actual = usarIA() ? 'ia:' + vozIA() : 'dev:' + ((vozElegida() || {}).name || '');
+    let html = '';
+    if (IA.estado === true) html += '<optgroup label="Voz natural (IA)">' + Object.keys(VOCES_IA).map(k => `<option value="ia:${k}"${actual === 'ia:' + k ? ' selected' : ''}>${VOCES_IA[k]}</option>`).join('') + '</optgroup>';
+    if (vs.length) html += '<optgroup label="Voz del celular' + (IA.estado === true ? ' (sin internet)' : '') + '">' + vs.map((v, i) => `<option value="dev:${escaparHTML(v.name)}"${actual === 'dev:' + v.name ? ' selected' : ''}>${!IA.estado && i === 0 ? '★ ' : ''}${escaparHTML(v.name)} (${escaparHTML(v.lang)})</option>`).join('') + '</optgroup>';
+    sel.innerHTML = html || '<option>Voz del celular</option>';
+    sel.disabled = !html;
+    const est = $('avVozEstado');
+    if (est) {
+      if (IA.estado === true) { est.className = 'av-estado ok'; est.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Voz natural (IA) activa'; }
+      else if (IA.motivo === 'clave_invalida') { est.className = 'av-estado mal'; est.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> La clave de la voz IA no es válida. Usando la voz del celular.'; }
+      else if (IA.motivo === 'sin_saldo_o_limite') { est.className = 'av-estado mal'; est.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> La cuenta de voz IA no tiene saldo. Usando la voz del celular.'; }
+      else { est.className = 'av-estado'; est.innerHTML = '<i class="fa-solid fa-mobile-screen"></i> Usando la voz del celular. Para la voz natural (IA), falta activar la clave.'; }
+    }
   }
 
   // ---------- Pantalla ----------
@@ -8369,6 +8481,7 @@ window.enviarInvitacionWhatsApp = function() {
     const chk = $('avVozIntentos'); if (chk) chk.checked = avisarIntentos();
     const tim = $('avTimbre'); if (tim) tim.checked = leer(LS.timbre, '1') === '1';
     llenarVoces(); pintarSugeridos(); pintarAnuncio(); contar();
+    comprobarIA(true).then(() => llenarVoces());
     const punto = document.querySelector('#btnAvisos .tb-punto');
     if (punto) punto.hidden = activo;
   }
@@ -8382,7 +8495,7 @@ window.enviarInvitacionWhatsApp = function() {
   function cerrar(){ const m = $('cyAvisos'); if (!m) return; m.classList.remove('visible'); setTimeout(() => { m.hidden = true; }, 200); }
 
   document.addEventListener('change', (e) => {
-    if (e.target && e.target.id === 'avVozSel') { escribir(LS.vozNombre, e.target.value); hablar(saludo('María Quispe').frase); }
+    if (e.target && e.target.id === 'avVozSel') { escribir(LS.vozNombre, e.target.value); detener(); hablar(saludo('María Quispe').frase, { tipo: 'saludo' }); }
     if (e.target && e.target.id === 'avVozIntentos') escribir(LS.intentos, e.target.checked ? '1' : '0');
   });
   document.addEventListener('input', (e) => { if (e.target && e.target.id === 'avAnuncioTxt') contar(); });
@@ -8407,8 +8520,8 @@ window.enviarInvitacionWhatsApp = function() {
     if (a === 'vozprueba') {
       if (!tieneVoz) { nota('Este navegador no tiene voz. Usa Google Chrome.', 'mal'); return; }
       detener();
-      if (b.dataset.ej === 'vencido') hablar(saludo('Juan García').frase + ' ' + MOTIVO_VOZ.VENCIDO);
-      else hablar(saludo('Karla Quispe').frase);
+      if (b.dataset.ej === 'vencido') hablar(saludo('Juan García').frase + ' ' + MOTIVO_VOZ.VENCIDO, { tipo: 'aviso' });
+      else hablar(saludo('Karla Quispe').frase, { tipo: 'saludo' });
       return;
     }
     if (ocupado) return;
@@ -8420,7 +8533,7 @@ window.enviarInvitacionWhatsApp = function() {
       else if (a === 'voz') {
         const on = !vozActiva();
         escribir(LS.voz, on ? '1' : '0');
-        if (on) { hablar('Voz de bienvenida activada.'); nota('Mantén el panel abierto y el volumen alto: saludará a cada socio que ingrese por QR.', 'ok'); }
+        if (on) { hablar('¡Listo! La voz de bienvenida está activada.', { tipo: 'saludo' }); nota('Mantén el panel abierto y el volumen alto: saludará a cada socio que ingrese por QR.', 'ok'); }
         else { detener(); nota('Voz apagada.', 'info'); }
       }
     } catch (err) {

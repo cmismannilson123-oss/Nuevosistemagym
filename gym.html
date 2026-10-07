@@ -4140,6 +4140,13 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 #cyAvisos .av-nota--mal{ color:#fecaca; background:rgba(248,113,113,.12); }
 #cyAvisos .av-nota--info{ color:#bae6fd; background:rgba(56,189,248,.1); }
 @media (prefers-reduced-motion: reduce){ #cyAvisos .av-panel, #cyAvisos{ transition:none; } }
+
+/* v69 — Registro: el campo con problema se marca en rojo con su explicación */
+#tab2 .rg-f--mal input{ border-color:#f87171 !important; box-shadow:0 0 0 3px rgba(248,113,113,.16) !important; }
+#tab2 .rg-f--mal > span{ color:#fca5a5 !important; }
+#tab2 .rg-err{ display:flex; gap:6px; align-items:flex-start; margin-top:6px; font-size:13px; line-height:1.35; font-weight:600; color:#fecaca; animation:rgErr .25s ease-out; }
+#tab2 .rg-err i{ margin-top:2px; color:#f87171; }
+@keyframes rgErr{ from{ opacity:0; transform:translateY(-3px); } }
 </style>
 </head>
 
@@ -5956,28 +5963,81 @@ function cyLimpiarTelefono(v){ let d = String(v || "").replace(/\D/g, ""); if (/
 function cyLimpiarDni(v){ return String(v || "").replace(/\D/g, ""); }
 function cyTelefonoValido(d){ return !d || /^9\d{8}$/.test(d); }
 
+// ---- Errores claros del formulario de registro (marca el campo y dice qué pasa) ----
+function rgLimpiarErrores(){
+  document.querySelectorAll('#tab2 .rg-f--mal').forEach(l => l.classList.remove('rg-f--mal'));
+  document.querySelectorAll('#tab2 .rg-err').forEach(e => e.remove());
+}
+function rgError(id, msg){
+  const input = document.getElementById(id);
+  const label = input && input.closest('.rg-f');
+  if (!label) return;
+  label.classList.add('rg-f--mal');
+  let e = label.querySelector('.rg-err');
+  if (!e) { e = document.createElement('small'); e.className = 'rg-err'; e.setAttribute('role', 'alert'); label.appendChild(e); }
+  e.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> ' + escaparHTML(msg);
+}
+function rgMostrarErrores(errores){
+  rgLimpiarErrores();
+  errores.forEach(x => rgError(x.id, x.msg));
+  const primero = document.getElementById(errores[0].id);
+  if (primero) { primero.scrollIntoView({ behavior: 'smooth', block: 'center' }); try { primero.focus({ preventScroll: true }); } catch(e){} }
+  mostrarToast(errores.length === 1 ? "⚠️ " + errores[0].msg : "⚠️ Revisa los " + errores.length + " datos marcados en rojo", "#f59e0b");
+}
+document.addEventListener('input', (e) => {
+  const l = e.target && e.target.closest && e.target.closest('#tab2 .rg-f--mal');
+  if (l) { l.classList.remove('rg-f--mal'); const m = l.querySelector('.rg-err'); if (m) m.remove(); }
+});
+function rgValidar(d){
+  const err = [];
+  const lista = (typeof dataGlobal !== 'undefined' && dataGlobal) || [];
+  if (!d.dniCrudo.trim()) err.push({ id: 'dni', msg: 'Falta el DNI.' });
+  else if (/[^\d\s.-]/.test(d.dniCrudo)) err.push({ id: 'dni', msg: 'El DNI solo lleva números.' });
+  else if (d.dni.length < 8 || d.dni.length > 12) err.push({ id: 'dni', msg: 'El DNI debe tener 8 dígitos (carnet de extranjería: 9 a 12). Tiene ' + d.dni.length + '.' });
+  else {
+    const otro = lista.find(s => cyLimpiarDni(s.dni) === d.dni);
+    if (otro) err.push({ id: 'dni', msg: 'Ya existe un socio con este DNI: ' + (otro.nombre || '') + '. Búscalo en Lista para renovarlo.' });
+  }
+  if (d.nombre.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/g, '').length < 2) err.push({ id: 'nombre', msg: 'Escribe el nombre del socio.' });
+  if (d.telCrudo.trim()) {
+    if (/[^\d\s+()-]/.test(d.telCrudo)) err.push({ id: 'telefono', msg: 'El celular solo lleva números.' });
+    else if (!/^9\d{8}$/.test(d.telefono)) err.push({ id: 'telefono', msg: 'El celular debe tener 9 dígitos y empezar con 9. Tiene ' + d.telefono.length + '.' });
+    else {
+      const otro = lista.find(s => cyLimpiarTelefono(s.telefono) === d.telefono);
+      if (otro) err.push({ id: 'telefono', msg: 'Este celular ya lo tiene ' + (otro.nombre || 'otro socio') + '. Cada socio necesita su propio número para el QR.' });
+    }
+  }
+  if (!d.tipo.trim()) err.push({ id: 'tipo_memb', msg: 'Escribe o elige un plan.' });
+  if (!d.inicio) err.push({ id: 'inicio', msg: 'Falta la fecha de inicio.' });
+  if (!d.fin) err.push({ id: 'fin', msg: 'Falta la fecha de vencimiento.' });
+  else if (d.inicio && d.fin < d.inicio) err.push({ id: 'fin', msg: 'El vencimiento no puede ser antes del inicio.' });
+  const precio = d.precio === '' ? 0 : Number(d.precio);
+  const deuda = d.deuda === '' ? 0 : Number(d.deuda);
+  if (isNaN(precio) || precio < 0) err.push({ id: 'precio', msg: 'El precio debe ser un monto, por ejemplo 80.' });
+  if (isNaN(deuda) || deuda < 0) err.push({ id: 'deuda', msg: 'La deuda debe ser un monto, por ejemplo 20.' });
+  else if (precio > 0 && deuda > precio) err.push({ id: 'deuda', msg: 'La deuda no puede ser mayor que el precio (S/ ' + precio + ').' });
+  return err;
+}
+
 let _guardando = false;
 window.guardar = async function(){
   if (_guardando) return;
   _guardando = true;
   try{
-    let dni = cyLimpiarDni(document.getElementById("dni").value);
-    let nombre = document.getElementById("nombre").value;
-    let telefono = cyLimpiarTelefono(document.getElementById("telefono").value);
-    let tipo = document.getElementById("tipo_memb").value;
-    if (!cyTelefonoValido(telefono)) {
-      mostrarToast("📱 El celular debe tener 9 dígitos y empezar con 9. Revísalo.", "#f59e0b");
-      return;
-    }
-          let precio = document.getElementById("precio").value;
+    const dniCrudo = document.getElementById("dni").value;
+    const telCrudo = document.getElementById("telefono").value;
+    let dni = cyLimpiarDni(dniCrudo);
+    let nombre = document.getElementById("nombre").value.trim().replace(/\s+/g, " ");
+    let telefono = cyLimpiarTelefono(telCrudo);
+    let tipo = document.getElementById("tipo_memb").value.trim();
+    let precio = document.getElementById("precio").value;
     let inicio = document.getElementById("inicio").value;
     let fin = document.getElementById("fin").value;
     let deuda = document.getElementById("deuda").value || "0";
 
-    if(!dni || !nombre || !inicio || !fin){
-      mostrarToast("📝 Complete todos los campos obligatorios", "#f59e0b");
-      return;
-    }
+    rgLimpiarErrores();
+    const errores = rgValidar({ dniCrudo, dni, nombre, telCrudo, telefono, tipo, inicio, fin, precio, deuda: document.getElementById("deuda").value });
+    if (errores.length) { rgMostrarErrores(errores); return; }
 
     // FIX: Cálculo preciso basado en fechas locales evitando desvíos por zona horaria
     const dateInicio = new Date(inicio + "T00:00:00");
@@ -6000,16 +6060,22 @@ window.guardar = async function(){
       }]);
 
     if (error) {
-      if (error.code === "23505") {
-        if (error.message.includes("socios_dni_unique")) {
-          mostrarToast("⚠️ Ya existe un socio registrado con ese DNI", "#f59e0b");
-        } else if (error.message.includes("socios_telefono_unique")) {
-          mostrarToast("⚠️ Ya existe un socio registrado con ese número de teléfono", "#f59e0b");
-        } else {
-          mostrarToast("⚠️ Ya existe un registro duplicado", "#f59e0b");
-        }
+      console.error("No se pudo registrar:", error);
+      const msg = String(error.message || "") + " " + String(error.details || "");
+      if (error.code === "23505" && msg.includes("dni")) {
+        rgMostrarErrores([{ id: "dni", msg: "Ya existe un socio con este DNI (se registró hace poco o desde otro celular). Búscalo en Lista." }]);
+      } else if (error.code === "23505" && msg.includes("telefono")) {
+        rgMostrarErrores([{ id: "telefono", msg: "Este celular ya lo tiene otro socio. Cada socio necesita su propio número para el QR." }]);
+      } else if (error.code === "23505") {
+        mostrarToast("⚠️ Ya existe un socio con esos datos. Búscalo en Lista.", "#f59e0b");
+      } else if (error.code === "42501" || /JWT|jwt|permission/i.test(msg)) {
+        mostrarToast("🔒 Tu sesión venció. Cierra sesión, vuelve a entrar y toca Guardar otra vez.", "#ef4444");
+      } else if (error.code === "22P02" || error.code === "22007" || error.code === "22008") {
+        mostrarToast("⚠️ Hay un dato con formato inválido (fecha o monto). Revísalos.", "#f59e0b");
+      } else if (!error.code || /fetch|network|Failed/i.test(msg)) {
+        mostrarToast("📶 Sin internet: el socio NO se guardó. Revisa la conexión y toca Guardar otra vez.", "#ef4444");
       } else {
-        mostrarToast("❌ Error al registrar el socio", "#ef4444");
+        mostrarToast("❌ No se guardó: " + (error.message || "error desconocido").slice(0, 90), "#ef4444");
       }
       return;
     }

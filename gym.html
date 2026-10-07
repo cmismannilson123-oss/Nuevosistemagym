@@ -4049,6 +4049,20 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 .sc .sc-bar{ height:5px; }
 .sc .sc-bar i{ background:linear-gradient(90deg,#60a5fa,#a78bfa 55%,#34d399) !important; opacity:1; }
 @media (max-width:370px){ .sc .sc-stats{ gap:6px; } .sc .sc-stats > div{ padding:8px 8px 8px 10px; } }
+
+/* v67 — Avisos del formulario del QR (número/DNI equivocado) */
+#qrFormAviso.qr-aviso{
+  display:flex; align-items:flex-start; gap:10px; text-align:left !important; margin:0 0 14px !important;
+  padding:12px 14px; border-radius:16px; font-size:14px !important; line-height:1.4; color:#fde2e2 !important;
+  background:rgba(239,68,68,.14); border:1px solid rgba(239,68,68,.45); animation:qrAvisoEntra .3s ease-out;
+}
+#qrFormAviso.qr-aviso--aviso{ color:#fdecc8 !important; background:rgba(245,158,11,.14); border-color:rgba(245,158,11,.45); }
+#qrFormAviso.qr-aviso i{ margin-top:2px; font-size:17px; color:#f87171; flex:none; }
+#qrFormAviso.qr-aviso--aviso i{ color:#fbbf24; }
+#qrFormAviso.qr-aviso b{ color:#fff; }
+#loginFormGym input.qr-campo-mal{ border-color:#f87171 !important; box-shadow:0 0 0 3px rgba(248,113,113,.18) !important; }
+@keyframes qrAvisoEntra{ from{ opacity:0; transform:translateY(-4px); } 20%,60%{ transform:translateX(-4px); } 40%,80%{ transform:translateX(4px); } }
+@media (prefers-reduced-motion: reduce){ #qrFormAviso.qr-aviso{ animation:none; } }
 </style>
 </head>
 
@@ -4912,7 +4926,14 @@ function borrarDniSeguro() {
   try { sessionStorage.removeItem("dniGym"); } catch (e) {}
 }
 // Muestra el formulario de teléfono + DNI (con el teléfono ya escrito si lo tenemos)
-function mostrarFormularioSocioQR(mensaje) {
+document.addEventListener("input", function(e){ if (e.target && e.target.classList && e.target.classList.contains("qr-campo-mal")) e.target.classList.remove("qr-campo-mal"); });
+function borrarTelefonoSeguro() {
+  try { localStorage.removeItem("telefonoGym"); } catch (e) {}
+  try { sessionStorage.removeItem("telefonoGym"); } catch (e) {}
+}
+// Muestra el formulario con un aviso. op = { tipo:'error'|'aviso', titulo, tel, dni, foco:'tel'|'dni' }
+function mostrarFormularioSocioQR(mensaje, op) {
+  op = op || {};
   const tarjeta = document.getElementById("qrCardPrimeraVez");
   if (tarjeta) tarjeta.style.display = "block";
   const opciones = document.getElementById("qrOpcionesInicio");
@@ -4920,13 +4941,28 @@ function mostrarFormularioSocioQR(mensaje) {
   const form = document.getElementById("loginFormGym");
   if (form) form.style.display = "block";
   const aviso = document.getElementById("qrFormAviso");
-  if (aviso && mensaje) aviso.textContent = mensaje;
+  if (aviso && mensaje) {
+    aviso.className = op.tipo ? "qr-aviso qr-aviso--" + op.tipo : "";
+    aviso.innerHTML = op.tipo
+      ? '<i class="fa-solid ' + (op.tipo === "error" ? "fa-circle-exclamation" : "fa-triangle-exclamation") + '" aria-hidden="true"></i><span>' +
+        (op.titulo ? "<b>" + escaparHTML(op.titulo) + "</b>" : "") + escaparHTML(mensaje) + "</span>"
+      : escaparHTML(mensaje);
+    aviso.setAttribute("role", op.tipo ? "alert" : "status");
+  }
   const tel = leerTelefonoSeguro();
   const phoneInput = document.getElementById("qrPhone");
   const dniInput = document.getElementById("qrDni");
-  if (phoneInput && tel && !phoneInput.value) phoneInput.value = tel;
-  if (dniInput) dniInput.value = "";
-  if (phoneInput && !phoneInput.value) phoneInput.focus(); else if (dniInput) dniInput.focus();
+  if (phoneInput) {
+    if (op.tel != null) phoneInput.value = op.tel;
+    else if (tel && !phoneInput.value) phoneInput.value = tel;
+    phoneInput.classList.toggle("qr-campo-mal", op.foco === "tel");
+  }
+  if (dniInput) {
+    dniInput.value = op.dni != null ? op.dni : "";
+    dniInput.classList.toggle("qr-campo-mal", op.foco === "dni");
+  }
+  const enfocar = op.foco === "dni" ? dniInput : (op.foco === "tel" ? phoneInput : ((phoneInput && !phoneInput.value) ? phoneInput : dniInput));
+  if (enfocar) { try { enfocar.focus({ preventScroll: false }); if (op.foco) enfocar.select(); } catch (e) {} }
 }
 
 // --- DETECCIÓN: navegador embebido (WhatsApp/Instagram/Facebook/etc.) o cookies/almacenamiento bloqueado ---
@@ -5673,8 +5709,12 @@ window.cerrarModalEditarSocio = function(){
 
 window.guardarEdicionSocio = async function(){
   const nombre = document.getElementById("editNombre").value.trim();
-  const nuevoDni = document.getElementById("editDni").value.trim();
-  const telefono = document.getElementById("editTelefono").value.trim();
+  const nuevoDni = cyLimpiarDni(document.getElementById("editDni").value);
+  const telefono = cyLimpiarTelefono(document.getElementById("editTelefono").value);
+  if (!cyTelefonoValido(telefono)) {
+    mostrarToast("📱 El celular debe tener 9 dígitos y empezar con 9. Revísalo.", "#f59e0b");
+    return;
+  }
   const tipoMemb = document.getElementById("editTipoMemb").value.trim();
   const precio = document.getElementById("editPrecio").value;
   const inicio = document.getElementById("editInicio").value;
@@ -5830,15 +5870,25 @@ window.guardarRenovacion = async function(){
   await render();
 };
 
+// Celular y DNI se guardan solo con números (sin espacios, guiones ni +51),
+// así el socio siempre puede entrar por el QR con sus datos bien escritos.
+function cyLimpiarTelefono(v){ let d = String(v || "").replace(/\D/g, ""); if (/^51\d{9}$/.test(d)) d = d.slice(2); return d; }
+function cyLimpiarDni(v){ return String(v || "").replace(/\D/g, ""); }
+function cyTelefonoValido(d){ return !d || /^9\d{8}$/.test(d); }
+
 let _guardando = false;
 window.guardar = async function(){
   if (_guardando) return;
   _guardando = true;
   try{
-    let dni = document.getElementById("dni").value;
+    let dni = cyLimpiarDni(document.getElementById("dni").value);
     let nombre = document.getElementById("nombre").value;
-    let telefono = document.getElementById("telefono").value;
+    let telefono = cyLimpiarTelefono(document.getElementById("telefono").value);
     let tipo = document.getElementById("tipo_memb").value;
+    if (!cyTelefonoValido(telefono)) {
+      mostrarToast("📱 El celular debe tener 9 dígitos y empezar con 9. Revísalo.", "#f59e0b");
+      return;
+    }
           let precio = document.getElementById("precio").value;
     let inicio = document.getElementById("inicio").value;
     let fin = document.getElementById("fin").value;
@@ -6650,10 +6700,18 @@ window.actualizarSistema = async function(){
 window.procesarIngresoSocio = function(event) {
   event.preventDefault(); // Evita que la página se recargue
   
-  let telefonoIngresado = document.getElementById("qrPhone").value.replace(/\D/g,'');
-  let dniIngresado = (document.getElementById("qrDni") || {}).value || "";
-  dniIngresado = dniIngresado.replace(/\D/g,'');
-  
+  let telefonoIngresado = cyLimpiarTelefono(document.getElementById("qrPhone").value);
+  let dniIngresado = cyLimpiarDni((document.getElementById("qrDni") || {}).value || "");
+
+  if (!/^9\d{8}$/.test(telefonoIngresado)) {
+    mostrarFormularioSocioQR("Tu número de celular debe tener 9 dígitos y empezar con 9.", { tipo: "aviso", titulo: "Revisa tu celular. ", tel: document.getElementById("qrPhone").value, dni: dniIngresado, foco: "tel" });
+    return;
+  }
+  if (!/^\d{6,12}$/.test(dniIngresado)) {
+    mostrarFormularioSocioQR("Escribe tu DNI completo (8 números).", { tipo: "aviso", titulo: "Revisa tu DNI. ", tel: telefonoIngresado, dni: dniIngresado, foco: "dni" });
+    return;
+  }
+
   if (telefonoIngresado && dniIngresado) {
     // Guarda número y DNI para mantener el automatismo (Android e iPhone)
     guardarTelefonoSeguro(telefonoIngresado);
@@ -6713,7 +6771,8 @@ window.buscarQR = async function(esPrimeraVez){
 
   // La vista pública no puede leer la tabla de socios: el servidor devuelve
   // solo los datos mínimos del socio si el teléfono Y el DNI coinciden.
-  const { data: socio, error } = await cyRpcSeguro("consultar_socio_qr", { p_telefono: telefono, p_dni: dni });
+  const { data: resp, error } = await cyRpcSeguro("verificar_socio_qr", { p_telefono: telefono, p_dni: dni });
+  const socio = resp && resp.ok ? resp : (resp && resp.bloqueado ? resp : null);
   let div = document.getElementById("qrResult");
   if(!div) return;
   const filaAccesos0 = document.getElementById("cyPromoRow");
@@ -6728,9 +6787,22 @@ window.buscarQR = async function(esPrimeraVez){
     return;
   }
   if(!socio){
+    // No coincide: se olvida lo guardado (para no repetir el error la próxima
+    // vez) y se vuelve a mostrar el formulario con un aviso claro. Nunca se
+    // muestran datos de otro socio.
     borrarDniSeguro();
-    div.innerHTML = "<div class='card' style='text-align:center; color:#ef4444; font-weight:700;'>❌ El número o el DNI no coinciden con ningún socio</div>";
-    mostrarFormularioSocioQR("Revisa tu número y tu DNI.");
+    borrarTelefonoSeguro();
+    div.innerHTML = "";
+    const motivo = resp && resp.motivo;
+    if (motivo === "TELEFONO_NO_COINCIDE") {
+      mostrarFormularioSocioQR("Tu DNI está inscrito con otro número de celular. Revisa que lo hayas escrito bien. Si es correcto, acércate a recepción para actualizarlo.", { tipo: "error", titulo: "Número equivocado. ", tel: telefono, dni: dni, foco: "tel" });
+    } else if (motivo === "DNI_NO_COINCIDE") {
+      mostrarFormularioSocioQR("Este celular está inscrito con otro DNI. Revisa tu DNI. Si es correcto, acércate a recepción.", { tipo: "error", titulo: "DNI equivocado. ", tel: telefono, dni: dni, foco: "dni" });
+    } else if (motivo === "DATOS_INVALIDOS") {
+      mostrarFormularioSocioQR("Revisa que tu celular tenga 9 dígitos y tu DNI 8.", { tipo: "aviso", titulo: "Datos incompletos. ", tel: telefono, dni: dni, foco: "tel" });
+    } else {
+      mostrarFormularioSocioQR("No encontramos un socio con ese celular ni con ese DNI. Si ya te inscribiste, acércate a recepción.", { tipo: "error", titulo: "Número no registrado. ", tel: telefono, dni: dni, foco: "tel" });
+    }
     return;
   }
 

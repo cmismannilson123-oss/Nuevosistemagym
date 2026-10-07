@@ -98,12 +98,14 @@ movimientos agrupados por día con su total.
 - ntfy sigue funcionando en paralelo; para apagarlo:
   `delete from public.admin_config where clave = 'ntfy_topic';`
 
-## Voz natural (IA)
+## Voz natural (IA) — gratis
 
-La voz de bienvenida y los anuncios usan voz neuronal (OpenAI `gpt-4o-mini-tts`) a través
-de la Edge Function `cy-voz` (solo personal). Cada frase se guarda en el bucket privado
-`voz` y en el celular: lo que se repite suena al instante y sin costo. Sin internet o sin
-clave, se usa la voz del celular.
+La voz de bienvenida y los anuncios usan voz neuronal de **Google Gemini TTS** (nivel
+gratuito, solo cuenta de Google) a través de la Edge Function `cy-voz` (solo personal).
+Cada frase se genera una vez y se guarda en el bucket privado `voz` y en el celular: lo que
+se repite suena al instante y no gasta cupo. Cada noche (`cy-voz-precalentar`, pg_cron) se
+usa el cupo sobrante para preparar las bienvenidas de los socios más frecuentes. Sin
+internet, sin clave o con el cupo agotado, se usa la voz del celular.
 
-Para activarla: crear una clave en platform.openai.com (API keys, con saldo) y guardarla en
-Supabase → Edge Functions → Secrets como `OPENAI_API_KEY`.
+Para activarla: crear una clave gratis en aistudio.google.com (Get API key) y guardarla en
+Supabase → Edge Functions → Secrets como `GEMINI_API_KEY`.

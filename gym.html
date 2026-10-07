@@ -8228,11 +8228,13 @@ window.enviarInvitacionWhatsApp = function() {
   //    neutros (los ajustes extremos son los que la hacen sonar robótica).
   // El timbre suena mientras llega el audio, así la espera no se nota.
   // =====================================================================
-  const IA = { estado: null, motivo: '' };
-  const VOCES_IA = { marin: 'Marin · natural y cálida (recomendada)', coral: 'Coral · amable y alegre', nova: 'Nova · juvenil y clara', shimmer: 'Shimmer · suave', sage: 'Sage · serena' };
+  // Voz natural GRATIS con Google Gemini (nivel gratuito). Si el cupo del día
+  // se acaba, se usa la voz del celular unos minutos y se vuelve a intentar.
+  const IA = { estado: null, motivo: '', voces: {}, defecto: 'Sulafat', pausaHasta: 0 };
   const eleccion = () => leer(LS.vozNombre, '');
+  // Aunque el cupo esté agotado se sigue consultando: lo ya guardado sale gratis con voz natural
   const usarIA = () => IA.estado === true && !eleccion().startsWith('dev:');
-  const vozIA = () => { const g = eleccion(); return g.startsWith('ia:') && VOCES_IA[g.slice(3)] ? g.slice(3) : 'marin'; };
+  const vozIA = () => { const g = eleccion(); return g.startsWith('ia:') && IA.voces[g.slice(3)] ? g.slice(3) : IA.defecto; };
   async function comprobarIA(forzar){
     if (IA.estado !== null && !forzar) return IA.estado;
     try {
@@ -8243,6 +8245,8 @@ window.enviarInvitacionWhatsApp = function() {
         body: JSON.stringify({ probar: true }) });
       const j = await r.json().catch(() => ({}));
       IA.estado = !!(r.ok && j.ia); IA.motivo = IA.estado ? '' : 'sin_clave';
+      if (j.voces) IA.voces = j.voces;
+      if (j.defecto) IA.defecto = j.defecto;
     } catch(e){ IA.estado = null; }   // sin internet: se vuelve a intentar luego
     return IA.estado === true;
   }
@@ -8252,7 +8256,7 @@ window.enviarInvitacionWhatsApp = function() {
   }
   async function audioIA(texto, tipo){
     const voz = vozIA();
-    const url = 'https://voz.cy-fitness.local/' + voz + '/' + tipo + '/' + (await huella(texto)) + '.mp3';
+    const url = 'https://voz.cy-fitness.local/' + voz + '/' + tipo + '/' + (await huella(texto)) + '.wav';
     let cache = null;
     try { cache = await caches.open('cy-voz-v1'); const r = await cache.match(url); if (r) return await r.arrayBuffer(); } catch(e){}
     const { data: { session } } = await supabaseClient.auth.getSession();
@@ -8266,11 +8270,12 @@ window.enviarInvitacionWhatsApp = function() {
     } finally { clearTimeout(reloj); }
     if (!r.ok) {
       const e = await r.json().catch(() => ({}));
-      if (['sin_clave', 'clave_invalida', 'sin_saldo_o_limite'].includes(e.error)) { IA.estado = false; IA.motivo = e.error; }
+      if (['sin_clave', 'clave_invalida'].includes(e.error)) { IA.estado = false; IA.motivo = e.error; }
+      if (e.error === 'cupo') { IA.pausaHasta = Date.now() + 10 * 60000; IA.motivo = 'cupo'; }
       throw new Error(e.error || ('HTTP ' + r.status));
     }
     const buf = await r.arrayBuffer();
-    try { if (cache) cache.put(url, new Response(buf.slice(0), { headers: { 'Content-Type': 'audio/mpeg' } })); } catch(e){}
+    try { if (cache) cache.put(url, new Response(buf.slice(0), { headers: { 'Content-Type': 'audio/wav' } })); } catch(e){}
     return buf;
   }
   function contexto(){
@@ -8443,16 +8448,16 @@ window.enviarInvitacionWhatsApp = function() {
     const vs = vocesEs().sort((a, b) => puntaje(b) - puntaje(a));
     const actual = usarIA() ? 'ia:' + vozIA() : 'dev:' + ((vozElegida() || {}).name || '');
     let html = '';
-    if (IA.estado === true) html += '<optgroup label="Voz natural (IA)">' + Object.keys(VOCES_IA).map(k => `<option value="ia:${k}"${actual === 'ia:' + k ? ' selected' : ''}>${VOCES_IA[k]}</option>`).join('') + '</optgroup>';
+    if (IA.estado === true) html += '<optgroup label="Voz natural (IA gratis)">' + Object.keys(IA.voces).map(k => `<option value="ia:${escaparHTML(k)}"${actual === 'ia:' + k ? ' selected' : ''}>${escaparHTML(IA.voces[k])}</option>`).join('') + '</optgroup>';
     if (vs.length) html += '<optgroup label="Voz del celular' + (IA.estado === true ? ' (sin internet)' : '') + '">' + vs.map((v, i) => `<option value="dev:${escaparHTML(v.name)}"${actual === 'dev:' + v.name ? ' selected' : ''}>${!IA.estado && i === 0 ? '★ ' : ''}${escaparHTML(v.name)} (${escaparHTML(v.lang)})</option>`).join('') + '</optgroup>';
     sel.innerHTML = html || '<option>Voz del celular</option>';
     sel.disabled = !html;
     const est = $('avVozEstado');
     if (est) {
-      if (IA.estado === true) { est.className = 'av-estado ok'; est.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Voz natural (IA) activa'; }
-      else if (IA.motivo === 'clave_invalida') { est.className = 'av-estado mal'; est.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> La clave de la voz IA no es válida. Usando la voz del celular.'; }
-      else if (IA.motivo === 'sin_saldo_o_limite') { est.className = 'av-estado mal'; est.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> La cuenta de voz IA no tiene saldo. Usando la voz del celular.'; }
-      else { est.className = 'av-estado'; est.innerHTML = '<i class="fa-solid fa-mobile-screen"></i> Usando la voz del celular. Para la voz natural (IA), falta activar la clave.'; }
+      if (IA.estado === true && Date.now() < IA.pausaHasta) { est.className = 'av-estado mal'; est.innerHTML = '<i class="fa-solid fa-hourglass-half"></i> Cupo gratuito del momento agotado: unos minutos con la voz del celular. Las frases ya guardadas siguen con voz natural.'; }
+      else if (IA.estado === true) { est.className = 'av-estado ok'; est.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Voz natural (IA) activa · gratis'; }
+      else if (IA.motivo === 'clave_invalida') { est.className = 'av-estado mal'; est.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> La clave de Google no es válida. Usando la voz del celular.'; }
+      else { est.className = 'av-estado'; est.innerHTML = '<i class="fa-solid fa-mobile-screen"></i> Usando la voz del celular. Para la voz natural gratis, falta poner la clave de Google.'; }
     }
   }
 

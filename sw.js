@@ -30,7 +30,7 @@
 // vieja y toma la nueva automáticamente.
 // ============================================================
 
-const CACHE_NAME = 'cy-fitness-gym-v71';
+const CACHE_NAME = 'cy-fitness-gym-v72';
 
 // Dominios externos de los que es seguro guardar copia (son archivos estáticos:
 // librerías, íconos, fuentes, fotos — nunca datos de socios). Cualquier petición
@@ -179,7 +179,7 @@ self.addEventListener('push', (event) => {
   // instante (aunque su conexión en vivo se haya cortado) y, si la voz está
   // activada, anuncie el ingreso.
   event.waitUntil(clients.matchAll({ type: 'window', includeUncontrolled: true }).then((vs) => {
-    vs.forEach((v) => v.postMessage({ tipo: 'cy-push', dni: d.dni, nombre: d.nombre, metodo: d.metodo, tag: d.tag }));
+    vs.forEach((v) => v.postMessage({ tipo: 'cy-push', evento: d.tipo || 'ingreso', motivo: d.motivo, dni: d.dni, nombre: d.nombre, metodo: d.metodo, tag: d.tag }));
   }).catch(() => {}));
   event.waitUntil(self.registration.showNotification(titulo, {
     body: d.body || '',

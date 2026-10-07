@@ -4147,6 +4147,62 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 #tab2 .rg-err{ display:flex; gap:6px; align-items:flex-start; margin-top:6px; font-size:13px; line-height:1.35; font-weight:600; color:#fecaca; animation:rgErr .25s ease-out; }
 #tab2 .rg-err i{ margin-top:2px; color:#f87171; }
 @keyframes rgErr{ from{ opacity:0; transform:translateY(-3px); } }
+
+/* v72 — Voz de bienvenida y anuncios por voz */
+#cyAvisos .av-op--anuncio{ --c:#f472b6; }
+#cyAvisos .av-op--voz, #cyAvisos .av-op--anuncio{ margin-bottom:0; border-bottom-left-radius:6px; border-bottom-right-radius:6px; }
+#cyAvisos .av-sub{
+  margin-top:3px; padding:12px; border-radius:6px 6px 16px 16px; display:flex; flex-direction:column; gap:10px;
+  background:rgba(255,255,255,.025); border:1px solid rgba(255,255,255,.07); border-top:0;
+}
+#cyAvisos .av-check{ display:flex; align-items:flex-start; gap:9px; font-size:13px; line-height:1.4; color:#cfdcd6; cursor:pointer; }
+#cyAvisos .av-check input{ width:18px; height:18px; margin:1px 0 0; flex:none; accent-color:#a78bfa; }
+#cyAvisos .av-check--min{ font-size:12.5px; align-items:center; gap:6px; }
+#cyAvisos .av-check--min input{ width:16px; height:16px; margin:0; accent-color:#f472b6; }
+#cyAvisos .av-campo{ display:flex; align-items:center; gap:10px; font-size:13px; color:#8da09a; }
+#cyAvisos .av-campo select{
+  flex:1; min-width:0; height:44px !important; min-height:0 !important; margin:0 !important; padding:0 12px !important; line-height:normal !important;
+  border-radius:11px !important; font-size:14px !important; color:#eef4f2 !important; text-overflow:ellipsis;
+  background:#0d1a16 !important; border:1px solid rgba(255,255,255,.12) !important; outline:none; box-shadow:none !important;
+}
+#cyAvisos .av-campo{ margin:0 !important; }
+#cyAvisos .av-check{ margin:0 !important; }
+#cyAvisos .av-fila{ display:flex; flex-wrap:wrap; gap:8px; }
+#cyAvisos .av-chip{
+  display:inline-flex; align-items:center; gap:6px; width:auto !important; min-height:36px !important; margin:0 !important; padding:0 12px !important;
+  border-radius:999px !important; font-size:13px !important; font-weight:600; line-height:1.2; color:#e9e4ff !important;
+  background:rgba(167,139,250,.12) !important; border:1px solid rgba(167,139,250,.3) !important; box-shadow:none !important; text-align:left;
+}
+#cyAvisos .av-chip i{ font-size:11px; }
+#cyAvisos .av-anuncio .av-chip{ color:#fde4f1 !important; background:rgba(244,114,182,.1) !important; border-color:rgba(244,114,182,.28) !important; }
+#cyAvisos .av-chip:active{ transform:scale(.96); }
+#cyAvisos .av-anuncio textarea{
+  width:100%; box-sizing:border-box; min-height:104px; resize:vertical; padding:12px 13px; border-radius:13px;
+  font:inherit; font-size:15px; line-height:1.45; color:#eef4f2; background:#0d1a16; border:1px solid rgba(255,255,255,.12); outline:none;
+}
+#cyAvisos .av-anuncio textarea:focus{ border-color:rgba(244,114,182,.55); }
+#cyAvisos .av-anuncio-pie{ display:flex; flex-wrap:wrap; align-items:center; gap:6px 14px; font-size:12px; color:#5f716b; }
+#cyAvisos .av-anuncio-pie > span{ margin-right:auto; font-variant-numeric:tabular-nums; }
+#cyAvisos .av-acciones{ display:flex; gap:8px; }
+#cyAvisos .av-play{
+  flex:1; display:flex; align-items:center; justify-content:center; gap:9px; width:auto !important; min-height:50px !important; margin:0 !important; padding:0 14px !important;
+  border-radius:14px !important; font-family:var(--cy-display) !important; font-size:20px !important; font-weight:700 !important; color:#2a0618 !important;
+  background:linear-gradient(135deg,#f9a8d4,#ec4899) !important; border:0 !important; box-shadow:0 10px 20px -12px rgba(236,72,153,.9) !important;
+}
+#cyAvisos .av-play.sonando{ animation:avPulso 1.1s ease-in-out infinite; }
+@keyframes avPulso{ 50%{ box-shadow:0 0 0 6px rgba(236,72,153,.18), 0 10px 20px -12px rgba(236,72,153,.9); } }
+#cyAvisos .av-stop, #cyAvisos .av-guardar{
+  flex:none; width:50px !important; min-height:50px !important; margin:0 !important; padding:0 !important; display:grid; place-items:center;
+  border-radius:14px !important; font-size:17px !important; color:#fecdd3 !important; background:rgba(255,255,255,.06) !important; border:1px solid rgba(255,255,255,.12) !important; box-shadow:none !important;
+}
+#cyAvisos .av-guardar{ color:#fde4f1 !important; }
+#cyAvisos .av-sug-t{ margin:4px 0 -2px; font-size:12px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; color:#8da09a; }
+#cyAvisos .av-sug-t[hidden]{ display:none; }
+#cyAvisos .av-sug{ display:flex; flex-wrap:wrap; gap:7px; }
+#cyAvisos .av-chip--mio{ padding:0 4px 0 0 !important; overflow:hidden; }
+#cyAvisos .av-chip--mio > button{ all:unset; padding:9px 4px 9px 12px; cursor:pointer; }
+#cyAvisos .av-chip--mio .av-chip-x{ padding:9px 8px; color:#f9a8d4; }
+@media (prefers-reduced-motion: reduce){ #cyAvisos .av-play.sonando{ animation:none; } }
 </style>
 </head>
 
@@ -6841,6 +6897,9 @@ if (!esVistaPublicaQR) {
   //  4. Respaldo: cada 20 s revisa si hay un ingreso nuevo (consulta mínima).
   const CANALES = [
     { nombre: 'socios-realtime', tabla: 'socios', alCambiar: () => renderConPausa() },
+    { nombre: 'intentos-realtime', tabla: 'intentos_ingreso', alCambiar: (p) => {
+        if (p && p.eventType === 'INSERT' && p.new) document.dispatchEvent(new CustomEvent('cy-intento', { detail: p.new }));
+      } },
     { nombre: 'asistencia-realtime', tabla: 'historial_asistencia', alCambiar: (p) => {
         historialConPausa();
         if (p && p.eventType === 'INSERT' && p.new) document.dispatchEvent(new CustomEvent('cy-ingreso', { detail: p.new }));
@@ -7011,6 +7070,15 @@ window.intentarRecuperarCredencialSilenciosa = async function(){
   return null;
 };
 
+// Avisa a recepción (voz y notificación) que un socio quiso ingresar y no puede.
+// La base decide el motivo con los datos reales; no frena la pantalla.
+window.cyAvisarIntento = function(){
+  try {
+    const tel = (leerTelefonoSeguro() || "").replace(/\D/g, ""), dni = (leerDniSeguro() || "").replace(/\D/g, "");
+    if (tel && dni) supabaseClient.rpc("avisar_intento_qr", { p_telefono: tel, p_dni: dni }).then(() => {}, () => {});
+  } catch (e) {}
+};
+
 window.buscarQR = async function(esPrimeraVez){
   let telefonoGuardado = leerTelefonoSeguro();
   let phoneInput = document.getElementById("qrPhone");
@@ -7068,6 +7136,7 @@ window.buscarQR = async function(esPrimeraVez){
     if (diasDeuda > 7) {
       div.innerHTML = `<div class="card" style="border:2px solid #ef4444; text-align:center;"><h2 style="color:#ef4444;">🚫 ACCESO BLOQUEADO</h2><h3>${escaparHTML(socio.nombre)}</h3><p>💰 Deuda pendiente: S/ ${escaparHTML(socio.deuda)}</p><p>Regularice su pago para habilitar su acceso.</p></div>`;
       playSound("VENCIDO");
+      cyAvisarIntento();
       return;
     }
   }
@@ -7089,6 +7158,7 @@ window.buscarQR = async function(esPrimeraVez){
       <div class="catalogo-promo-arrow">›</div>
     </div>`;
     playSound("VENCIDO");
+    cyAvisarIntento();
     return;
   }
 
@@ -7108,6 +7178,7 @@ window.buscarQR = async function(esPrimeraVez){
       <div class="catalogo-promo-arrow">›</div>
     </div>`;
     playSound("VENCIDO");
+    cyAvisarIntento();
     return;
   }
 
@@ -7198,12 +7269,15 @@ window.confirmarAsistenciaQR = async function () {
     if (!resultado.ok) {
       switch (resultado.motivo) {
         case "AGOTADO":
+          cyAvisarIntento();
           mostrarTarjetaEstado("🚫 MEMBRESÍA AGOTADA", `<b>${escaparHTML(resultado.nombre)}</b><br><br>Ha consumido las 15 asistencias de su plan Interdiario.<br><br>Acérquese a recepción para renovar su membresía.`);
           break;
         case "VENCIDO":
+          cyAvisarIntento();
           mostrarTarjetaEstado("❌ MEMBRESÍA VENCIDA", "Su membresía ha vencido por fecha calendario.<br><br>Acérquese a recepción para renovarla.");
           break;
         case "DEUDA":
+          cyAvisarIntento();
           mostrarTarjetaEstado("🚫 ACCESO BLOQUEADO", `<b>${escaparHTML(resultado.nombre)}</b><br><br>💰 Deuda pendiente: <b>S/ ${escaparHTML(resultado.deuda)}</b><br><br>Regularice su pago para habilitar su acceso.`, "#ef4444");
           break;
         case "BLOQUEADO":
@@ -7959,12 +8033,44 @@ window.enviarInvitacionWhatsApp = function() {
     </section>
     <button type="button" class="av-prueba" id="avPrueba" data-av="prueba" hidden><i class="fa-solid fa-paper-plane"></i> Enviar una notificación de prueba</button>
 
+    <!-- Voz de bienvenida -->
     <section class="av-op av-op--voz">
       <span class="av-ico"><i class="fa-solid fa-volume-high"></i></span>
-      <div class="av-txt"><b>Voz en recepción</b><small>Con el panel abierto, anuncia en voz alta quién ingresa por QR: “Ingresó María. Estado activo”.</small></div>
+      <div class="av-txt"><b>Voz de bienvenida</b><small>Con el panel abierto, saluda a quien ingresa por QR: “¡Bienvenida, Karla Quispe!”.</small></div>
       <button type="button" class="av-btn" id="avVozBtn" data-av="voz" aria-pressed="false">Activar</button>
     </section>
-    <button type="button" class="av-prueba" id="avVozPrueba" data-av="vozprueba"><i class="fa-solid fa-play"></i> Escuchar un ejemplo</button>
+    <div class="av-sub">
+      <label class="av-check"><input type="checkbox" id="avVozIntentos" checked> <span>Avisar también cuando alguien con la membresía vencida o agotada intenta ingresar</span></label>
+      <label class="av-campo"><span>Voz</span>
+        <select id="avVozSel" aria-label="Elegir voz"></select>
+      </label>
+      <div class="av-fila">
+        <button type="button" class="av-chip" data-av="vozprueba" data-ej="ingreso"><i class="fa-solid fa-play"></i> Bienvenida</button>
+        <button type="button" class="av-chip" data-av="vozprueba" data-ej="vencido"><i class="fa-solid fa-play"></i> Membresía vencida</button>
+      </div>
+    </div>
+
+    <!-- Anuncios por voz -->
+    <section class="av-op av-op--anuncio">
+      <span class="av-ico"><i class="fa-solid fa-bullhorn"></i></span>
+      <div class="av-txt"><b>Anuncios por voz</b><small>Escribe un mensaje y reprodúcelo con la misma voz. Ideal con el celular conectado al parlante del gimnasio.</small></div>
+    </section>
+    <div class="av-sub av-anuncio">
+      <textarea id="avAnuncioTxt" rows="4" maxlength="600" placeholder="Ej.: Atención, por favor. El gimnasio cerrará en 5 minutos. ¡Gracias por entrenar con nosotros!"></textarea>
+      <div class="av-anuncio-pie"><span id="avAnuncioCont">0/600</span>
+        <label class="av-check av-check--min"><input type="checkbox" id="avTimbre" checked> <span>Timbre de aviso</span></label>
+        <label class="av-check av-check--min"><input type="checkbox" id="avRepetir"> <span>Repetir 2 veces</span></label>
+      </div>
+      <div class="av-acciones">
+        <button type="button" class="av-play" id="avPlay" data-av="anunciar"><i class="fa-solid fa-play"></i> <span>Reproducir</span></button>
+        <button type="button" class="av-stop" data-av="detener" aria-label="Detener"><i class="fa-solid fa-stop"></i></button>
+        <button type="button" class="av-guardar" data-av="guardarmsg" aria-label="Guardar este mensaje"><i class="fa-regular fa-bookmark"></i></button>
+      </div>
+      <p class="av-sug-t">Mensajes sugeridos</p>
+      <div class="av-sug" id="avSugeridos"></div>
+      <p class="av-sug-t" id="avMisT" hidden>Mis mensajes</p>
+      <div class="av-sug" id="avMios"></div>
+    </div>
 
     <p class="av-nota" id="avNota"></p>
   </div>
@@ -7972,20 +8078,23 @@ window.enviarInvitacionWhatsApp = function() {
 
 <script>
 // =====================================================================
-// APP Y NOTIFICACIONES — instalar la app, avisos push propios (sin ntfy)
-// y voz en recepción. Solo en el panel; la pantalla del QR no lo usa.
+// APP Y NOTIFICACIONES — instalar la app, avisos push propios (sin ntfy),
+// voz de bienvenida y anuncios por voz. Solo en el panel.
 // =====================================================================
 (function(){
   if (document.documentElement.classList.contains('qr-mode')) return;
   const VAPID = 'BAGbwqTYN3ORt7VRygX0uhX_5ZT3FiWJhFMvlSzwsDK0zcjK0Y-OiLArjBgJae3clm27Rp4EZRLFnFcmyu9TTws';
-  const LS_VOZ = 'cy_voz_recepcion';
+  const LS = { voz: 'cy_voz_recepcion', intentos: 'cy_voz_intentos', vozNombre: 'cy_voz_nombre', mios: 'cy_anuncios_mios', timbre: 'cy_anuncio_timbre' };
   const $ = (id) => document.getElementById(id);
+  const leer = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch(e){ return d; } };
+  const escribir = (k, v) => { try { localStorage.setItem(k, v); } catch(e){} };
   let promptInstalar = null;
   let ocupado = false;
 
   const soportaPush = () => ('serviceWorker' in navigator) && ('PushManager' in window) && ('Notification' in window);
   const instalada = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
-  const vozActiva = () => { try { return localStorage.getItem(LS_VOZ) === '1'; } catch(e){ return false; } };
+  const vozActiva = () => leer(LS.voz, '0') === '1';
+  const avisarIntentos = () => leer(LS.intentos, '1') === '1';
   const b64aBytes = (b64) => {
     const p = '='.repeat((4 - b64.length % 4) % 4);
     const s = atob((b64 + p).replace(/-/g, '+').replace(/_/g, '/'));
@@ -7996,39 +8105,30 @@ window.enviarInvitacionWhatsApp = function() {
   // ---------- Instalar ----------
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); promptInstalar = e; pintar(); });
   window.addEventListener('appinstalled', () => { promptInstalar = null; pintar(); mostrarToast('✅ App instalada en tu pantalla de inicio', '#10b981'); });
-
   async function instalar(){
     if (instalada()) return;
-    if (promptInstalar) {
-      promptInstalar.prompt();
-      try { await promptInstalar.userChoice; } catch(e){}
-      promptInstalar = null; pintar();
-      return;
-    }
+    if (promptInstalar) { promptInstalar.prompt(); try { await promptInstalar.userChoice; } catch(e){} promptInstalar = null; pintar(); return; }
     nota('En Chrome: toca los tres puntos ⋮ (arriba a la derecha) y elige “Instalar aplicación” o “Agregar a la pantalla principal”.', 'info');
   }
 
-  // ---------- Notificaciones ----------
+  // ---------- Notificaciones push ----------
   async function suscripcionActual(){
     if (!soportaPush()) return null;
-    const reg = await navigator.serviceWorker.ready;
-    return reg.pushManager.getSubscription();
+    // Si el service worker aún no está listo, no se queda esperando para siempre
+    const reg = await Promise.race([navigator.serviceWorker.ready, new Promise(r => setTimeout(() => r(null), 3000))]);
+    return reg ? reg.pushManager.getSubscription() : null;
   }
   async function guardarSuscripcion(sub){
     const j = sub.toJSON();
     const { error } = await supabaseClient.from('push_suscripciones').upsert([{
-      endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth,
-      dispositivo: (navigator.userAgent || '').slice(0, 160)
+      endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth, dispositivo: (navigator.userAgent || '').slice(0, 160)
     }], { onConflict: 'endpoint' });
     if (error) throw error;
   }
   async function activarPush(){
     if (!soportaPush()) { nota('Este navegador no permite notificaciones. Abre el panel en Google Chrome.', 'mal'); return; }
     const permiso = await Notification.requestPermission();
-    if (permiso !== 'granted') {
-      nota('Las notificaciones están bloqueadas. Toca el candado junto a la dirección (o Ajustes del sitio) → Notificaciones → Permitir, y vuelve a intentarlo.', 'mal');
-      return pintar();
-    }
+    if (permiso !== 'granted') { nota('Las notificaciones están bloqueadas. Toca el candado junto a la dirección (o Ajustes del sitio) → Notificaciones → Permitir, y vuelve a intentarlo.', 'mal'); return; }
     const reg = await navigator.serviceWorker.ready;
     let sub = await reg.pushManager.getSubscription();
     if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64aBytes(VAPID) });
@@ -8037,10 +8137,7 @@ window.enviarInvitacionWhatsApp = function() {
   }
   async function desactivarPush(){
     const sub = await suscripcionActual();
-    if (sub) {
-      try { await supabaseClient.from('push_suscripciones').delete().eq('endpoint', sub.endpoint); } catch(e){}
-      await sub.unsubscribe();
-    }
+    if (sub) { try { await supabaseClient.from('push_suscripciones').delete().eq('endpoint', sub.endpoint); } catch(e){} await sub.unsubscribe(); }
     nota('Notificaciones apagadas en este celular.', 'info');
   }
   async function probar(){
@@ -8049,59 +8146,202 @@ window.enviarInvitacionWhatsApp = function() {
     nota('Enviada. Debería llegarte en unos segundos (también con la pantalla apagada).', 'ok');
   }
 
-  // ---------- Voz ----------
-  function vozEspanol(){
-    const vs = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
-    return vs.find(v => /^es[-_](PE|US|MX|419)/i.test(v.lang)) || vs.find(v => /^es/i.test(v.lang)) || null;
+  // =====================================================================
+  // VOZ: femenina, cálida y clara. Se elige la mejor voz en español del
+  // celular (prefiere español latino y voces de mujer), con un tono un poco
+  // más alegre y un ritmo pausado para que se entienda bien. Antes de hablar
+  // suena un timbre suave para que la gente preste atención.
+  // =====================================================================
+  const tieneVoz = 'speechSynthesis' in window;
+  const RE_MUJER = /(female|mujer|woman|paulina|m[oó]nica|helena|laura|sabina|lupe|camila|paloma|elvira|dalia|marisol|valentina|sof[ií]a|luciana|francisca|isabela|esperanza|catalina|ximena|elena|sfb|esc\b|eea|-f\d|#female)/i;
+  const RE_HOMBRE = /(\bmale\b|hombre|jorge|diego|juan\b|carlos|pablo|enrique|ra[uú]l|andr[eé]s|tom[aá]s|esd\b|esf\b|eed|#male)/i;
+  function vocesEs(){ return tieneVoz ? speechSynthesis.getVoices().filter(v => /^es/i.test(v.lang)) : []; }
+  function puntaje(v){
+    let p = 0;
+    if (/^es[-_](US|MX|419|PE|CO|AR|CL)/i.test(v.lang)) p += 30; else if (/^es[-_]ES/i.test(v.lang)) p += 10;
+    if (RE_MUJER.test(v.name + ' ' + (v.voiceURI || ''))) p += 25;
+    if (RE_HOMBRE.test(v.name + ' ' + (v.voiceURI || ''))) p -= 40;
+    if (/google/i.test(v.name)) p += 8;           // voces de Google: las más naturales
+    if (/natural|neural|enhanced|premium/i.test(v.name)) p += 10;
+    if (v.localService) p += 3;                   // funciona sin internet
+    return p;
   }
-  function hablar(texto){
-    if (!('speechSynthesis' in window)) return false;
-    const u = new SpeechSynthesisUtterance(texto);
-    const v = vozEspanol();
-    if (v) u.voice = v;
-    u.lang = v ? v.lang : 'es-PE'; u.rate = 1; u.pitch = 1; u.volume = 1;
-    speechSynthesis.speak(u);
+  function vozElegida(){
+    const vs = vocesEs(); if (!vs.length) return null;
+    const guardada = leer(LS.vozNombre, '');
+    return vs.find(v => v.name === guardada) || vs.slice().sort((a, b) => puntaje(b) - puntaje(a))[0];
+  }
+
+  // Timbre suave (dos notas) con el propio celular, sin archivos
+  let ctxAudio = null;
+  function timbre(largo){
+    try {
+      ctxAudio = ctxAudio || new (window.AudioContext || window.webkitAudioContext)();
+      if (ctxAudio.state === 'suspended') ctxAudio.resume();
+      const notas = largo ? [[659.25, 0], [830.61, .22], [987.77, .44]] : [[783.99, 0], [1046.5, .16]];
+      notas.forEach(([f, t0]) => {
+        const o = ctxAudio.createOscillator(), g = ctxAudio.createGain();
+        o.type = 'sine'; o.frequency.value = f;
+        const t = ctxAudio.currentTime + t0;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(0.32, t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + (largo ? 0.9 : 0.6));
+        o.connect(g).connect(ctxAudio.destination); o.start(t); o.stop(t + 1);
+      });
+      return largo ? 1100 : 650;
+    } catch(e){ return 0; }
+  }
+
+  // Texto pensado para el oído: nombres bien escritos y siglas que se leen bien
+  const capital = (s) => String(s || '').toLowerCase().replace(/(^|[\s'-])([a-záéíóúüñ])/g, (m, a, b) => a + b.toUpperCase());
+  function paraVoz(t){
+    return String(t || '')
+      .replace(/C\s*&\s*Y/gi, 'C y Y')
+      .replace(/S\/\.?\s*(\d+(?:[.,]\d+)?)/g, '$1 soles')
+      .replace(/(\d+)\s*%/g, '$1 por ciento')
+      .replace(/\s+/g, ' ').trim();
+  }
+  function trozos(t){
+    const partes = t.match(/[^.!?¡¿\n]+[.!?]*|[¡¿][^.!?\n]+[.!?]*/g) || [t];
+    const out = [];
+    partes.forEach(p => {
+      p = p.trim(); if (!p) return;
+      while (p.length > 180) { const i = p.lastIndexOf(',', 180); const c = i > 40 ? i + 1 : 180; out.push(p.slice(0, c)); p = p.slice(c).trim(); }
+      if (p) out.push(p);
+    });
+    return out;
+  }
+  let hablando = false;
+  function hablar(texto, op){
+    op = op || {};
+    if (!tieneVoz || !texto) return false;
+    const v = vozElegida();
+    const decir = () => {
+      trozos(paraVoz(texto)).forEach((frase, i, arr) => {
+        const u = new SpeechSynthesisUtterance(frase);
+        if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'es-US';
+        u.rate = op.rate || 0.93;     // pausado y claro
+        u.pitch = op.pitch || 1.12;   // cálido y amable, sin chillar
+        u.volume = 1;                 // fuerte y claro
+        if (i === arr.length - 1) u.onend = u.onerror = () => { hablando = false; pintarAnuncio(); };
+        speechSynthesis.speak(u);
+      });
+    };
+    hablando = true; pintarAnuncio();
+    if (speechSynthesis.paused) speechSynthesis.resume();
+    const espera = op.timbre === false ? 0 : timbre(op.largo);
+    if (espera) setTimeout(decir, espera); else decir();
     return true;
   }
-  if ('speechSynthesis' in window) { try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => {}; } catch(e){} }
+  function detener(){ if (tieneVoz) speechSynthesis.cancel(); hablando = false; pintarAnuncio(); }
+  if (tieneVoz) { try { speechSynthesis.getVoices(); speechSynthesis.addEventListener('voiceschanged', () => llenarVoces()); } catch(e){} }
 
-  function fraseIngreso(fila){
-    const s = ((typeof dataGlobal !== 'undefined' && dataGlobal) || []).find(x => String(x.dni) === String(fila.dni)) || {};
-    const nombre = String(s.nombre || fila.nombre || 'un socio').trim().split(/\s+/).slice(0, 2).join(' ');
-    const deuda = parseFloat(s.deuda) || 0;
-    let estado = 'Estado activo';
-    if (deuda > 0) estado = 'Tiene deuda de ' + deuda + ' soles';
-    else if (s.fecha_fin) {
-      const dias = Math.round((new Date(s.fecha_fin + 'T00:00:00') - new Date(new Date().toDateString())) / 864e5);
-      if (dias <= 0) estado = 'Su membresía vence hoy';
-      else if (dias <= 3) estado = 'Su membresía vence en ' + dias + (dias === 1 ? ' día' : ' días');
-    }
-    return 'Ingresó ' + nombre + '. ' + estado + '.';
+  // ¿Bienvenida o bienvenido? Según el primer nombre (nombres comunes en Perú).
+  const FEM = new Set('isabel raquel carmen pilar luz ruth ester esther beatriz ines mercedes dolores soledad rocio belen nicole nicol jazmin yasmin maribel marisol consuelo rosario milagros lourdes flor abigail miriam mirian sharon karen evelyn ingrid lizbeth elizabeth yuliet juliet scarlet scarleth nayeli yaneli aracely aracelly deysi daysi daisy heidi wendy sandy cindy betty kelly sally nancy mery mary ruby lucy gisel gissel giselle noemi zoe mabel sol lili liz yamileth joselyn jocelyn estefany stefany tiffany brigitte brigith anahi nohely nely edith judith yudith ivonne ivon lisbeth nataly nathaly kimberly shirley fanny jenny jhenny emily emely melany melanie stephanie madeleine caroline jacqueline jaqueline yesenia dayana diana catherine katherine kathy cathy rachel rebeca ximena geraldine jade irene danae adele marilyn madai nahomi naomi sheyli sheily yeni yeny leydi lady suly araceli rosmery rosemary maricel marisel aylin ailin evelin ashley britany brittany alison allison'.split(' '));
+  const MASC = new Set('luca joshua nikita bautista elias jeremias isaias matias tobias josue jhony johnny jony rony andy henry danny freddy eddy teddy ruddy harry jerry gary roy ray rey ali rudi rudy jhonny yoel jose felipe enrique dante jorge jaime vicente alexis kenny jhoel noe abel'.split(' '));
+  function genero(nombre){
+    const n = String(nombre || '').trim().split(/\s+/)[0].toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    if (!n) return null;
+    if (FEM.has(n)) return 'f';
+    if (MASC.has(n)) return 'm';
+    if (/a$/.test(n)) return 'f';
+    if (/o$/.test(n)) return 'm';
+    if (/(eth|lyn|line|elle|ette)$/.test(n)) return 'f';
+    if (/[bcdfgjklmnprstvxz]$/.test(n)) return 'm';
+    return null;   // no estamos seguros: saludo neutral
   }
-  // La voz usa la misma conexión en vivo del panel (evento 'cy-ingreso') y,
-  // si esa conexión se cortó, la notificación push (evento 'cy-push').
-  // Cada ingreso se anuncia una sola vez aunque lleguen los dos.
-  const anunciados = new Map();
-  function anunciar(dni, texto){
-    const clave = String(dni || texto);
+  function saludo(nombreCompleto){
+    const partes = capital(nombreCompleto).trim().split(/\s+/);
+    const corto = partes.slice(0, 2).join(' ') || 'socio';
+    const g = genero(corto);
+    return { corto, frase: g === 'f' ? '¡Bienvenida, ' + corto + '!' : g === 'm' ? '¡Bienvenido, ' + corto + '!' : '¡Te damos la bienvenida, ' + corto + '!' };
+  }
+  const MOTIVO_VOZ = {
+    VENCIDO: 'Tu membresía venció. Por favor, acércate a recepción, en un momento te atendemos.',
+    AGOTADO: 'Ya usaste todas las asistencias de tu plan. Por favor, acércate a recepción, en un momento te atendemos.',
+    DEUDA: 'Por favor, acércate a recepción, en un momento te atendemos.'
+  };
+  const MOTIVO_TXT = { VENCIDO: 'membresía vencida', AGOTADO: 'asistencias agotadas', DEUDA: 'bloqueado por deuda' };
+  const nombreDe = (dni, nombre) => {
+    const s = ((typeof dataGlobal !== 'undefined' && dataGlobal) || []).find(x => String(x.dni) === String(dni));
+    return (s && s.nombre) || nombre || '';
+  };
+
+  // Cada ingreso o intento se anuncia una sola vez (llega en vivo y por push)
+  const hechos = new Map();
+  function unaVez(clave, ms){
     const ahora = Date.now();
-    if (anunciados.has(clave) && ahora - anunciados.get(clave) < 120000) return;
-    anunciados.set(clave, ahora);
-    hablar(texto);
+    for (const [k, t] of hechos) if (ahora - t > 300000) hechos.delete(k);
+    if (hechos.has(clave) && ahora - hechos.get(clave) < ms) return false;
+    hechos.set(clave, ahora); return true;
   }
-  function escucharIngresos(){
-    if (window._cyVozLista) return;
-    window._cyVozLista = true;
-    document.addEventListener('cy-ingreso', (e) => {
-      const f = e.detail;
-      if (!f || !vozActiva() || String(f.metodo || '').toUpperCase() !== 'QR') return;
-      anunciar(f.dni, fraseIngreso(f));
-    });
-    document.addEventListener('cy-push', (e) => {
-      const d = e.detail || {};
-      if (!vozActiva() || d.metodo !== 'QR' || !d.dni) return;
-      anunciar(d.dni, fraseIngreso({ dni: d.dni, nombre: d.nombre }));
-    });
+  function alIngresar(dni, nombre, metodo){
+    if (!vozActiva() || String(metodo || '').toUpperCase() !== 'QR') return;
+    if (!unaVez('i' + dni, 120000)) return;
+    hablar(saludo(nombreDe(dni, nombre)).frase);
+  }
+  function alIntentar(dni, nombre, motivo){
+    // Llega en vivo y por push: se avisa una vez. La base ya separa los reintentos (10 s).
+    if (!unaVez('t' + dni + motivo, 9000)) return;
+    const n = nombreDe(dni, nombre);
+    mostrarToast('⛔ ' + (capital(n) || 'Un socio') + ' intentó ingresar — ' + (MOTIVO_TXT[motivo] || 'no puede ingresar'), '#ef4444');
+    if (vozActiva() && avisarIntentos()) hablar(saludo(n).frase + ' ' + (MOTIVO_VOZ[motivo] || MOTIVO_VOZ.DEUDA));
+  }
+  document.addEventListener('cy-ingreso', (e) => { const f = e.detail || {}; alIngresar(f.dni, f.nombre, f.metodo); });
+  document.addEventListener('cy-intento', (e) => { const f = e.detail || {}; alIntentar(f.dni, f.nombre, f.motivo); });
+  document.addEventListener('cy-push', (e) => {
+    const d = e.detail || {};
+    if (d.evento === 'intento') alIntentar(d.dni, d.nombre, d.motivo);
+    else alIngresar(d.dni, d.nombre, d.metodo);
+  });
+
+  // ---------- Anuncios por voz ----------
+  const SUGERIDOS = [
+    ['Cierre en 5 min', 'Atención, por favor. El gimnasio cerrará en 5 minutos. ¡Muchas gracias por entrenar con nosotros, los esperamos mañana!'],
+    ['Cierre en 15 min', 'Atención, por favor. Les recordamos que el gimnasio cerrará en 15 minutos. Vayan terminando su rutina con calma.'],
+    ['Ordenar equipos', 'Les pedimos, por favor, devolver las pesas, discos y mancuernas a su lugar después de usarlos. ¡Gracias por mantener el orden!'],
+    ['Limpiar máquinas', 'Por favor, limpien las máquinas y bancas después de usarlas. Cuidemos juntos nuestro espacio.'],
+    ['Hidratación', 'Recuerden mantenerse hidratados durante su entrenamiento. ¡Su cuerpo se lo agradecerá!'],
+    ['Buenos días', '¡Buenos días, familia C&Y Fitness! Les deseamos un excelente entrenamiento. ¡A darle con todo!'],
+    ['Buenas noches', '¡Buenas noches, familia C&Y Fitness! Gracias por elegirnos. Disfruten su entrenamiento.'],
+    ['Renovación 10%', 'Les recordamos que si renuevan su membresía antes de su fecha de vencimiento, tienen 10% de descuento. Consulten en recepción.'],
+    ['Pertenencias', 'Por favor, cuiden sus pertenencias y usen los casilleros. El gimnasio no se responsabiliza por objetos olvidados.'],
+    ['Clase en 10 min', 'Atención, por favor. La clase grupal empieza en 10 minutos. ¡Los esperamos!']
+  ];
+  function misMensajes(){ try { return JSON.parse(leer(LS.mios, '[]')) || []; } catch(e){ return []; } }
+  function pintarSugeridos(){
+    const s = $('avSugeridos'), m = $('avMios'), mt = $('avMisT');
+    if (s && !s.childElementCount) s.innerHTML = SUGERIDOS.map((x, i) => `<button type="button" class="av-chip" data-av="usar" data-i="${i}">${escaparHTML(x[0])}</button>`).join('');
+    const mios = misMensajes();
+    if (m) m.innerHTML = mios.map((x, i) => `<span class="av-chip av-chip--mio"><button type="button" data-av="usarmio" data-i="${i}">${escaparHTML(x.length > 34 ? x.slice(0, 32) + '…' : x)}</button><button type="button" class="av-chip-x" data-av="borrarmio" data-i="${i}" aria-label="Quitar"><i class="fa-solid fa-xmark"></i></button></span>`).join('');
+    if (mt) mt.hidden = !mios.length;
+  }
+  function pintarAnuncio(){
+    const b = $('avPlay'); if (!b) return;
+    b.classList.toggle('sonando', hablando);
+    b.querySelector('span').textContent = hablando ? 'Reproduciendo…' : 'Reproducir';
+  }
+  function contar(){ const t = $('avAnuncioTxt'), c = $('avAnuncioCont'); if (t && c) c.textContent = t.value.length + '/600'; }
+  function anunciar(){
+    const t = ($('avAnuncioTxt').value || '').trim();
+    if (!t) { nota('Escribe un mensaje o toca uno de los sugeridos.', 'info'); $('avAnuncioTxt').focus(); return; }
+    if (!tieneVoz) { nota('Este navegador no tiene voz. Usa Google Chrome.', 'mal'); return; }
+    detener();
+    const conTimbre = $('avTimbre').checked;
+    escribir(LS.timbre, conTimbre ? '1' : '0');
+    const texto = $('avRepetir').checked ? t + '\n' + t : t;
+    hablar(texto, { timbre: conTimbre, largo: true, rate: 0.9 });
+    nota('');
+  }
+
+  // ---------- Selector de voz ----------
+  function llenarVoces(){
+    const sel = $('avVozSel'); if (!sel) return;
+    const vs = vocesEs().sort((a, b) => puntaje(b) - puntaje(a));
+    const actual = vozElegida();
+    if (!vs.length) { sel.innerHTML = '<option>Voz del celular</option>'; sel.disabled = true; return; }
+    sel.disabled = false;
+    sel.innerHTML = vs.map((v, i) => `<option value="${escaparHTML(v.name)}"${actual && v.name === actual.name ? ' selected' : ''}>${i === 0 ? '★ ' : ''}${escaparHTML(v.name)} (${escaparHTML(v.lang)})</option>`).join('');
   }
 
   // ---------- Pantalla ----------
@@ -8113,9 +8353,8 @@ window.enviarInvitacionWhatsApp = function() {
     }
     const pushBtn = $('avPushBtn'), pushTxt = $('avPushTxt'), prueba = $('avPrueba');
     let activo = false;
-    if (!soportaPush()) {
-      pushBtn.textContent = 'No disponible'; pushBtn.disabled = true;
-    } else {
+    if (!soportaPush()) { pushBtn.textContent = 'No disponible'; pushBtn.disabled = true; }
+    else {
       let sub = null; try { sub = await suscripcionActual(); } catch(e){}
       activo = !!sub && Notification.permission === 'granted';
       pushBtn.disabled = false;
@@ -8127,6 +8366,9 @@ window.enviarInvitacionWhatsApp = function() {
     if (prueba) prueba.hidden = !activo;
     const vozBtn = $('avVozBtn');
     if (vozBtn) { const on = vozActiva(); vozBtn.textContent = on ? 'Apagar' : 'Activar'; vozBtn.classList.toggle('ok', on); vozBtn.setAttribute('aria-pressed', String(on)); }
+    const chk = $('avVozIntentos'); if (chk) chk.checked = avisarIntentos();
+    const tim = $('avTimbre'); if (tim) tim.checked = leer(LS.timbre, '1') === '1';
+    llenarVoces(); pintarSugeridos(); pintarAnuncio(); contar();
     const punto = document.querySelector('#btnAvisos .tb-punto');
     if (punto) punto.hidden = activo;
   }
@@ -8139,6 +8381,11 @@ window.enviarInvitacionWhatsApp = function() {
   };
   function cerrar(){ const m = $('cyAvisos'); if (!m) return; m.classList.remove('visible'); setTimeout(() => { m.hidden = true; }, 200); }
 
+  document.addEventListener('change', (e) => {
+    if (e.target && e.target.id === 'avVozSel') { escribir(LS.vozNombre, e.target.value); hablar(saludo('María Quispe').frase); }
+    if (e.target && e.target.id === 'avVozIntentos') escribir(LS.intentos, e.target.checked ? '1' : '0');
+  });
+  document.addEventListener('input', (e) => { if (e.target && e.target.id === 'avAnuncioTxt') contar(); });
   document.addEventListener('click', async (e) => {
     const m = $('cyAvisos');
     if (!m || m.hidden) return;
@@ -8146,6 +8393,24 @@ window.enviarInvitacionWhatsApp = function() {
     const b = e.target.closest('[data-av]'); if (!b || !m.contains(b)) return;
     const a = b.getAttribute('data-av');
     if (a === 'cerrar') return cerrar();
+    if (a === 'detener') return detener();
+    if (a === 'anunciar') return anunciar();
+    if (a === 'usar') { $('avAnuncioTxt').value = SUGERIDOS[+b.dataset.i][1]; contar(); return; }
+    if (a === 'usarmio') { $('avAnuncioTxt').value = misMensajes()[+b.dataset.i] || ''; contar(); return; }
+    if (a === 'borrarmio') { const l = misMensajes(); l.splice(+b.dataset.i, 1); escribir(LS.mios, JSON.stringify(l)); pintarSugeridos(); return; }
+    if (a === 'guardarmsg') {
+      const t = ($('avAnuncioTxt').value || '').trim();
+      if (!t) { nota('Escribe primero el mensaje que quieres guardar.', 'info'); return; }
+      const l = misMensajes().filter(x => x !== t); l.unshift(t); escribir(LS.mios, JSON.stringify(l.slice(0, 12)));
+      pintarSugeridos(); nota('Mensaje guardado en “Mis mensajes”.', 'ok'); return;
+    }
+    if (a === 'vozprueba') {
+      if (!tieneVoz) { nota('Este navegador no tiene voz. Usa Google Chrome.', 'mal'); return; }
+      detener();
+      if (b.dataset.ej === 'vencido') hablar(saludo('Juan García').frase + ' ' + MOTIVO_VOZ.VENCIDO);
+      else hablar(saludo('Karla Quispe').frase);
+      return;
+    }
     if (ocupado) return;
     ocupado = true; b.classList.add('cargando');
     try {
@@ -8154,11 +8419,10 @@ window.enviarInvitacionWhatsApp = function() {
       else if (a === 'prueba') await probar();
       else if (a === 'voz') {
         const on = !vozActiva();
-        try { localStorage.setItem(LS_VOZ, on ? '1' : '0'); } catch(err){}
-        if (on) { escucharIngresos(); hablar('Voz de recepción activada'); nota('Mantén el panel abierto y el volumen alto: anunciará cada ingreso por QR.', 'ok'); }
-        else nota('Voz apagada.', 'info');
+        escribir(LS.voz, on ? '1' : '0');
+        if (on) { hablar('Voz de bienvenida activada.'); nota('Mantén el panel abierto y el volumen alto: saludará a cada socio que ingrese por QR.', 'ok'); }
+        else { detener(); nota('Voz apagada.', 'info'); }
       }
-      else if (a === 'vozprueba') { if (!hablar('Ingresó María Quispe. Estado activo.')) nota('Este navegador no tiene voz. Usa Google Chrome.', 'mal'); }
     } catch (err) {
       console.error('Avisos:', err);
       const n = err && err.name;
@@ -8171,11 +8435,9 @@ window.enviarInvitacionWhatsApp = function() {
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { const m = $('cyAvisos'); if (m && !m.hidden) cerrar(); } });
 
-  // Al abrir el panel con sesión: renueva en silencio la suscripción (por si cambió)
-  // y retoma la voz si estaba activada.
+  // Al abrir el panel con sesión: renueva en silencio la suscripción push
   setTimeout(async () => {
     try {
-      if (vozActiva()) escucharIngresos();
       if (soportaPush() && Notification.permission === 'granted') {
         const sub = await suscripcionActual();
         if (sub) await guardarSuscripcion(sub);

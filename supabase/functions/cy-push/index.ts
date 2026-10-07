@@ -63,6 +63,7 @@ async function mensajeIngreso(ev: { dni: string; nombre: string; metodo?: string
     dni: ev.dni,
     nombre,
     metodo: ev.metodo === "QR" ? "QR" : "Manual",
+    tipo: "ingreso",
     url: "./?app=panel",
     voz: `Ingresó ${primerNombre(nombre)}. ${deuda > 0 ? `Tiene deuda de ${deuda} soles` : "Estado activo"}.`,
   };
@@ -79,6 +80,20 @@ Deno.serve(async (req) => {
     let consulta = sb.from("push_suscripciones").select("id, endpoint, p256dh, auth");
     if (ev.tipo === "ingreso") {
       aviso = await mensajeIngreso(ev);
+    } else if (ev.tipo === "intento") {
+      const motivos: Record<string, string> = {
+        VENCIDO: "Membresía vencida",
+        AGOTADO: "Asistencias del plan agotadas",
+        DEUDA: "Bloqueado por deuda",
+      };
+      const nombre = String(ev.nombre || "Un socio").trim();
+      aviso = {
+        title: `⛔ ${nombre} intentó ingresar`,
+        body: `${motivos[ev.motivo] ?? "No puede ingresar"} — está esperando en recepción`,
+        tag: "intento-" + ev.dni,
+        dni: ev.dni, nombre, motivo: ev.motivo, metodo: "QR", tipo: "intento",
+        url: "./?app=panel",
+      };
     } else if (ev.tipo === "prueba") {
       aviso = {
         title: "🔔 Notificaciones activadas",

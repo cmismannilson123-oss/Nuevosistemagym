@@ -24,8 +24,10 @@ create or replace function public._qr_norm_dni(p text)
 returns text language sql immutable set search_path = '' as $$
   select ltrim(regexp_replace(coalesce(p, ''), '\D', '', 'g'), '0');
 $$;
-revoke all on function public._qr_norm_tel(text) from public, anon, authenticated;
-revoke all on function public._qr_norm_dni(text) from public, anon, authenticated;
+-- Deben poder usarlas todos: los índices de abajo las llaman al guardar o
+-- editar un socio desde el panel (sin este permiso, registrar fallaba).
+grant execute on function public._qr_norm_tel(text) to anon, authenticated;
+grant execute on function public._qr_norm_dni(text) to anon, authenticated;
 
 -- Búsqueda rápida por los valores normalizados
 create index if not exists socios_tel_norm_idx on public.socios (public._qr_norm_tel(telefono));

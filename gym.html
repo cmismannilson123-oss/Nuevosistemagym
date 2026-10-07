@@ -6068,8 +6068,10 @@ window.guardar = async function(){
         rgMostrarErrores([{ id: "telefono", msg: "Este celular ya lo tiene otro socio. Cada socio necesita su propio número para el QR." }]);
       } else if (error.code === "23505") {
         mostrarToast("⚠️ Ya existe un socio con esos datos. Búscalo en Lista.", "#f59e0b");
-      } else if (error.code === "42501" || /JWT|jwt|permission/i.test(msg)) {
+      } else if (/JWT|jwt/.test(msg) || /^PGRST30/.test(String(error.code || ""))) {
         mostrarToast("🔒 Tu sesión venció. Cierra sesión, vuelve a entrar y toca Guardar otra vez.", "#ef4444");
+      } else if (error.code === "42501") {
+        mostrarToast("⛔ La base de datos no permitió guardar (no es tu internet). Detalle: " + (error.message || "").slice(0, 80), "#ef4444");
       } else if (error.code === "22P02" || error.code === "22007" || error.code === "22008") {
         mostrarToast("⚠️ Hay un dato con formato inválido (fecha o monto). Revísalos.", "#f59e0b");
       } else if (!error.code || /fetch|network|Failed/i.test(msg)) {

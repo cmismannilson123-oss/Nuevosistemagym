@@ -8316,21 +8316,26 @@ window.enviarInvitacionWhatsApp = function() {
   let hablando = false, turno = 0, cola = Promise.resolve();
   function hablar(texto, op){
     op = op || {};
-    if (!texto) return false;
+    if (!texto && !op.partes) return false;
     const mio = turno;
     cola = cola.then(async () => {
       if (mio !== turno) return;
       hablando = true; pintarAnuncio();
-      const t = paraVoz(texto);
-      let audio = null;
+      // Un mensaje puede ir en partes (ej.: bienvenida + "tu membresía venció"):
+      // así la parte común se genera una sola vez para todos los socios.
+      const partes = (op.partes || [{ texto, tipo: op.tipo || 'anuncio' }]).map(x => ({ texto: paraVoz(x.texto), tipo: x.tipo }));
+      const t = partes.map(x => x.texto).join(' ');
+      let audios = null;
       if (IA.estado === null) await Promise.race([comprobarIA(), pausa(1500)]);
-      if (usarIA()) audio = audioIA(t, op.tipo || 'anuncio').catch(e => { console.warn('Voz IA no disponible, se usa la del celular:', e.message); return null; });
+      if (usarIA()) audios = Promise.all(partes.map(x => audioIA(x.texto, x.tipo))).catch(e => { console.warn('Voz IA no disponible, se usa la del celular:', e.message); return null; });
       const espera = op.timbre === false ? 0 : timbre(op.largo);
       await pausa(espera ? espera + 60 : 0);
-      const buf = audio ? await audio : null;
+      const bufs = audios ? await audios : null;   // si falta una parte, todo con la misma voz (del celular)
       for (let vez = 0; vez < (op.repetir ? 2 : 1) && mio === turno; vez++) {
         if (vez) await pausa(900);
-        if (buf) { try { await reproducir(buf); continue; } catch(e){} }
+        if (bufs) {
+          try { for (let i = 0; i < bufs.length && mio === turno; i++) { if (i) await pausa(120); await reproducir(bufs[i]); } continue; } catch(e){}
+        }
         await hablarCelular(t);
       }
     }).catch(() => {}).then(() => { if (mio === turno) { hablando = false; pintarAnuncio(); } });
@@ -8394,7 +8399,7 @@ window.enviarInvitacionWhatsApp = function() {
     if (!unaVez('t' + dni + motivo, 9000)) return;
     const n = nombreDe(dni, nombre);
     mostrarToast('⛔ ' + (capital(n) || 'Un socio') + ' intentó ingresar — ' + (MOTIVO_TXT[motivo] || 'no puede ingresar'), '#ef4444');
-    if (vozActiva() && avisarIntentos()) hablar(saludo(n).frase + ' ' + (MOTIVO_VOZ[motivo] || MOTIVO_VOZ.DEUDA), { tipo: 'aviso' });
+    if (vozActiva() && avisarIntentos()) hablar('', { partes: [{ texto: saludo(n).frase, tipo: 'saludo' }, { texto: MOTIVO_VOZ[motivo] || MOTIVO_VOZ.DEUDA, tipo: 'aviso' }] });
   }
   document.addEventListener('cy-ingreso', (e) => { const f = e.detail || {}; alIngresar(f.dni, f.nombre, f.metodo); });
   document.addEventListener('cy-intento', (e) => { const f = e.detail || {}; alIntentar(f.dni, f.nombre, f.motivo); });
@@ -8525,7 +8530,7 @@ window.enviarInvitacionWhatsApp = function() {
     if (a === 'vozprueba') {
       if (!tieneVoz) { nota('Este navegador no tiene voz. Usa Google Chrome.', 'mal'); return; }
       detener();
-      if (b.dataset.ej === 'vencido') hablar(saludo('Juan García').frase + ' ' + MOTIVO_VOZ.VENCIDO, { tipo: 'aviso' });
+      if (b.dataset.ej === 'vencido') hablar('', { partes: [{ texto: saludo('Juan García').frase, tipo: 'saludo' }, { texto: MOTIVO_VOZ.VENCIDO, tipo: 'aviso' }] });
       else hablar(saludo('Karla Quispe').frase, { tipo: 'saludo' });
       return;
     }

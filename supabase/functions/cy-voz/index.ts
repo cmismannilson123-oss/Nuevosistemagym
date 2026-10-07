@@ -118,7 +118,17 @@ async function obtener(clave: string, voz: string, texto: string, tipo: string) 
   return { bytes, cache: "miss", ruta };
 }
 
-// Prepara bienvenidas de los socios más frecuentes que aún no tienen audio
+// Frases fijas del panel (avisos y anuncios sugeridos), tal como las envía
+// el panel: se preparan una sola vez y sirven para siempre.
+const FIJOS: [string, string][] = [["aviso", "Tu membresía venció. Por favor, acércate a recepción, en un momento te atendemos."], ["aviso", "Ya usaste todas las asistencias de tu plan. Por favor, acércate a recepción, en un momento te atendemos."], ["aviso", "Por favor, acércate a recepción, en un momento te atendemos."], ["saludo", "¡Listo! La voz de bienvenida está activada."], ["anuncio", "Atención, por favor. El gimnasio cerrará en 5 minutos. ¡Muchas gracias por entrenar con nosotros, los esperamos mañana!"], ["anuncio", "Atención, por favor. Les recordamos que el gimnasio cerrará en 15 minutos. Vayan terminando su rutina con calma."], ["anuncio", "Les pedimos, por favor, devolver las pesas, discos y mancuernas a su lugar después de usarlos. ¡Gracias por mantener el orden!"], ["anuncio", "Por favor, limpien las máquinas y bancas después de usarlas. Cuidemos juntos nuestro espacio."], ["anuncio", "Recuerden mantenerse hidratados durante su entrenamiento. ¡Su cuerpo se lo agradecerá!"], ["anuncio", "¡Buenos días, familia C y Y Fitness! Les deseamos un excelente entrenamiento. ¡A darle con todo!"], ["anuncio", "¡Buenas noches, familia C y Y Fitness! Gracias por elegirnos. Disfruten su entrenamiento."], ["anuncio", "Les recordamos que si renuevan su membresía antes de su fecha de vencimiento, tienen 10 por ciento de descuento. Consulten en recepción."], ["anuncio", "Por favor, cuiden sus pertenencias y usen los casilleros. El gimnasio no se responsabiliza por objetos olvidados."], ["anuncio", "Atención, por favor. La clase grupal empieza en 10 minutos. ¡Los esperamos!"]];
+
+async function existe(ruta: string) {
+  const i = ruta.lastIndexOf("/");
+  const { data } = await sb.storage.from("voz").list(ruta.slice(0, i), { search: ruta.slice(i + 1) });
+  return !!(data && data.length);
+}
+
+// Prepara primero las frases fijas y luego las bienvenidas de los socios más frecuentes
 async function precalentar(clave: string, maximo: number) {
   const desde = new Date(Date.now() - 30 * 864e5).toISOString().slice(0, 10);
   const { data: filas } = await sb.from("historial_asistencia").select("dni, nombre").gte("fecha", desde).limit(5000);
@@ -126,14 +136,21 @@ async function precalentar(clave: string, maximo: number) {
   (filas ?? []).forEach((f) => { const c = cuenta.get(f.dni) ?? { n: 0, nombre: f.nombre }; c.n++; cuenta.set(f.dni, c); });
   const orden = [...cuenta.entries()].sort((a, b) => b[1].n - a[1].n);
   let hechos = 0, revisados = 0;
+  for (const [tipo, texto] of FIJOS) {
+    if (hechos >= maximo) return { hechos, revisados };
+    revisados++;
+    if (await existe(`${VOZ_DEFECTO}/${tipo}/${await sha(texto)}.wav`)) continue;
+    try { await obtener(clave, VOZ_DEFECTO, texto, tipo); hechos++; }
+    catch (e) { if (e instanceof ErrorIA && e.codigo === "cupo") return { hechos, revisados, cupo: true }; console.error("precalentar", e); }
+    await new Promise((r) => setTimeout(r, 21000));
+  }
   for (const [dni, c] of orden) {
     if (hechos >= maximo) break;
     const { data: s } = await sb.from("socios").select("nombre").eq("dni", dni).maybeSingle();
     const texto = saludo(s?.nombre || c.nombre);
     const ruta = `${VOZ_DEFECTO}/saludo/${await sha(texto)}.wav`;
     revisados++;
-    const { data: existe } = await sb.storage.from("voz").list(`${VOZ_DEFECTO}/saludo`, { search: ruta.split("/").pop() });
-    if (existe && existe.length) continue;
+    if (await existe(ruta)) continue;
     try { await obtener(clave, VOZ_DEFECTO, texto, "saludo"); hechos++; }
     catch (e) { if (e instanceof ErrorIA && e.codigo === "cupo") break; console.error("precalentar", e); }
     await new Promise((r) => setTimeout(r, 21000)); // respeta el límite por minuto del nivel gratuito

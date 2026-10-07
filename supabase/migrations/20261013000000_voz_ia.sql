@@ -30,3 +30,30 @@ $$;
 revoke all on function public._precalentar_voz() from public, anon, authenticated;
 
 select cron.schedule('cy-voz-precalentar', '15,45 3-6 * * *', 'select public._precalentar_voz()');
+
+-- Ajuste: el cupo gratis de Google es de pocas frases nuevas al día y se
+-- renueva ~2 a. m. (Lima). Se reparte así: 6 frases recién renovado el cupo
+-- (primero avisos y anuncios fijos, luego bienvenidas de los socios más
+-- frecuentes) y lo que sobre del día se usa por la noche.
+create or replace function public._precalentar_voz(p_maximo int default 4)
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare v_secreto text;
+begin
+  select valor into v_secreto from public.admin_config where clave = 'push_secreto';
+  if v_secreto is null then return; end if;
+  perform net.http_post(
+    url := 'https://ygbiqnbygjbrmwyttkku.supabase.co/functions/v1/cy-voz',
+    body := jsonb_build_object('maximo', p_maximo),
+    headers := jsonb_build_object('Content-Type', 'application/json', 'x-cy-secreto', v_secreto),
+    timeout_milliseconds := 150000);
+end;
+$$;
+revoke all on function public._precalentar_voz(int) from public, anon, authenticated;
+select cron.unschedule('cy-voz-precalentar');
+select cron.schedule('cy-voz-madrugada', '20,50 7 * * *', 'select public._precalentar_voz(2)');
+select cron.schedule('cy-voz-madrugada-2', '20 8 * * *', 'select public._precalentar_voz(2)');
+select cron.schedule('cy-voz-sobrante', '15,45 3-6 * * *', 'select public._precalentar_voz(4)');

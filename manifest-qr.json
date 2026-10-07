@@ -1,0 +1,18 @@
+{
+  "id": "./?qr=1",
+  "name": "C&Y Fitness Gym",
+  "short_name": "C&Y Fitness",
+  "description": "Marca tu asistencia en C&Y Fitness Gym y usa tus cupones.",
+  "lang": "es-PE",
+  "start_url": "./?qr=1",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07100d",
+  "theme_color": "#07100d",
+  "icons": [
+    { "src": "images/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "images/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "images/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

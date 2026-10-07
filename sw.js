@@ -30,7 +30,7 @@
 // vieja y toma la nueva automáticamente.
 // ============================================================
 
-const CACHE_NAME = 'cy-fitness-gym-v67';
+const CACHE_NAME = 'cy-fitness-gym-v68';
 
 // Dominios externos de los que es seguro guardar copia (son archivos estáticos:
 // librerías, íconos, fuentes, fotos — nunca datos de socios). Cualquier petición
@@ -52,6 +52,10 @@ const ARCHIVOS_APP = [
   './',
   './gym.html',
   './images/logo-cy.png',
+  './images/icon-192.png',
+  './images/badge-96.png',
+  './manifest-panel.json',
+  './manifest-qr.json',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css',
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js',
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
@@ -158,4 +162,40 @@ self.addEventListener('fetch', (event) => {
       return respuestaGuardada || peticionRed;
     })
   );
+});
+
+
+// ============================================================
+// NOTIFICACIONES PROPIAS (Web Push, sin ntfy)
+// Las envía la Edge Function "cy-push" cuando un socio ingresa. Llegan
+// aunque la app esté cerrada y el celular bloqueado.
+// ============================================================
+self.addEventListener('push', (event) => {
+  let d = {};
+  try { d = event.data ? event.data.json() : {}; }
+  catch (e) { d = { title: 'C&Y Fitness Gym', body: event.data ? event.data.text() : '' }; }
+  const titulo = d.title || 'C&Y Fitness Gym';
+  event.waitUntil(self.registration.showNotification(titulo, {
+    body: d.body || '',
+    icon: './images/icon-192.png',
+    badge: './images/badge-96.png',
+    tag: d.tag || 'cy-aviso',
+    renotify: true,
+    vibrate: [180, 90, 180],
+    timestamp: Date.now(),
+    data: { url: d.url || './?app=panel' }
+  }));
+});
+
+// Al tocar la notificación: abre el panel (o lo trae al frente si ya está abierto)
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const destino = new URL((event.notification.data && event.notification.data.url) || './?app=panel', self.registration.scope).href;
+  event.waitUntil((async () => {
+    const ventanas = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const v of ventanas) {
+      if (v.url.startsWith(self.registration.scope) && !v.url.includes('qr=1') && 'focus' in v) return v.focus();
+    }
+    if (clients.openWindow) return clients.openWindow(destino);
+  })());
 });

@@ -13,7 +13,21 @@
     if (window.location.search.includes("qr=1")) {
       document.documentElement.classList.add("qr-mode");
     }
+    // App instalable: el panel y la pantalla del QR se instalan por separado,
+    // cada una con su nombre y abriendo directo en su pantalla.
+    (function(){
+      var l = document.createElement("link");
+      l.rel = "manifest";
+      l.href = window.location.search.includes("qr=1") ? "manifest-qr.json" : "manifest-panel.json";
+      document.head.appendChild(l);
+    })();
   </script>
+  <meta name="theme-color" content="#07100d">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png">
 
   <title>C&Y FITNESS GYM</title>
 
@@ -4063,6 +4077,69 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 #loginFormGym input.qr-campo-mal{ border-color:#f87171 !important; box-shadow:0 0 0 3px rgba(248,113,113,.18) !important; }
 @keyframes qrAvisoEntra{ from{ opacity:0; transform:translateY(-4px); } 20%,60%{ transform:translateX(-4px); } 40%,80%{ transform:translateX(4px); } }
 @media (prefers-reduced-motion: reduce){ #qrFormAviso.qr-aviso{ animation:none; } }
+
+/* ==========================================================================
+   v68 — App y notificaciones (botón campana del encabezado)
+   ========================================================================== */
+.topbar .tb-acc{ display:flex; align-items:center; gap:8px; flex:none; }
+.topbar .tb-avisos{
+  position:relative; flex:none; width:40px !important; height:40px !important; min-height:0 !important; margin:0 !important; padding:0 !important;
+  display:grid; place-items:center; border-radius:12px !important; font-size:16px !important;
+  color:#fbbf24 !important; background:rgba(251,191,36,.1) !important; border:1px solid rgba(251,191,36,.3) !important; box-shadow:none !important;
+}
+.topbar .tb-avisos:active{ transform:scale(.94); }
+.topbar .tb-punto{ position:absolute; top:7px; right:7px; width:8px; height:8px; border-radius:50%; background:#f87171; box-shadow:0 0 0 2px #0b1714; }
+.topbar .tb-punto[hidden]{ display:none; }
+
+#cyAvisos{ position:fixed; inset:0; z-index:100001; display:flex; align-items:flex-end; justify-content:center; background:rgba(2,6,5,0); transition:background .2s ease; color:#eef4f2; }
+#cyAvisos[hidden]{ display:none !important; }
+#cyAvisos.visible{ background:rgba(2,6,5,.78); }
+#cyAvisos .av-panel{
+  width:100%; max-width:520px; max-height:92vh; overflow-y:auto; box-sizing:border-box;
+  padding:16px 16px calc(20px + env(safe-area-inset-bottom,0px)); border-radius:24px 24px 0 0;
+  background:#0a1512; border:1px solid rgba(52,211,153,.18); border-bottom:0; box-shadow:0 -20px 50px -20px rgba(0,0,0,.8);
+  transform:translateY(24px); opacity:0; transition:transform .24s cubic-bezier(.2,.8,.2,1), opacity .18s ease;
+}
+#cyAvisos.visible .av-panel{ transform:none; opacity:1; }
+@media (min-width:700px){ #cyAvisos{ align-items:center; } #cyAvisos .av-panel{ border-radius:24px; border-bottom:1px solid rgba(52,211,153,.18); } }
+#cyAvisos .av-head{ display:flex; align-items:center; gap:12px; margin-bottom:14px; }
+#cyAvisos .av-logo{ width:44px; height:44px; flex:none; border-radius:14px; display:grid; place-items:center; font-size:19px; color:#1a1200; background:linear-gradient(180deg,#fcd34d,#f59e0b); }
+#cyAvisos .av-tit{ flex:1; min-width:0; }
+#cyAvisos .av-tit h3{ margin:0 !important; font-family:var(--cy-display) !important; font-size:25px !important; font-weight:700; line-height:1; color:#eef4f2 !important; }
+#cyAvisos .av-tit small{ display:block; margin-top:3px; font-size:12.5px; color:#8da09a; }
+#cyAvisos button{ font-family:inherit; -webkit-tap-highlight-color:transparent; cursor:pointer; }
+#cyAvisos button::before, #cyAvisos button::after{ display:none !important; content:none !important; }
+#cyAvisos .av-btn{ width:auto !important; max-width:none !important; flex:0 0 auto !important; position:relative; }
+#cyAvisos .av-x{ width:42px !important; height:42px !important; min-height:0 !important; margin:0 !important; padding:0 !important; display:grid; place-items:center; border-radius:13px !important; font-size:18px !important; color:#c9d6d1 !important; background:rgba(255,255,255,.06) !important; border:1px solid rgba(255,255,255,.1) !important; box-shadow:none !important; }
+#cyAvisos .av-op{
+  --c:#34d399; display:flex; align-items:center; gap:12px; margin-top:10px; padding:13px 12px 13px 13px; border-radius:16px;
+  background:rgba(255,255,255,.035); border:1px solid rgba(255,255,255,.08);
+}
+#cyAvisos .av-op--app{ --c:#38bdf8; } #cyAvisos .av-op--push{ --c:#fbbf24; } #cyAvisos .av-op--voz{ --c:#a78bfa; }
+#cyAvisos .av-ico{ width:40px; height:40px; flex:none; border-radius:12px; display:grid; place-items:center; font-size:17px; color:var(--c); background:rgba(255,255,255,.06); }
+#cyAvisos .av-txt{ flex:1; min-width:0; }
+#cyAvisos .av-txt b{ display:block; font-family:var(--cy-display); font-size:18.5px; font-weight:700; line-height:1.1; }
+#cyAvisos .av-txt small{ display:block; margin-top:3px; font-size:12.5px; line-height:1.35; color:#8da09a; }
+#cyAvisos .av-btn{
+  flex:none; min-width:84px; height:40px !important; min-height:0 !important; margin:0 !important; padding:0 14px !important; border-radius:12px !important;
+  font-family:var(--cy-display) !important; font-size:16.5px !important; font-weight:700 !important; color:#06120e !important;
+  background:var(--c) !important; border:0 !important; box-shadow:none !important;
+}
+#cyAvisos .av-btn.ok{ color:var(--c) !important; background:rgba(255,255,255,.06) !important; border:1px solid rgba(255,255,255,.14) !important; }
+#cyAvisos .av-btn:disabled{ opacity:.85; pointer-events:none; }
+#cyAvisos .av-btn.cargando, #cyAvisos .av-prueba.cargando{ opacity:.6; pointer-events:none; }
+#cyAvisos .av-prueba{
+  display:flex; align-items:center; justify-content:center; gap:8px; width:100% !important; min-height:42px !important; margin:8px 0 0 !important; padding:0 12px !important;
+  border-radius:12px !important; font-size:14px !important; font-weight:600; color:#cfdcd6 !important; background:transparent !important;
+  border:1px dashed rgba(255,255,255,.16) !important; box-shadow:none !important;
+}
+#cyAvisos .av-prueba[hidden]{ display:none; }
+#cyAvisos .av-nota:empty{ display:none; }
+#cyAvisos .av-nota{ margin:12px 0 0; padding:10px 12px; border-radius:12px; font-size:13.5px; line-height:1.4; color:#cfdcd6; background:rgba(255,255,255,.05); }
+#cyAvisos .av-nota--ok{ color:#a7f3d0; background:rgba(52,211,153,.1); }
+#cyAvisos .av-nota--mal{ color:#fecaca; background:rgba(248,113,113,.12); }
+#cyAvisos .av-nota--info{ color:#bae6fd; background:rgba(56,189,248,.1); }
+@media (prefers-reduced-motion: reduce){ #cyAvisos .av-panel, #cyAvisos{ transition:none; } }
 </style>
 </head>
 
@@ -4092,7 +4169,10 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
       <small>Panel de recepción</small>
     </div>
   </div>
-  <button type="button" id="btnCerrarSesion" class="btn-cerrar-sesion" onclick="cerrarSesionStaff()" title="Cerrar sesión" aria-label="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
+  <div class="tb-acc">
+    <button type="button" id="btnAvisos" class="tb-avisos" onclick="cyAbrirAvisos()" title="App y notificaciones" aria-label="App y notificaciones"><i class="fa-solid fa-bell"></i><span class="tb-punto" hidden></span></button>
+    <button type="button" id="btnCerrarSesion" class="btn-cerrar-sesion" onclick="cerrarSesionStaff()" title="Cerrar sesión" aria-label="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
+  </div>
 </div>
 <div class="topbar-spacer" id="topbarSpacer"></div>
 <script>
@@ -7685,6 +7765,241 @@ window.enviarInvitacionWhatsApp = function() {
 </div>
 
 
+
+<!-- ========================================== -->
+<!-- APP Y NOTIFICACIONES (panel)               -->
+<!-- ========================================== -->
+<div id="cyAvisos" class="cy-avisos" role="dialog" aria-modal="true" aria-labelledby="avTitulo" hidden>
+  <div class="av-panel">
+    <header class="av-head">
+      <span class="av-logo" aria-hidden="true"><i class="fa-solid fa-bell"></i></span>
+      <div class="av-tit"><h3 id="avTitulo">App y notificaciones</h3><small>En este celular</small></div>
+      <button type="button" class="av-x" data-av="cerrar" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+    </header>
+
+    <section class="av-op av-op--app">
+      <span class="av-ico"><i class="fa-solid fa-mobile-screen-button"></i></span>
+      <div class="av-txt"><b>App en tu pantalla</b><small id="avAppTxt">Ábrela con el logo, como cualquier app.</small></div>
+      <button type="button" class="av-btn" id="avAppBtn" data-av="instalar">Instalar</button>
+    </section>
+
+    <section class="av-op av-op--push">
+      <span class="av-ico"><i class="fa-solid fa-bell"></i></span>
+      <div class="av-txt"><b>Notificaciones de ingresos</b><small id="avPushTxt">Te llega un aviso cada vez que un socio ingresa, aunque la app esté cerrada.</small></div>
+      <button type="button" class="av-btn" id="avPushBtn" data-av="push">Activar</button>
+    </section>
+    <button type="button" class="av-prueba" id="avPrueba" data-av="prueba" hidden><i class="fa-solid fa-paper-plane"></i> Enviar una notificación de prueba</button>
+
+    <section class="av-op av-op--voz">
+      <span class="av-ico"><i class="fa-solid fa-volume-high"></i></span>
+      <div class="av-txt"><b>Voz en recepción</b><small>Con el panel abierto, anuncia en voz alta quién ingresa por QR: “Ingresó María. Estado activo”.</small></div>
+      <button type="button" class="av-btn" id="avVozBtn" data-av="voz" aria-pressed="false">Activar</button>
+    </section>
+    <button type="button" class="av-prueba" id="avVozPrueba" data-av="vozprueba"><i class="fa-solid fa-play"></i> Escuchar un ejemplo</button>
+
+    <p class="av-nota" id="avNota"></p>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+// APP Y NOTIFICACIONES — instalar la app, avisos push propios (sin ntfy)
+// y voz en recepción. Solo en el panel; la pantalla del QR no lo usa.
+// =====================================================================
+(function(){
+  if (document.documentElement.classList.contains('qr-mode')) return;
+  const VAPID = 'BAGbwqTYN3ORt7VRygX0uhX_5ZT3FiWJhFMvlSzwsDK0zcjK0Y-OiLArjBgJae3clm27Rp4EZRLFnFcmyu9TTws';
+  const LS_VOZ = 'cy_voz_recepcion';
+  const $ = (id) => document.getElementById(id);
+  let promptInstalar = null;
+  let ocupado = false;
+
+  const soportaPush = () => ('serviceWorker' in navigator) && ('PushManager' in window) && ('Notification' in window);
+  const instalada = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+  const vozActiva = () => { try { return localStorage.getItem(LS_VOZ) === '1'; } catch(e){ return false; } };
+  const b64aBytes = (b64) => {
+    const p = '='.repeat((4 - b64.length % 4) % 4);
+    const s = atob((b64 + p).replace(/-/g, '+').replace(/_/g, '/'));
+    return Uint8Array.from(s, c => c.charCodeAt(0));
+  };
+  const nota = (txt, tipo) => { const n = $('avNota'); if (!n) return; n.textContent = txt || ''; n.className = 'av-nota' + (tipo ? ' av-nota--' + tipo : ''); };
+
+  // ---------- Instalar ----------
+  window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); promptInstalar = e; pintar(); });
+  window.addEventListener('appinstalled', () => { promptInstalar = null; pintar(); mostrarToast('✅ App instalada en tu pantalla de inicio', '#10b981'); });
+
+  async function instalar(){
+    if (instalada()) return;
+    if (promptInstalar) {
+      promptInstalar.prompt();
+      try { await promptInstalar.userChoice; } catch(e){}
+      promptInstalar = null; pintar();
+      return;
+    }
+    nota('En Chrome: toca los tres puntos ⋮ (arriba a la derecha) y elige “Instalar aplicación” o “Agregar a la pantalla principal”.', 'info');
+  }
+
+  // ---------- Notificaciones ----------
+  async function suscripcionActual(){
+    if (!soportaPush()) return null;
+    const reg = await navigator.serviceWorker.ready;
+    return reg.pushManager.getSubscription();
+  }
+  async function guardarSuscripcion(sub){
+    const j = sub.toJSON();
+    const { error } = await supabaseClient.from('push_suscripciones').upsert([{
+      endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth,
+      dispositivo: (navigator.userAgent || '').slice(0, 160)
+    }], { onConflict: 'endpoint' });
+    if (error) throw error;
+  }
+  async function activarPush(){
+    if (!soportaPush()) { nota('Este navegador no permite notificaciones. Abre el panel en Google Chrome.', 'mal'); return; }
+    const permiso = await Notification.requestPermission();
+    if (permiso !== 'granted') {
+      nota('Las notificaciones están bloqueadas. Toca el candado junto a la dirección (o Ajustes del sitio) → Notificaciones → Permitir, y vuelve a intentarlo.', 'mal');
+      return pintar();
+    }
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64aBytes(VAPID) });
+    await guardarSuscripcion(sub);
+    nota('Listo. Te llegará un aviso con cada ingreso. Toca “Enviar una notificación de prueba” para comprobarlo.', 'ok');
+  }
+  async function desactivarPush(){
+    const sub = await suscripcionActual();
+    if (sub) {
+      try { await supabaseClient.from('push_suscripciones').delete().eq('endpoint', sub.endpoint); } catch(e){}
+      await sub.unsubscribe();
+    }
+    nota('Notificaciones apagadas en este celular.', 'info');
+  }
+  async function probar(){
+    const { error } = await supabaseClient.rpc('probar_push');
+    if (error) throw error;
+    nota('Enviada. Debería llegarte en unos segundos (también con la pantalla apagada).', 'ok');
+  }
+
+  // ---------- Voz ----------
+  function vozEspanol(){
+    const vs = (window.speechSynthesis && speechSynthesis.getVoices()) || [];
+    return vs.find(v => /^es[-_](PE|US|MX|419)/i.test(v.lang)) || vs.find(v => /^es/i.test(v.lang)) || null;
+  }
+  function hablar(texto){
+    if (!('speechSynthesis' in window)) return false;
+    const u = new SpeechSynthesisUtterance(texto);
+    const v = vozEspanol();
+    if (v) u.voice = v;
+    u.lang = v ? v.lang : 'es-PE'; u.rate = 1; u.pitch = 1; u.volume = 1;
+    speechSynthesis.speak(u);
+    return true;
+  }
+  if ('speechSynthesis' in window) { try { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => {}; } catch(e){} }
+
+  function fraseIngreso(fila){
+    const s = ((typeof dataGlobal !== 'undefined' && dataGlobal) || []).find(x => String(x.dni) === String(fila.dni)) || {};
+    const nombre = String(s.nombre || fila.nombre || 'un socio').trim().split(/\s+/).slice(0, 2).join(' ');
+    const deuda = parseFloat(s.deuda) || 0;
+    let estado = 'Estado activo';
+    if (deuda > 0) estado = 'Tiene deuda de ' + deuda + ' soles';
+    else if (s.fecha_fin) {
+      const dias = Math.round((new Date(s.fecha_fin + 'T00:00:00') - new Date(new Date().toDateString())) / 864e5);
+      if (dias <= 0) estado = 'Su membresía vence hoy';
+      else if (dias <= 3) estado = 'Su membresía vence en ' + dias + (dias === 1 ? ' día' : ' días');
+    }
+    return 'Ingresó ' + nombre + '. ' + estado + '.';
+  }
+  function escucharIngresos(){
+    if (window._cyVozCanal || typeof supabaseClient === 'undefined') return;
+    window._cyVozCanal = supabaseClient.channel('voz-ingresos')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'historial_asistencia' }, (p) => {
+        const f = p && p.new;
+        if (!f || !vozActiva() || String(f.metodo || '').toUpperCase() !== 'QR') return;
+        hablar(fraseIngreso(f));
+      }).subscribe();
+  }
+
+  // ---------- Pantalla ----------
+  async function pintar(){
+    const appBtn = $('avAppBtn'), appTxt = $('avAppTxt');
+    if (appBtn) {
+      if (instalada()) { appBtn.textContent = 'Instalada'; appBtn.disabled = true; appBtn.classList.add('ok'); appTxt.textContent = 'Ya la estás usando como app.'; }
+      else { appBtn.textContent = 'Instalar'; appBtn.disabled = false; appBtn.classList.remove('ok'); }
+    }
+    const pushBtn = $('avPushBtn'), pushTxt = $('avPushTxt'), prueba = $('avPrueba');
+    let activo = false;
+    if (!soportaPush()) {
+      pushBtn.textContent = 'No disponible'; pushBtn.disabled = true;
+    } else {
+      let sub = null; try { sub = await suscripcionActual(); } catch(e){}
+      activo = !!sub && Notification.permission === 'granted';
+      pushBtn.disabled = false;
+      pushBtn.textContent = activo ? 'Apagar' : 'Activar';
+      pushBtn.classList.toggle('ok', activo);
+      pushTxt.textContent = activo ? 'Activadas: te llega un aviso con cada ingreso, aunque la app esté cerrada.'
+        : (Notification.permission === 'denied' ? 'Bloqueadas en este celular. Permítelas en los ajustes del sitio.' : 'Te llega un aviso cada vez que un socio ingresa, aunque la app esté cerrada.');
+    }
+    if (prueba) prueba.hidden = !activo;
+    const vozBtn = $('avVozBtn');
+    if (vozBtn) { const on = vozActiva(); vozBtn.textContent = on ? 'Apagar' : 'Activar'; vozBtn.classList.toggle('ok', on); vozBtn.setAttribute('aria-pressed', String(on)); }
+    const punto = document.querySelector('#btnAvisos .tb-punto');
+    if (punto) punto.hidden = activo;
+  }
+
+  window.cyAbrirAvisos = function(){
+    const m = $('cyAvisos'); if (!m) return;
+    nota('');
+    m.hidden = false; requestAnimationFrame(() => m.classList.add('visible'));
+    pintar();
+  };
+  function cerrar(){ const m = $('cyAvisos'); if (!m) return; m.classList.remove('visible'); setTimeout(() => { m.hidden = true; }, 200); }
+
+  document.addEventListener('click', async (e) => {
+    const m = $('cyAvisos');
+    if (!m || m.hidden) return;
+    if (e.target === m) return cerrar();
+    const b = e.target.closest('[data-av]'); if (!b || !m.contains(b)) return;
+    const a = b.getAttribute('data-av');
+    if (a === 'cerrar') return cerrar();
+    if (ocupado) return;
+    ocupado = true; b.classList.add('cargando');
+    try {
+      if (a === 'instalar') await instalar();
+      else if (a === 'push') { const sub = await suscripcionActual().catch(() => null); if (sub && Notification.permission === 'granted') await desactivarPush(); else await activarPush(); }
+      else if (a === 'prueba') await probar();
+      else if (a === 'voz') {
+        const on = !vozActiva();
+        try { localStorage.setItem(LS_VOZ, on ? '1' : '0'); } catch(err){}
+        if (on) { escucharIngresos(); hablar('Voz de recepción activada'); nota('Mantén el panel abierto y el volumen alto: anunciará cada ingreso por QR.', 'ok'); }
+        else nota('Voz apagada.', 'info');
+      }
+      else if (a === 'vozprueba') { if (!hablar('Ingresó María Quispe. Estado activo.')) nota('Este navegador no tiene voz. Usa Google Chrome.', 'mal'); }
+    } catch (err) {
+      console.error('Avisos:', err);
+      const n = err && err.name;
+      nota((n === 'AbortError' || n === 'NotAllowedError' || n === 'NotSupportedError')
+        ? 'Este navegador no dejó activar las notificaciones. Abre el panel en Google Chrome (no en modo incógnito) e inténtalo otra vez.'
+        : 'No se pudo completar. Revisa el internet e inténtalo de nuevo.', 'mal');
+    } finally {
+      ocupado = false; b.classList.remove('cargando'); pintar();
+    }
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { const m = $('cyAvisos'); if (m && !m.hidden) cerrar(); } });
+
+  // Al abrir el panel con sesión: renueva en silencio la suscripción (por si cambió)
+  // y retoma la voz si estaba activada.
+  setTimeout(async () => {
+    try {
+      if (vozActiva()) escucharIngresos();
+      if (soportaPush() && Notification.permission === 'granted') {
+        const sub = await suscripcionActual();
+        if (sub) await guardarSuscripcion(sub);
+      }
+      pintar();
+    } catch(e){}
+  }, 5000);
+})();
+</script>
 
 <script>
   // Registro del Service Worker: hace que la app cargue instantánea

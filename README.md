@@ -83,3 +83,17 @@ movimientos agrupados por día con su total.
 - **Ningún pago se pierde:** cada movimiento se guarda primero en el celular y luego se
   sube. Sin internet, aparece como "Por subir" y se sube solo al volver la conexión,
   sin duplicarse (`cliente_id`).
+
+## App instalable y notificaciones propias
+
+- **Instalar:** el panel y la pantalla del QR se instalan como apps separadas con el
+  logo (`manifest-panel.json`, `manifest-qr.json`, íconos en `images/icon-*`).
+- **Notificaciones (sin ntfy):** botón de la campana del panel → *Activar*. Al guardarse
+  cada asistencia, la base (`_notificar_asistencia` → `_enviar_push`) llama a la Edge
+  Function `cy-push` (`supabase/functions/cy-push`), que arma el mensaje con el estado del
+  socio y lo envía a los celulares suscritos (`push_suscripciones`). Llegan con la app
+  cerrada y el celular bloqueado. Migración: `supabase/migrations/20261010000000_push.sql`.
+  Las llaves VAPID y el secreto están en `admin_config` (no en el código).
+- **Voz en recepción:** con el panel abierto, anuncia los ingresos por QR.
+- ntfy sigue funcionando en paralelo; para apagarlo:
+  `delete from public.admin_config where clave = 'ntfy_topic';`

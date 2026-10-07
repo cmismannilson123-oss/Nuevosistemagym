@@ -5903,8 +5903,33 @@ window.guardarRenovacion = async function(){
     textoTipoMemb = `${tipo} (Inicia: ${d}/${m}/${y})`;
   }
 
-  // 3. GUARDAR EN SUPABASE (un solo toque: el botón se bloquea mientras guarda)
+  // 3. ¿YA SE REGISTRÓ ESTE COBRO HACE UN MOMENTO? (evita cobrar dos veces)
   _renovando = true;
+  try {
+    const desde = new Date(Date.now() - 10 * 60000).toISOString();
+    const { data: recientes } = await supabaseClient.from("historial_caja")
+      .select("monto_ingreso, fecha_movimiento")
+      .eq("dni", dniBuscado).in("concepto", ["Renovación de membresía", "Adelanto de membresía"])
+      .eq("anulado", false).gte("fecha_movimiento", desde)
+      .order("fecha_movimiento", { ascending: false }).limit(1);
+    const enCola = (typeof cyCajaCola === "function" ? cyCajaCola() : [])
+      .filter(f => f.dni === dniBuscado && /Renovación|Adelanto/.test(f.concepto || "") && f.fecha_movimiento >= desde);
+    const previo = (recientes && recientes[0]) || enCola[0];
+    if (previo) {
+      const seg = Math.max(1, Math.round((Date.now() - new Date(previo.fecha_movimiento).getTime()) / 1000));
+      const hace = seg < 60 ? seg + " segundos" : Math.round(seg / 60) + (Math.round(seg / 60) === 1 ? " minuto" : " minutos");
+      const sigue = confirm("⚠️ A " + nombreSocio + " ya se le registró una renovación de S/ " + (parseFloat(previo.monto_ingreso) || 0) +
+        " hace " + hace + ".\n\n¿Es un pago NUEVO y quieres cobrarlo otra vez?\n\nAceptar = sí, registrar otro cobro\nCancelar = no, fue un error");
+      if (!sigue) {
+        _renovando = false;
+        cerrarModalRenovar();
+        mostrarToast("No se registró de nuevo: la renovación anterior ya está guardada", "#3b82f6");
+        return;
+      }
+    }
+  } catch (e) { /* si no se puede revisar, se sigue normalmente */ }
+
+  // 4. GUARDAR EN SUPABASE (un solo toque: el botón se bloquea mientras guarda)
   const btnRen = document.querySelector('#modalRenovar .btn-green');
   if (btnRen) btnRen.disabled = true;
   let errRen = null;
@@ -5930,7 +5955,7 @@ window.guardarRenovacion = async function(){
     return;
   }
 
-  // 4. ANOTAR EL PAGO EN EL CUADERNO DE CAJA (solo si se guardó)
+  // 5. ANOTAR EL PAGO EN EL CUADERNO DE CAJA (solo si se guardó)
   cyCajaGuardar({
     dni: dniBuscado || '',
     nombre: nombreSocio || '',
@@ -6806,9 +6831,85 @@ if (!esVistaPublicaQR) {
     temporizadorHistorial = setTimeout(mostrarHistorial, 400);
   }
 
-  supabaseClient.channel('socios-realtime').on('postgres_changes', { event: '*', schema: 'public', table: 'socios' }, (payload) => { renderConPausa(); }).subscribe();
+  // ===== TIEMPO REAL QUE NO SE QUEDA ATRÁS =====
+  // Antes los canales se abrían al cargar, ANTES de tener la sesión: la base
+  // los trataba como anónimos y no mandaba los ingresos. Además, al bloquear
+  // el celular la conexión se cortaba y no volvía. Ahora:
+  //  1. Se conecta con la sesión del personal y se reconecta solo si se cae.
+  //  2. Al volver a la app (desbloquear, cambiar de app) se pone al día al instante.
+  //  3. Cuando llega una notificación push, la lista se actualiza también.
+  //  4. Respaldo: cada 20 s revisa si hay un ingreso nuevo (consulta mínima).
+  const CANALES = [
+    { nombre: 'socios-realtime', tabla: 'socios', alCambiar: () => renderConPausa() },
+    { nombre: 'asistencia-realtime', tabla: 'historial_asistencia', alCambiar: (p) => {
+        historialConPausa();
+        if (p && p.eventType === 'INSERT' && p.new) document.dispatchEvent(new CustomEvent('cy-ingreso', { detail: p.new }));
+      } }
+  ];
+  const canales = {};
+  let reintentoRT = null, ultimoTokenRT = null;
 
-  supabaseClient.channel('asistencia-realtime').on('postgres_changes', { event: '*', schema: 'public', table: 'historial_asistencia' }, (payload) => { historialConPausa(); }).subscribe();
+  async function conectarTiempoReal(){
+    let sesion = null;
+    try { ({ data: { session: sesion } } = await supabaseClient.auth.getSession()); } catch(e){}
+    if (!sesion) return;
+    if (sesion.access_token !== ultimoTokenRT) {
+      ultimoTokenRT = sesion.access_token;
+      try { await supabaseClient.realtime.setAuth(sesion.access_token); } catch(e){}
+    }
+    CANALES.forEach(def => {
+      const c = canales[def.nombre];
+      if (c && (c.state === 'joined' || c.state === 'joining')) return;
+      if (c) { try { supabaseClient.removeChannel(c); } catch(e){} }
+      canales[def.nombre] = supabaseClient.channel(def.nombre)
+        .on('postgres_changes', { event: '*', schema: 'public', table: def.tabla }, def.alCambiar)
+        .subscribe((estado) => {
+          if (estado === 'SUBSCRIBED') { if (def.tabla === 'historial_asistencia') historialConPausa(); }
+          else if (estado === 'CHANNEL_ERROR' || estado === 'TIMED_OUT' || estado === 'CLOSED') {
+            clearTimeout(reintentoRT);
+            reintentoRT = setTimeout(conectarTiempoReal, 3000);
+          }
+        });
+    });
+  }
+  window.cyConectarTiempoReal = conectarTiempoReal;
+
+  // Respaldo liviano: ¿hay un ingreso más nuevo que el último que vimos?
+  let ultimoIngresoVisto = null;
+  async function revisarIngresosNuevos(){
+    try {
+      const { data, error } = await supabaseClient.from('historial_asistencia')
+        .select('id').eq('fecha', fechaHoyISO()).order('id', { ascending: false }).limit(1);
+      if (error) return;
+      const id = data && data[0] ? data[0].id : 0;
+      if (ultimoIngresoVisto !== null && id !== ultimoIngresoVisto) historialConPausa();
+      ultimoIngresoVisto = id;
+    } catch(e){}
+  }
+
+  let ocultoDesde = 0;
+  function ponerseAlDia(){
+    historialConPausa();
+    if (ocultoDesde && Date.now() - ocultoDesde > 60000) renderConPausa();
+    ocultoDesde = 0;
+    conectarTiempoReal();
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') ponerseAlDia(); else ocultoDesde = Date.now();
+  });
+  window.addEventListener('online', ponerseAlDia);
+  window.addEventListener('pageshow', (e) => { if (e.persisted) ponerseAlDia(); });
+  supabaseClient.auth.onAuthStateChange((evento) => {
+    if (evento === 'SIGNED_IN' || evento === 'TOKEN_REFRESHED' || evento === 'INITIAL_SESSION') conectarTiempoReal();
+  });
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', (e) => {
+      if (e.data && e.data.tipo === 'cy-push') { historialConPausa(); document.dispatchEvent(new CustomEvent('cy-push', { detail: e.data })); }
+    });
+  }
+  setInterval(() => { if (document.visibilityState === 'visible') { revisarIngresosNuevos(); conectarTiempoReal(); } }, 20000);
+  conectarTiempoReal();
+  revisarIngresosNuevos();
 }
 
 window.resetHistorial = async function(){
@@ -7977,14 +8078,30 @@ window.enviarInvitacionWhatsApp = function() {
     }
     return 'Ingresó ' + nombre + '. ' + estado + '.';
   }
+  // La voz usa la misma conexión en vivo del panel (evento 'cy-ingreso') y,
+  // si esa conexión se cortó, la notificación push (evento 'cy-push').
+  // Cada ingreso se anuncia una sola vez aunque lleguen los dos.
+  const anunciados = new Map();
+  function anunciar(dni, texto){
+    const clave = String(dni || texto);
+    const ahora = Date.now();
+    if (anunciados.has(clave) && ahora - anunciados.get(clave) < 120000) return;
+    anunciados.set(clave, ahora);
+    hablar(texto);
+  }
   function escucharIngresos(){
-    if (window._cyVozCanal || typeof supabaseClient === 'undefined') return;
-    window._cyVozCanal = supabaseClient.channel('voz-ingresos')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'historial_asistencia' }, (p) => {
-        const f = p && p.new;
-        if (!f || !vozActiva() || String(f.metodo || '').toUpperCase() !== 'QR') return;
-        hablar(fraseIngreso(f));
-      }).subscribe();
+    if (window._cyVozLista) return;
+    window._cyVozLista = true;
+    document.addEventListener('cy-ingreso', (e) => {
+      const f = e.detail;
+      if (!f || !vozActiva() || String(f.metodo || '').toUpperCase() !== 'QR') return;
+      anunciar(f.dni, fraseIngreso(f));
+    });
+    document.addEventListener('cy-push', (e) => {
+      const d = e.detail || {};
+      if (!vozActiva() || d.metodo !== 'QR' || !d.dni) return;
+      anunciar(d.dni, fraseIngreso({ dni: d.dni, nombre: d.nombre }));
+    });
   }
 
   // ---------- Pantalla ----------
@@ -9165,9 +9282,20 @@ window.cyConfirmarIngreso = function(nombre){
       var s = await supabaseClient.auth.getSession();
       if (!s.data || !s.data.session) return;
       window.cyCargarCuponesHoy();
-      supabaseClient.channel('cupones-realtime')
-        .on('postgres_changes', { event:'INSERT', schema:'public', table:'cupones_uso' }, alCambiar)
-        .subscribe();
+      var canal = null, reintento = null;
+      function suscribir(){
+        if (canal && (canal.state === 'joined' || canal.state === 'joining')) return;
+        if (canal) { try { supabaseClient.removeChannel(canal); } catch(e){} }
+        canal = supabaseClient.channel('cupones-realtime')
+          .on('postgres_changes', { event:'INSERT', schema:'public', table:'cupones_uso' }, alCambiar)
+          .subscribe(function(st){
+            if (st === 'CHANNEL_ERROR' || st === 'TIMED_OUT' || st === 'CLOSED') { clearTimeout(reintento); reintento = setTimeout(suscribir, 3000); }
+          });
+      }
+      suscribir();
+      document.addEventListener('visibilitychange', function(){
+        if (document.visibilityState === 'visible') { suscribir(); alCambiar(); }
+      });
       var btn = $('btnActualizar'); if (btn) btn.addEventListener('click', function(){ window.cyCargarCuponesHoy(); });
     } catch (e) {}
   });

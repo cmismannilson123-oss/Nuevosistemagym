@@ -60,6 +60,9 @@ async function mensajeIngreso(ev: { dni: string; nombre: string; metodo?: string
     title: `${alerta ? "⚠️" : "✅"} Ingresó ${nombre}`,
     body: `${partes.join(" · ")} — ${via}`,
     tag: "ingreso-" + ev.dni,
+    dni: ev.dni,
+    nombre,
+    metodo: ev.metodo === "QR" ? "QR" : "Manual",
     url: "./?app=panel",
     voz: `Ingresó ${primerNombre(nombre)}. ${deuda > 0 ? `Tiene deuda de ${deuda} soles` : "Estado activo"}.`,
   };

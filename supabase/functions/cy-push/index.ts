@@ -31,7 +31,7 @@ const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "set", "o
 const hoyLima = () => new Date(Date.now() - 5 * 3600e3).toISOString().slice(0, 10);
 const primerNombre = (n: string) => String(n || "Socio").trim().split(/\s+/).slice(0, 2).join(" ");
 
-async function mensajeIngreso(ev: { dni: string; nombre: string; metodo?: string }) {
+async function mensajeIngreso(ev: { dni: string; nombre: string; metodo?: string; hora?: string; fecha?: string; pendiente_id?: number }) {
   const { data: s } = await sb.from("socios")
     .select("nombre, tipo_memb, fecha_fin, dias_restantes, dias_totales, deuda")
     .eq("dni", ev.dni).maybeSingle();
@@ -55,11 +55,15 @@ async function mensajeIngreso(ev: { dni: string; nombre: string; metodo?: string
       : `vence ${m[3]} ${MESES[+m[2] - 1]}`);
   }
   const via = ev.metodo === "QR" ? "por QR" : "en recepción";
+  // Hora REAL del ingreso (Lima), no la hora en que llega el aviso
+  const hora = String(ev.hora || "").slice(0, 5);
+  const ts = ev.fecha && ev.hora ? Date.parse(`${ev.fecha}T${String(ev.hora).slice(0, 8)}-05:00`) : Date.now();
   const alerta = deuda > 0 || (diasVence !== null && diasVence <= 3);
   return {
     title: `${alerta ? "⚠️" : "✅"} Ingresó ${nombre}`,
-    body: `${partes.join(" · ")} — ${via}`,
-    tag: "ingreso-" + ev.dni,
+    body: `${hora ? hora + " · " : ""}${partes.join(" · ")} — ${via}`,
+    tag: "ingreso-" + (ev.pendiente_id ?? ev.dni),
+    ts,
     dni: ev.dni,
     nombre,
     metodo: ev.metodo === "QR" ? "QR" : "Manual",
@@ -126,6 +130,11 @@ Deno.serve(async (req) => {
     }));
     // Celulares que ya no aceptan avisos (app desinstalada, permiso quitado)
     if (vencidos.length) await sb.from("push_suscripciones").delete().in("id", vencidos);
+    // Confirmar el aviso en la cola: solo si llegó a algún celular (o no hay celulares),
+    // así el reenvío de cada minuto recupera los que fallaron
+    if (ev.pendiente_id && (enviados > 0 || !(subs ?? []).length)) {
+      await sb.from("push_pendientes").update({ enviado_en: new Date().toISOString() }).eq("id", ev.pendiente_id);
+    }
     return Response.json({ enviados, vencidos: vencidos.length, total: subs?.length ?? 0 });
   } catch (e) {
     console.error(e);

@@ -30,7 +30,7 @@
 // vieja y toma la nueva automáticamente.
 // ============================================================
 
-const CACHE_NAME = 'cy-fitness-gym-v75';
+const CACHE_NAME = 'cy-fitness-gym-v76';
 
 // Dominios externos de los que es seguro guardar copia (son archivos estáticos:
 // librerías, íconos, fuentes, fotos — nunca datos de socios). Cualquier petición
@@ -188,7 +188,7 @@ self.addEventListener('push', (event) => {
     tag: d.tag || 'cy-aviso',
     renotify: true,
     vibrate: [180, 90, 180],
-    timestamp: Date.now(),
+    timestamp: d.ts || Date.now(),   // hora real del ingreso, no la de llegada
     data: { url: d.url || './?app=panel' }
   }));
 });

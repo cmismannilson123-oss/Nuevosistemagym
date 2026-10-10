@@ -68,6 +68,23 @@ Cada uso queda guardado en `public.cupones_uso` y manda un aviso al canal de ntf
 - **Invitar → Cupones**: historial por mes con totales (`listar_cupones_usados`,
   `supabase/migrations/20261007010000_cupones_panel.sql`).
 
+## Página del QR separada (qr.html)
+
+`qr.html` es solo la pantalla del socio (escanear, marcar asistencia, cupones, promociones).
+Pesa unos 115 KB frente a los ~300 KB del panel, y ambas páginas comparten `app.css`.
+Los enlaces que ya están impresos (`gym.html?qr=1`) siguen funcionando igual.
+
+`qr.html` es **generado**: no lo edites a mano. Edita `gym.html` y ejecuta:
+
+```
+ACORN_PATH=<carpeta con acorn> node tools/build-qr.js          # regenera qr.html
+ACORN_PATH=<carpeta con acorn> node tools/build-qr.js --check  # falla si qr.html quedó desactualizado
+```
+
+El script copia solo el JavaScript que usa la pantalla del socio. Las funciones del panel
+(`render`, `asistenciaNueva`, etc.) se reemplazan por stubs vacíos, y el marcado del panel se quita.
+Si cambias la pantalla del QR en `gym.html`, vuelve a generar `qr.html`.
+
 ## Cuaderno de caja
 
 Botón **Cuaderno de caja** (pestaña Lista). Muestra los ingresos de un mes a la vez:

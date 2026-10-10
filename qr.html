@@ -1,0 +1,2171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C&Y FITNESS GYM</title>
+      <script>document.documentElement.classList.add("qr-mode");</script>
+  <link rel="manifest" href="manifest-qr.json">
+  <meta name="theme-color" content="#07100d">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png">
+
+  
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<!-- Conexiones anticipadas: la app habla con Supabase y con sus librerías desde el primer segundo -->
+<link rel="preconnect" href="https://ygbiqnbygjbrmwyttkku.supabase.co" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+<link rel="dns-prefetch" href="https://ntfy.sh">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
+
+<link rel="stylesheet" href="app.css">
+</head>
+
+<body>
+<!-- PANTALLA DE CARGA DE SEGURIDAD -->
+
+
+<audio id="soundOk" src="https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg"></audio>
+<audio id="soundBad" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+
+
+
+
+
+<div class="container">
+  <div id="publicCheckin" style="display:none; padding:20px;">
+
+    <!-- Aviso: se muestra solo si detectamos un mini-navegador (WhatsApp/Instagram/etc.) o cookies/almacenamiento bloqueado -->
+    <div id="avisoNavegador" style="display:none; background:rgba(245,158,11,.12); border:1px solid rgba(245,158,11,.4); border-radius:14px; padding:14px 16px; margin-bottom:14px;">
+      <div style="display:flex; gap:10px; align-items:flex-start;">
+        <div style="font-size:22px; line-height:1;">⚠️</div>
+        <div>
+          <div id="avisoNavegadorTitulo" style="color:#fbbf24; font-weight:800; font-size:14px; margin-bottom:4px;"></div>
+          <div id="avisoNavegadorTexto" style="color:#e2e8f0; font-size:12.5px; line-height:1.5;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- v46: fila de accesos rápidos: Suplementos + Promos (visible para cualquiera que escanee el QR) -->
+    <div class="cy-prow" id="cyPromoRow">
+      <div id="btnAbrirCatalogo" class="cy-pbtn cy-sup" role="button" tabindex="0" onclick="abrirCatalogoModal()">
+        <div class="cy-sup-th">
+          <img src="images/catalogo-thumb-1.jpg" alt="">
+          <img src="images/catalogo-thumb-2.jpg" alt="">
+          <img src="images/catalogo-thumb-3.jpg" alt="">
+          <img src="images/catalogo-thumb-4.jpg" alt="">
+        </div>
+        <div class="cy-ptxt"><div class="t1">Suplementos</div><div class="t2">Ver catálogo completo</div></div>
+        <div class="cy-parrow" aria-hidden="true">›</div>
+      </div>
+      <div id="btnAbrirPromos" class="cy-pbtn cy-promo" role="button" tabindex="0" onclick="abrirPromoModal()" aria-label="Ver promociones">
+        <div class="cy-coins" aria-hidden="true">
+          <i style="--x:8%;--s:13px;--t:3.2s;--d:-.4s;--dx:6px"></i><i style="--x:22%;--s:10px;--t:2.6s;--d:-1.9s;--dx:-5px"></i>
+          <i style="--x:36%;--s:15px;--t:3.6s;--d:-2.7s;--dx:7px"></i><i style="--x:50%;--s:11px;--t:2.9s;--d:-.9s;--dx:-6px"></i>
+          <i style="--x:63%;--s:14px;--t:3.4s;--d:-3.1s;--dx:5px"></i><i style="--x:76%;--s:10px;--t:2.7s;--d:-1.4s;--dx:-4px"></i>
+          <i style="--x:88%;--s:13px;--t:3.1s;--d:-2.2s;--dx:4px"></i><i style="--x:44%;--s:9px;--t:2.4s;--d:-1.1s;--dx:3px"></i>
+        </div>
+        <div class="cy-promo-th"><img src="images/promo-thumb.jpg" alt=""></div>
+        <div class="cy-ptxt"><div class="t1">PROMOS</div><div class="t2">Hasta 10% dcto.</div></div>
+        <div class="cy-parrow" aria-hidden="true">›</div>
+      </div>
+    </div>
+
+  <div class="qr-hero-fullbleed" id="qrCardPrimeraVez">
+    <div class="cy-bg" aria-hidden="true">
+      <div class="cy-bg-par"><div class="cy-bg-photo"></div></div>
+      <div class="cy-glow"></div>
+      <i class="cy-p" style="--x:12%;--s:3px;--t:14s;--d:-2s"></i><i class="cy-p" style="--x:26%;--s:2px;--t:11s;--d:-7s"></i>
+      <i class="cy-p" style="--x:38%;--s:4px;--t:17s;--d:-4s"></i><i class="cy-p" style="--x:51%;--s:2px;--t:12s;--d:-9s"></i>
+      <i class="cy-p" style="--x:63%;--s:3px;--t:15s;--d:-1s"></i><i class="cy-p" style="--x:74%;--s:2px;--t:13s;--d:-6s"></i>
+      <i class="cy-p" style="--x:86%;--s:3px;--t:16s;--d:-10s"></i><i class="cy-p" style="--x:93%;--s:2px;--t:12s;--d:-3s"></i>
+    </div>
+    <div class="qr-hero-content">
+      <div class="qr-logo-ring"><span class="logo-cy"></span></div>
+      <h2 class="qr-titulo" style="font-size:26px; line-height:1.2;"><span class="tl tl1">C&amp;Y</span><span class="tl tl2 accent">FITNESS</span><span class="tl tl3">GYM</span></h2>
+      <p class="qr-sub" style="margin-top:12px;">Tu mejor versión empieza aquí</p>
+      <div class="qr-hero-divider"></div>
+
+      <!-- Bifurcación: socio existente vs. persona nueva que solo quiere conocer -->
+      <div id="qrOpcionesInicio" style="display:flex; flex-direction:column; gap:14px; margin-top:6px;">
+        <button type="button" id="btnSoySocioQR" class="qr-btn-principal cy-tile cy-tile--socio">
+          <span class="cy-ico">
+            <svg class="cy-lifter" viewBox="0 0 64 64" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <ellipse cx="32" cy="61" rx="13" ry="2" fill="rgba(0,0,0,.35)"/>
+              <path stroke="#e2e8f0" stroke-width="5" d="M30 40 L27 52 L27 59">
+                <animate attributeName="d" dur="2.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.3;.55;.7;1" keySplines=".4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1" values="M30 40 L27 52 L27 59;M30 46 L21 52 L25 59;M30 40 L27 52 L27 59;M30 40 L27 52 L27 59;M30 40 L27 52 L27 59"/>
+              </path>
+              <path stroke="#e2e8f0" stroke-width="5" d="M34 40 L37 52 L37 59">
+                <animate attributeName="d" dur="2.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.3;.55;.7;1" keySplines=".4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1" values="M34 40 L37 52 L37 59;M34 46 L43 52 L39 59;M34 40 L37 52 L37 59;M34 40 L37 52 L37 59;M34 40 L37 52 L37 59"/>
+              </path>
+              <g>
+                <animateTransform attributeName="transform" type="translate" dur="2.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.3;.55;.7;1" keySplines=".4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1" values="0 0;0 6;0 0;0 0;0 0"/>
+                <path d="M32 23 L32 40" stroke="#e2e8f0" stroke-width="7"/>
+                <path d="M25 24 L39 24" stroke="#e2e8f0" stroke-width="5"/>
+                <circle cx="32" cy="14" r="5.5" fill="#f8fafc" stroke="none"/>
+              </g>
+              <path stroke="#f1f5f9" stroke-width="3.4" d="M26 24 L19 31 L20 24">
+                <animate attributeName="d" dur="2.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.3;.55;.7;1" keySplines=".4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1" values="M26 24 L19 31 L20 24;M26 30 L19 37 L20 30;M26 24 L21 15 L20 6;M26 24 L21 15 L20 6;M26 24 L19 31 L20 24"/>
+              </path>
+              <path stroke="#f1f5f9" stroke-width="3.4" d="M38 24 L45 31 L44 24">
+                <animate attributeName="d" dur="2.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.3;.55;.7;1" keySplines=".4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1" values="M38 24 L45 31 L44 24;M38 30 L45 37 L44 30;M38 24 L43 15 L44 6;M38 24 L43 15 L44 6;M38 24 L45 31 L44 24"/>
+              </path>
+              <g>
+                <animateTransform attributeName="transform" type="translate" dur="2.8s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.3;.55;.7;1" keySplines=".4 0 .2 1;.4 0 .2 1;.4 0 .2 1;.4 0 .2 1" values="0 24;0 30;0 6;0 6;0 24"/>
+                <line x1="7" y1="0" x2="57" y2="0" stroke="#cbd5e1" stroke-width="2.6"/>
+                <rect x="4" y="-8" width="4" height="16" rx="1.5" fill="#dc2626" stroke="none"/>
+                <rect x="8.5" y="-6" width="3" height="12" rx="1.2" fill="#ef4444" stroke="none"/>
+                <rect x="56" y="-8" width="4" height="16" rx="1.5" fill="#dc2626" stroke="none"/>
+                <rect x="52.5" y="-6" width="3" height="12" rx="1.2" fill="#ef4444" stroke="none"/>
+                <circle cx="20" cy="0" r="3.3" fill="#fcd34d" stroke="none"/>
+                <circle cx="44" cy="0" r="3.3" fill="#fcd34d" stroke="none"/>
+              </g>
+            </svg>
+          </span>
+          <span class="lbl-wiz"><b>Soy socio</b><small>Marca tu asistencia de hoy</small></span>
+          <span class="flecha" aria-hidden="true"><i class="fa-solid fa-chevron-right"></i></span>
+        </button>
+        <div class="cy-sec">
+        <button type="button" id="btnPrimeraVezQR" class="qr-btn-principal cy-tile cy-tile--nuevo">
+          <span class="cy-ico">
+            <svg class="cy-wave" viewBox="0 0 64 64" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path class="cy-wl" d="M50 18 Q56 24 52 32" stroke="#bfdbfe" stroke-width="2.6"/>
+              <path class="cy-wl" d="M55 12 Q63 22 57 34" stroke="#bfdbfe" stroke-width="2.2"/>
+              <path class="cy-wl" d="M14 18 Q8 24 12 32" stroke="#bfdbfe" stroke-width="2.6"/>
+              <g class="cy-hand">
+                <rect x="25" y="47" width="14" height="10" rx="3" fill="#dc2626" stroke="none"/>
+                <rect x="14" y="31" width="15" height="6" rx="3" fill="#fcd34d" stroke="none" transform="rotate(-38 27 36)"/>
+                <rect x="21" y="26" width="22" height="24" rx="10" fill="#fcd34d" stroke="none"/>
+                <rect x="21.5" y="12" width="5" height="22" rx="2.5" fill="#fcd34d" stroke="none"/>
+                <rect x="27" y="8" width="5" height="26" rx="2.5" fill="#fcd34d" stroke="none"/>
+                <rect x="32.5" y="10" width="5" height="24" rx="2.5" fill="#fcd34d" stroke="none"/>
+                <rect x="38" y="15" width="5" height="19" rx="2.5" fill="#fcd34d" stroke="none"/>
+                <path d="M27 30 L27 36 M32.5 30 L32.5 36 M38 30 L38 36" stroke="#f59e0b" stroke-width="1.2" opacity=".6"/>
+              </g>
+            </svg>
+          </span>
+          <span class="lbl-wiz"><b>Conocer el gym</b><small>Planes, horarios y servicios</small></span>
+        </button>
+
+        <button type="button" id="btnInscribirseQR" class="qr-btn-principal cy-tile cy-tile--inscribir">
+          <span class="cy-ico">
+            <svg class="cy-clip" viewBox="0 0 64 64" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="13" y="10" width="38" height="48" rx="6" fill="#f8fafc" stroke="none"/>
+              <rect x="23" y="5" width="18" height="10" rx="3.5" fill="#fcd34d" stroke="none"/>
+              <rect x="19" y="21" width="26" height="3" rx="1.5" fill="#cbd5e1" stroke="none"/>
+              <rect x="19" y="28" width="18" height="3" rx="1.5" fill="#cbd5e1" stroke="none"/>
+              <path d="M20 44 L27 51 L44 34" stroke="#ea580c" stroke-width="5" stroke-dasharray="36" stroke-dashoffset="36">
+                <animate attributeName="stroke-dashoffset" dur="3.2s" repeatCount="indefinite" calcMode="spline" keyTimes="0;.35;.85;1" keySplines=".4 0 .2 1;.4 0 .2 1;.4 0 .2 1" values="36;0;0;36"/>
+              </path>
+            </svg>
+          </span>
+          <span class="lbl-wiz"><b>Inscribirme</b><small>Reserva tu lugar y gana un premio</small></span>
+          <span class="tile-promo" id="tilePromo" style="display:none;">🔥 PROMO</span>
+        </button>
+        </div>
+      </div>
+
+      <button type="button" id="promoTeaser" class="promo-teaser" style="display:none;" onclick="cyAbrirInscripcion()">
+        <span class="pt-em" id="ptEm" aria-hidden="true">🔥</span>
+        <span class="pt-tx"><b>PROMO ACTIVA</b><small id="ptTx"></small></span>
+        <span class="pt-time" id="ptTime"></span>
+      </button>
+
+      <form id="loginFormGym" onsubmit="procesarIngresoSocio(event)" style="display:none;" autocomplete="off">
+        <input 
+          type="tel" 
+          id="qrPhone" 
+          name="telefonoSocio" 
+          autocomplete="off" 
+          placeholder="Tu número de celular" 
+          required
+          style="width:100%;padding:15px 16px;border-radius:50px;border:1.5px solid rgba(16,185,129,.4);background:rgba(6,20,18,.6);color:#fff;font-size:15px;margin-bottom:12px;box-sizing:border-box;text-align:center;"
+        >
+        <input 
+          type="tel" 
+          id="qrDni" 
+          name="dniSocio" 
+          inputmode="numeric"
+          autocomplete="off" 
+          placeholder="Tu DNI" 
+          required
+          style="width:100%;padding:15px 16px;border-radius:50px;border:1.5px solid rgba(16,185,129,.4);background:rgba(6,20,18,.6);color:#fff;font-size:15px;margin-bottom:12px;box-sizing:border-box;text-align:center;"
+        >
+        <p id="qrFormAviso" style="color:#94a3b8;font-size:13px;margin:0 0 12px;text-align:center;">Solo la primera vez en este celular.</p>
+        <button type="submit" class="qr-btn-principal">
+          <span class="icono-circulo">🔍</span> Buscar <span class="flecha">→</span>
+        </button>
+      </form>
+
+      <!-- Guarda el número como si fuera un inicio de sesión, SOLO para que en iPhone
+           (donde el localStorage no siempre persiste) el teléfono quede recordado por
+           el propio sistema del celular. No se ve, no interrumpe la búsqueda, y solo
+           se activa después de encontrar al socio (ver guardarCredencialNavegador). -->
+      <iframe name="credSaveFrame" style="display:none;" tabindex="-1" aria-hidden="true"></iframe>
+      <form id="credSaveForm" target="credSaveFrame" style="display:none;" autocomplete="on">
+        <input type="text" name="username" id="credSaveUser" autocomplete="username">
+        <input type="password" name="password" id="credSavePass" autocomplete="new-password">
+      </form>
+
+      <button type="button" id="btnRegistrarSocioQR" class="qr-btn-principal" style="display:none;">
+        <span class="icono-circulo">📝</span> Registrar Socio <span class="flecha">→</span>
+      </button>
+
+      <div class="qr-secure-line"><i class="fa-solid fa-lock"></i> Registro seguro y rápido</div>
+    </div>
+  </div>
+
+  <!-- Ventana flotante a pantalla completa: "Nuevo / Quiero conocer el gym" -->
+  <div class="wiz-overlay" id="wizOverlay">
+
+    <!-- Pantalla: "Conoce C&Y Fitness Gym" (v49: experiencia estilo Apple) -->
+    <div class="wiz-screen" id="wizConoce" style="display:none;">
+      <div class="wiz-topbar">
+        <button type="button" class="wiz-back" onclick="wizVolver()" aria-label="Volver">←</button>
+        <span class="wiz-title">Conoce C&amp;Y Fitness Gym</span>
+      </div>
+
+      <section class="ap-hero" id="apHero">
+        <div class="ap-hero-img"><div class="ap-hero-photo" style="background-image:url('https://images.unsplash.com/photo-1744551154623-4b5336e95c28?q=80&w=900&auto=format&fit=crop');"></div></div>
+        <div class="ap-hero-copy">
+          <div class="ap-eyebrow">C&amp;Y FITNESS GYM</div>
+          <h3 class="ap-h1">Todo lo que necesitas para alcanzar <em>tus objetivos</em></h3>
+          <p class="ap-sub">Entrena, supérate y alcanza tu mejor versión con nosotros.</p>
+        </div>
+        <div class="ap-cue" aria-hidden="true"></div>
+      </section>
+
+      <p class="ap-state" id="apState" aria-label="No es solo un gimnasio, es tu comunidad.">No es solo un gimnasio, es tu comunidad.</p>
+
+      <div class="ap-sec ap-rv"><small>Lo que incluye</small><h4>Todo para entrenar mejor.</h4></div>
+
+      <div class="wiz-grid2 ap-bento">
+        <div class="wiz-feat-card2 wiz-feat-hero" style="--a:#ef4444"><div class="ic"><i class="fa-solid fa-dumbbell"></i></div><div><div class="t">CAPACITACIÓN E INSTRUCCIÓN</div><div class="d">En las máquinas en general.</div></div></div>
+        <div class="wiz-feat-card2" style="--a:#10b981"><div class="ic"><i class="fa-solid fa-user-check"></i></div><div class="t">INSTRUCTOR GENERAL O PERSONALIZADO</div><div class="d">Para ayudarte durante tu entrenamiento.</div></div>
+        <div class="wiz-feat-card2" style="--a:#f59e0b"><div class="ic"><i class="fa-solid fa-apple-whole"></i></div><div class="t">ASESORÍA NUTRICIONAL</div><div class="d">Orientación para tu alimentación.</div></div>
+        <div class="wiz-feat-card2" style="--a:#60a5fa"><div class="ic"><i class="fa-solid fa-list-check"></i></div><div class="t">INSTRUCCIÓN Y ASESORÍA EN EJERCICIOS</div><div class="d">Dependiendo del objetivo y condición de cada miembro.</div></div>
+        <div class="wiz-feat-card2" style="--a:#22d3ee"><div class="ic"><i class="fa-solid fa-user"></i></div><div class="t">INSTRUCTORES DISPONIBLES</div><div class="d">En todos los horarios y días de atención.</div></div>
+        <div class="wiz-feat-card2 wiz-feat-dance" style="--a:#e879f9"><div class="ic"><i class="fa-solid fa-music"></i></div><div><div class="t">CLASES DE BAILE Y STEP</div><div class="d">Incluidas para todos los miembros.</div></div><span class="ap-eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span></div>
+      </div>
+
+      <div class="ap-stats" id="apStats">
+        <div class="ap-stat ap-rv"><b data-n="6">6</b><span>días de entrenamiento<br>Lunes a Sábado</span></div>
+        <div class="ap-stat ap-rv"><b data-n="2">2</b><span>turnos al día<br>mañana y tarde</span></div>
+        <div class="ap-stat ap-rv"><b>7–9</b><span>p.m. Baile y Step<br>Lunes a Viernes</span></div>
+      </div>
+
+      <div class="ap-cta ap-rv">
+        <h4>Tu mejor versión empieza aquí.</h4>
+        <p>Conoce nuestros planes y el lugar donde vas a entrenar.</p>
+        <button type="button" class="ap-btn ap-btn-main" onclick="wizIr('wizPlanes')">Ver nuestros planes <span aria-hidden="true">→</span></button>
+        <button type="button" class="ap-btn ap-btn-ghost" onclick="wizIr('wizHorarios')">Horarios y ubicación <span aria-hidden="true">→</span></button>
+      </div>
+    </div>
+
+    <!-- Pantalla: "Horarios y ubicación" -->
+    <div class="wiz-screen" id="wizHorarios" style="display:none;">
+      <div class="wiz-topbar">
+        <button type="button" class="wiz-back" onclick="wizVolver()">←</button>
+        <span class="wiz-title">Horarios y ubicación</span>
+      </div>
+      <div class="ap-large"><small>Entrena con nosotros</small><h2>Horarios y ubicación</h2></div>
+
+      <div id="estadoAbierto" class="open-chip cerrado"></div>
+      <div class="wiz-info-card">
+        <div class="lbl">🕐 HORARIOS</div>
+        <div class="wiz-horario-split">
+          <div class="wiz-horario-col">
+            <div class="wiz-horario-ico sol">☀️</div>
+            <div class="d1">MAÑANAS</div>
+            <div class="d2">Lunes a Sábado</div>
+            <div class="wiz-horario-pill">6:30 a.m. - 12:00 p.m.</div>
+          </div>
+          <div class="wiz-horario-col">
+            <div class="wiz-horario-ico luna">🌙</div>
+            <div class="d1">TARDES</div>
+            <div class="d2">Lunes a Sábado</div>
+            <div class="wiz-horario-pill">4:00 p.m. - 10:30 p.m.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wiz-info-card wiz-baile-card">
+        <div class="wiz-baile-row">
+          <div class="wiz-horario-ico baile">💃</div>
+          <div>
+            <div class="d1">BAILE &amp; <span style="color:#e879f9;">STEP</span></div>
+            <div class="d2">Lunes a Viernes</div>
+            <div class="wiz-horario-pill baile">7:00 p.m. - 9:00 p.m.</div>
+          </div>
+        </div>
+        <div class="wiz-baile-banner">Baile<br>Step</div>
+      </div>
+
+      <div class="wiz-info-card">
+        <div class="lbl">📍 UBICACIÓN</div>
+        <div class="wiz-ubicacion-row">
+          <div>
+            <div class="d1"><i class="fa-solid fa-location-dot" style="color:#dc2626; margin-right:6px;"></i>Av. San Juan Evangelista 110</div>
+            <div class="d2" style="margin-top:8px;"><i class="fa-solid fa-shield-halved" style="color:#34d399; margin-right:6px;"></i>Fácil acceso y zona segura</div>
+          </div>
+          <div class="wiz-mini-mapa"><div class="pin">📍</div></div>
+        </div>
+      </div>
+
+      <div class="wiz-banner">
+        <div class="bi">🏋️</div>
+        <div class="bt">Instalaciones modernas</div>
+        <div class="bd">para tu máximo rendimiento</div>
+      </div>
+
+      <button type="button" id="btnWhatsAppInfoQR" class="wiz-whatsapp-btn" onclick="abrirWhatsAppInfo()">
+        <i class="fa-brands fa-whatsapp" style="font-size:20px;"></i><span class="wiz-wsp-divider"></span> Quiero más información <span style="margin-left:auto;">→</span>
+      </button>
+    </div>
+
+    <!-- Pantalla: "Nuestros planes" -->
+    <div class="wiz-screen" id="wizPlanes" style="display:none;">
+      <div class="wiz-topbar">
+        <button type="button" class="wiz-back" onclick="wizVolver()">←</button>
+        <span class="wiz-title">Nuestros planes</span>
+      </div>
+      <div class="ap-large"><small>Elige lo que va contigo</small><h2>Nuestros planes</h2></div>
+      <p class="wiz-p" style="margin-bottom:16px;">Elige el plan que mejor se adapta a ti.</p>
+
+      <div class="wiz-plan-list" id="listaPlanesPublica"></div>
+
+      <div id="catalogoBtnWizSlot"></div>
+
+      <button type="button" class="wiz-whatsapp-btn" onclick="abrirWhatsAppInfo()">
+        <i class="fa-brands fa-whatsapp" style="font-size:20px;"></i><span class="wiz-wsp-divider"></span> Quiero más información <span style="margin-left:auto;">→</span>
+      </button>
+    </div>
+
+  </div>
+
+    <div id="qrResult"></div>
+  </div>
+
+
+  <!-- v46: Modal del flyer de promociones (se muestra tal cual) -->
+  <div id="promoModal" class="cy-pm" style="display:none;" role="dialog" aria-modal="true" aria-label="Promociones C&Y">
+    <div class="cy-pm-panel">
+      <div class="cy-pm-head">
+        <strong>🔥 Promos C&amp;Y Fitness Gym</strong>
+        <button type="button" onclick="cerrarPromoModal()" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="cy-pm-body">
+        <img src="images/promo-renueva.jpg" alt="Renueva tu membresía y obtén hasta 10% de descuento" decoding="async" loading="lazy">
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal flotante del catálogo -->
+  <div id="catalogoModal" class="modal-backdrop" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.85);z-index:99999;justify-content:center;align-items:center;">
+    <div class="modal-panel" style="width:100%;height:100%;max-width:600px;display:flex;flex-direction:column;background:#0b0d12;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:#14161c;border-bottom:2px solid #dc2626;flex-shrink:0;">
+        <strong style="color:#fff;font-size:15px;">📖 Catálogo C&amp;Y Fitness Gym</strong>
+        <button type="button" onclick="cerrarCatalogoModal()" style="background:#dc2626;border:none;color:#fff;width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;">✕</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;">
+        <img src="images/catalogo-full-1.jpg" style="width:100%;display:block;" loading="lazy" decoding="async" alt="Catálogo 1">
+<img src="images/catalogo-full-2.jpg" style="width:100%;display:block;" loading="lazy" decoding="async" alt="Catálogo 2">
+<img src="images/catalogo-full-3.jpg" style="width:100%;display:block;" loading="lazy" decoding="async" alt="Catálogo 3">
+<img src="images/catalogo-full-4.jpg" style="width:100%;display:block;" loading="lazy" decoding="async" alt="Catálogo 4">
+<img src="images/catalogo-full-5.jpg" style="width:100%;display:block;" loading="lazy" decoding="async" alt="Catálogo 5">
+<img src="images/catalogo-full-6.jpg" style="width:100%;display:block;" loading="lazy" decoding="async" alt="Catálogo 6">
+<img src="images/catalogo-full-7.jpg" style="width:100%;display:block;" loading="lazy" decoding="async" alt="Catálogo 7">
+<img src="images/catalogo-full-8.jpg" style="width:100%;display:block;" loading="lazy" decoding="async" alt="Catálogo 8">
+<img src="images/catalogo-full-9.jpg" style="width:100%;display:block;" loading="lazy" decoding="async" alt="Catálogo 9">
+
+      </div>
+    </div>
+  </div>
+
+
+<!-- v42: Pre-registro "Quiero inscribirme" (pantalla pública) -->
+<div id="inscOverlay" class="cy-ov" role="dialog" aria-modal="true" aria-labelledby="inscTitulo" style="display:none;">
+  <div class="av-layer" aria-hidden="true">
+      <i class="av av1" style="--x:37%;--y:21%;--s:96px;--c1:#34d399;--c2:#059669;--b:0px;--t:24s;--d:-17s;--dx:71px;--dy:-39px"></i>
+      <i class="av av2" style="--x:8%;--y:48%;--s:84px;--c1:#60a5fa;--c2:#2563eb;--b:0px;--t:27s;--d:-2s;--dx:-88px;--dy:-34px"></i>
+      <i class="av av3" style="--x:51%;--y:55%;--s:72px;--c1:#f472b6;--c2:#db2777;--b:0px;--t:22s;--d:-13s;--dx:-45px;--dy:-100px"></i>
+      <i class="av av1" style="--x:3%;--y:74%;--s:64px;--c1:#fbbf24;--c2:#d97706;--b:1px;--t:30s;--d:-20s;--dx:-90px;--dy:-110px"></i>
+      <i class="av av2" style="--x:70%;--y:9%;--s:56px;--c1:#a78bfa;--c2:#7c3aed;--b:1px;--t:26s;--d:-17s;--dx:33px;--dy:-35px"></i>
+      <i class="av av3" style="--x:13%;--y:39%;--s:46px;--c1:#fb923c;--c2:#ea580c;--b:2px;--t:34s;--d:-19s;--dx:39px;--dy:-103px"></i>
+      <i class="av av1" style="--x:67%;--y:89%;--s:40px;--c1:#2dd4bf;--c2:#0d9488;--b:2px;--t:31s;--d:-6s;--dx:-36px;--dy:-77px"></i>
+      <i class="av av2" style="--x:66%;--y:10%;--s:34px;--c1:#f87171;--c2:#dc2626;--b:3px;--t:38s;--d:-34s;--dx:-69px;--dy:-93px"></i>
+      <i class="av av3" style="--x:50%;--y:42%;--s:30px;--c1:#34d399;--c2:#059669;--b:3px;--t:36s;--d:-19s;--dx:67px;--dy:76px"></i>
+      <i class="av av1" style="--x:27%;--y:25%;--s:88px;--c1:#60a5fa;--c2:#2563eb;--b:0px;--t:29s;--d:-15s;--dx:-35px;--dy:97px"></i>
+      <i class="av av2" style="--x:39%;--y:59%;--s:52px;--c1:#f472b6;--c2:#db2777;--b:1px;--t:33s;--d:-32s;--dx:68px;--dy:-45px"></i>
+      <i class="av av3" style="--x:49%;--y:23%;--s:36px;--c1:#fbbf24;--c2:#d97706;--b:3px;--t:40s;--d:-2s;--dx:39px;--dy:83px"></i>
+      <i class="av av1" style="--x:81%;--y:11%;--s:60px;--c1:#a78bfa;--c2:#7c3aed;--b:1px;--t:28s;--d:-15s;--dx:51px;--dy:106px"></i>
+      <i class="av av2" style="--x:70%;--y:60%;--s:28px;--c1:#fb923c;--c2:#ea580c;--b:3px;--t:42s;--d:-30s;--dx:-83px;--dy:-64px"></i>
+      <i class="av av3" style="--x:85%;--y:87%;--s:44px;--c1:#2dd4bf;--c2:#0d9488;--b:2px;--t:35s;--d:-28s;--dx:-33px;--dy:103px"></i>
+  </div>
+  <div class="insc-wrap">
+    <div class="wiz-topbar">
+      <button type="button" class="wiz-back" onclick="cyCerrarInscripcion()" aria-label="Volver">←</button>
+      <span class="wiz-title" id="inscTitulo">Quiero inscribirme</span>
+    </div>
+    <div class="insc-card">
+      <h3>¡Únete a la comunidad C&amp;Y! 💪</h3>
+      <p>Déjanos tus datos y reserva tu lugar. Al terminar te espera un <b>premio sorpresa</b> 🎁</p>
+      <div id="inscPromo" class="insc-promo" style="display:none;"></div>
+      <form id="inscForm" onsubmit="cyEnviarPrereg(event)" autocomplete="off" novalidate>
+        <label for="inscDni">DNI</label>
+        <input id="inscDni" type="text" inputmode="numeric" maxlength="12" placeholder="Tu DNI" autocomplete="off">
+        <label for="inscNombre">Nombre completo</label>
+        <input id="inscNombre" type="text" maxlength="80" placeholder="Nombres y apellidos" autocomplete="off">
+        <label for="inscWsp">WhatsApp</label>
+        <input id="inscWsp" type="tel" inputmode="tel" maxlength="16" placeholder="Ej: 927885791" autocomplete="off">
+        <div id="inscError" class="insc-error" role="alert"></div>
+        <button type="submit" id="inscEnviar" class="insc-send"><i class="fa-solid fa-paper-plane"></i> <span>Enviar y ver mi premio</span></button>
+      </form>
+      <div class="insc-nota"><i class="fa-solid fa-lock"></i> Tus datos solo los usa el gimnasio para atenderte.</div>
+    </div>
+  </div>
+</div>
+
+<div id="celebOverlay" class="cy-ov cy-celeb" role="dialog" aria-modal="true" aria-labelledby="celebTitulo" style="display:none;">
+  <div class="cel-fx" id="celFx" aria-hidden="true"></div>
+  <button type="button" class="cel-back" onclick="cyCerrarCelebracion()" aria-label="Volver al inicio">←</button>
+  <div class="cel-box">
+    <div class="cel-emoji" id="celEmoji" aria-hidden="true">🎉</div>
+    <div class="cel-badge" id="celBadge" style="display:none;"></div>
+    <h2 id="celebTitulo">¡Felicidades<span id="celNombre"></span>!</h2>
+    <div class="cel-sub" id="celSub">Ganaste</div>
+    <div class="cel-prize" id="celPrize" aria-live="polite">…</div>
+    <div class="cel-desc" id="celDesc" style="display:none;"></div>
+    <div class="cel-vence" id="celVence" style="display:none;"></div>
+    <p class="cel-hint" id="celHint">Preséntate en recepción y menciona tu DNI para canjearlo. ¡Te esperamos!</p>
+    <button type="button" class="cel-btn" onclick="cyCerrarCelebracion()"><i class="fa-solid fa-arrow-left"></i> Volver al inicio</button>
+  </div>
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  <!-- PANEL DE INVITACIONES Y PROMOCIONES (TAB 5) -->
+  
+</div>
+
+
+
+
+<!-- Modal: Editar / corregir los datos generales de un socio ya inscrito.
+     Mismos campos que el formulario de Registro, para corregir errores de
+     inscripción (nombre, DNI, teléfono, plan, precio, fechas, deuda) sin
+     alterar ninguna otra lógica del sistema. -->
+
+
+
+
+
+<!-- Modal Dinámico para Precios de Invitación -->
+
+
+
+<!-- ========================================== -->
+<!-- CUADERNO DE CAJA (inscripciones y pagos)   -->
+<!-- ========================================== -->
+
+
+
+
+<!-- ========================================== -->
+<!-- APP Y NOTIFICACIONES (panel)               -->
+<!-- ========================================== -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+/* GENERADO por tools/build-qr.js desde gym.html. No editar a mano: editar gym.html y regenerar. */
+window.mostrarSocio = function () {};
+window.generarCardSocio = function () {};
+window.asistenciaNueva = function () {};
+window.cyConfirmarIngreso = function () {};
+window.renovar = function () {};
+window.render = function () {};
+window.mostrarHistorial = function () {};
+
+(function ajustarSpacerHeader(){
+  function actualizar() {
+    var tb = document.getElementById('topbarPrincipal');
+    var sp = document.getElementById('topbarSpacer');
+    if (tb && sp) sp.style.height = tb.getBoundingClientRect().bottom + 'px';
+  }
+  window.addEventListener('load', actualizar);
+  window.addEventListener('resize', actualizar);
+  window.addEventListener('orientationchange', actualizar);
+  // Reintentamos varias veces al inicio por si las fuentes/íconos tardan en cargar y cambian el alto
+  setTimeout(actualizar, 50);
+  setTimeout(actualizar, 300);
+  setTimeout(actualizar, 1000);
+  setTimeout(actualizar, 2000);
+  actualizar();
+
+  // Detección en tiempo real: si el header cambia de tamaño por CUALQUIER motivo
+  // (rotar el celular, la barra del navegador que aparece/desaparece al hacer scroll,
+  // cambio de pestaña, fuentes que tardan en cargar, etc.), esto lo detecta al instante
+  // y ajusta el espacio reservado, sin depender de adivinar tiempos.
+  var tbEl = document.getElementById('topbarPrincipal');
+  if (tbEl && window.ResizeObserver) {
+    new ResizeObserver(actualizar).observe(tbEl);
+  }
+})();
+
+function escaparHTML(t) {
+  return String(t == null ? "" : t)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+function leerTelefonoSeguro() {
+  let valor = null;
+  try { valor = localStorage.getItem("telefonoGym"); } catch (e) {}
+  if (!valor) {
+    try { valor = sessionStorage.getItem("telefonoGym"); } catch (e) {}
+  }
+  return valor;
+}
+
+function guardarTelefonoSeguro(telefono) {
+  try { localStorage.setItem("telefonoGym", telefono); } catch (e) {}
+  try { sessionStorage.setItem("telefonoGym", telefono); } catch (e) {}
+}
+
+function leerDniSeguro() {
+  let valor = null;
+  try { valor = localStorage.getItem("dniGym"); } catch (e) {}
+  if (!valor) {
+    try { valor = sessionStorage.getItem("dniGym"); } catch (e) {}
+  }
+  return valor;
+}
+
+function guardarDniSeguro(dni) {
+  try { localStorage.setItem("dniGym", dni); } catch (e) {}
+  try { sessionStorage.setItem("dniGym", dni); } catch (e) {}
+}
+
+function borrarDniSeguro() {
+  try { localStorage.removeItem("dniGym"); } catch (e) {}
+  try { sessionStorage.removeItem("dniGym"); } catch (e) {}
+}
+
+document.addEventListener("input", function(e){ if (e.target && e.target.classList && e.target.classList.contains("qr-campo-mal")) e.target.classList.remove("qr-campo-mal"); });
+
+function borrarTelefonoSeguro() {
+  try { localStorage.removeItem("telefonoGym"); } catch (e) {}
+  try { sessionStorage.removeItem("telefonoGym"); } catch (e) {}
+}
+
+function mostrarFormularioSocioQR(mensaje, op) {
+  op = op || {};
+  const tarjeta = document.getElementById("qrCardPrimeraVez");
+  if (tarjeta) tarjeta.style.display = "block";
+  const opciones = document.getElementById("qrOpcionesInicio");
+  if (opciones) opciones.style.display = "none";
+  const form = document.getElementById("loginFormGym");
+  if (form) form.style.display = "block";
+  const aviso = document.getElementById("qrFormAviso");
+  if (aviso && mensaje) {
+    aviso.className = op.tipo ? "qr-aviso qr-aviso--" + op.tipo : "";
+    aviso.innerHTML = op.tipo
+      ? '<i class="fa-solid ' + (op.tipo === "error" ? "fa-circle-exclamation" : "fa-triangle-exclamation") + '" aria-hidden="true"></i><span>' +
+        (op.titulo ? "<b>" + escaparHTML(op.titulo) + "</b>" : "") + escaparHTML(mensaje) + "</span>"
+      : escaparHTML(mensaje);
+    aviso.setAttribute("role", op.tipo ? "alert" : "status");
+  }
+  const tel = leerTelefonoSeguro();
+  const phoneInput = document.getElementById("qrPhone");
+  const dniInput = document.getElementById("qrDni");
+  if (phoneInput) {
+    if (op.tel != null) phoneInput.value = op.tel;
+    else if (tel && !phoneInput.value) phoneInput.value = tel;
+    phoneInput.classList.toggle("qr-campo-mal", op.foco === "tel");
+  }
+  if (dniInput) {
+    dniInput.value = op.dni != null ? op.dni : "";
+    dniInput.classList.toggle("qr-campo-mal", op.foco === "dni");
+  }
+  const enfocar = op.foco === "dni" ? dniInput : (op.foco === "tel" ? phoneInput : ((phoneInput && !phoneInput.value) ? phoneInput : dniInput));
+  if (enfocar) { try { enfocar.focus({ preventScroll: false }); if (op.foco) enfocar.select(); } catch (e) {} }
+}
+
+function detectarProblemaNavegador() {
+  const ua = navigator.userAgent || "";
+
+  // Firmas conocidas de navegadores embebidos dentro de otras apps
+  const esNavegadorEmbebido = /FBAN|FBAV|Instagram|Line\/|MicroMessenger|TikTok|musical_ly|Twitter|GSA\/|WhatsApp/i.test(ua)
+    || (/\bwv\b/i.test(ua) && /Android/i.test(ua)); // WebView genérico de Android
+
+  // Prueba real de almacenamiento: si falla, es que el navegador lo está bloqueando (ej. "Bloquear todas las cookies")
+  let almacenamientoBloqueado = false;
+  try {
+    const testKey = "__cy_test__";
+    localStorage.setItem(testKey, "1");
+    localStorage.removeItem(testKey);
+  } catch (e) {
+    almacenamientoBloqueado = true;
+  }
+
+  const aviso = document.getElementById("avisoNavegador");
+  const titulo = document.getElementById("avisoNavegadorTitulo");
+  const texto = document.getElementById("avisoNavegadorTexto");
+  if (!aviso || !titulo || !texto) return;
+
+  if (esNavegadorEmbebido) {
+    titulo.textContent = "Abre este link en Safari o Chrome";
+    texto.textContent = "Estás dentro de otra app (como WhatsApp o Instagram). Para que el sistema recuerde tu número y no te lo pida cada vez, toca el ícono de compartir o los tres puntos (⋮) y elige \"Abrir en Safari\" o \"Abrir en Chrome\".";
+    aviso.style.display = "block";
+  } else if (almacenamientoBloqueado) {
+    titulo.textContent = "Activa las cookies para que te recordemos";
+    texto.textContent = "Tu navegador está bloqueando la memoria de este sitio. En iPhone: Ajustes → Safari (o Apps → Safari) → Avanzado → desactiva \"Bloquear todas las cookies\". En Android: revisa que las cookies estén permitidas en la configuración de tu navegador.";
+    aviso.style.display = "block";
+  } else {
+    aviso.style.display = "none";
+  }
+}
+
+window.abrirCatalogoModal = function() {
+  const modal = document.getElementById("catalogoModal");
+  if (modal) modal.style.display = "flex";
+};
+
+window.cerrarCatalogoModal = function() {
+  const modal = document.getElementById("catalogoModal");
+  if (modal) modal.style.display = "none";
+};
+
+window.abrirPromoModal = function() {
+  const m = document.getElementById("promoModal");
+  if (m) { m.style.display = "flex"; const b = m.querySelector(".cy-pm-body"); if (b) b.scrollTop = 0; }
+};
+
+window.cerrarPromoModal = function() {
+  const m = document.getElementById("promoModal");
+  if (m) m.style.display = "none";
+};
+
+document.addEventListener("keydown", function(e){
+  if (e.key === "Escape") { cerrarPromoModal(); }
+  if ((e.key === "Enter" || e.key === " ") && e.target && e.target.classList && e.target.classList.contains("cy-pbtn")) { e.preventDefault(); e.target.click(); }
+});
+
+document.addEventListener("click", function(e){
+  const m = document.getElementById("promoModal");
+  if (m && e.target === m) cerrarPromoModal();
+});
+
+async function inicializarFlujoQR(){
+  // Evita que dos disparadores (la carga inicial y el evento de "pestaña
+  // visible") terminen ejecutando el flujo dos veces al mismo tiempo,
+  // compitiendo entre sí por la misma conexión y haciendo sentir todo más lento.
+  if (window._flujoQREnCurso) return;
+  window._flujoQREnCurso = true;
+  try {
+    await inicializarFlujoQRInterno();
+  } finally {
+    window._flujoQREnCurso = false;
+  }
+}
+
+async function inicializarFlujoQRInterno(){
+  const url = new URL(window.location.href);
+  if(document.documentElement.classList.contains("qr-mode")){
+    const dash = document.querySelector(".dashboard");
+    if(dash) dash.style.display = "none";
+    
+    const tabs = document.querySelector(".tabs");
+    if(tabs) tabs.style.display = "none";
+
+    const panels = ["tab1", "tab2", "tab3", "tab4"];
+    panels.forEach(p => {
+      const el = document.getElementById(p);
+      if(el) el.style.display = "none";
+    });
+
+    const pubCheck = document.getElementById("publicCheckin");
+    if(pubCheck) pubCheck.style.display = "block";
+    detectarProblemaNavegador();
+
+    const telefonoGuardado = leerTelefonoSeguro();
+    const tarjetaPrimeraVez = document.getElementById("qrCardPrimeraVez");
+
+    // --- AQUÍ CAMBIA LA LÓGICA PARA CONTROLAR EL FORMULARIO NUEVO ---
+
+    if (!telefonoGuardado) {
+      // Antes de mostrar los botones, intentamos recuperar en silencio un número
+      // guardado por el propio celular (esto es lo que resuelve el caso de iPhone,
+      // donde el localStorage no siempre persiste). Si lo encontramos, seguimos
+      // directo al flujo de marcar asistencia, igual que ya le pasa a Android.
+      const recuperado = await intentarRecuperarCredencialSilenciosa();
+      if (recuperado) {
+        guardarTelefonoSeguro(recuperado.telefono);
+        if (recuperado.dni) guardarDniSeguro(recuperado.dni);
+        await continuarConTelefonoGuardado();
+        return;
+      }
+
+      // SI NO HAY TELÉFONO: mostramos primero la bifurcación (socio vs. primera vez).
+      if (tarjetaPrimeraVez) tarjetaPrimeraVez.style.display = "block";
+      const formGym = document.getElementById("loginFormGym");
+      if(formGym) formGym.style.display = "none";
+      const qrResultLimpio = document.getElementById("qrResult");
+      if (qrResultLimpio) qrResultLimpio.innerHTML = "";
+
+      const opciones = document.getElementById("qrOpcionesInicio");
+      const btnRegistrar = document.getElementById("btnRegistrarSocioQR");
+      const btnSoySocio = document.getElementById("btnSoySocioQR");
+      const btnPrimeraVez = document.getElementById("btnPrimeraVezQR");
+
+      if (btnSoySocio) {
+        btnSoySocio.onclick = () => {
+          if (opciones) opciones.style.display = "none";
+          if (formGym) formGym.style.display = "block";
+          const phoneInput = document.getElementById("qrPhone");
+          if (phoneInput) phoneInput.focus();
+        };
+      }
+
+      if (btnPrimeraVez) {
+        btnPrimeraVez.onclick = () => {
+          mostrarBienvenidaPublicaQR();
+        };
+      }
+
+      if (btnRegistrar) {
+        btnRegistrar.style.display = "none";
+        btnRegistrar.onclick = () => {
+          btnRegistrar.style.display = "none";
+          if (formGym) formGym.style.display = "block";
+          const phoneInput = document.getElementById("qrPhone");
+          if (phoneInput) phoneInput.focus();
+        };
+      }
+      return;
+    }
+
+    // SI YA HAY TELÉFONO (Android, o iPhone ya recuperado arriba): procesamos directo
+    await continuarConTelefonoGuardado();
+
+    async function continuarConTelefonoGuardado(){
+      if (!leerDniSeguro()) {
+        mostrarFormularioSocioQR("Por seguridad, confirma tu DNI (solo una vez en este celular).");
+        return;
+      }
+      if (tarjetaPrimeraVez) tarjetaPrimeraVez.style.display = "none";
+      const formGym = document.getElementById("loginFormGym");
+      if(formGym) formGym.style.display = "none";
+
+      document.getElementById("qrResult").innerHTML = "<div class='card' style='text-align:center'><h2>🔄 Verificando...</h2><div class='skeleton-line'></div><div class='skeleton-line' style='width:45%'></div></div>";
+
+      await buscarQR();
+    }
+  }
+}
+
+document.addEventListener("DOMContentLoaded", inicializarFlujoQR);
+
+window.addEventListener('pageshow', (event) => {
+  if (event.persisted && document.documentElement.classList.contains("qr-mode")) {
+    inicializarFlujoQR();
+  }
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    sincronizarDatosSilencioso();
+  }
+});
+
+window.addEventListener('focus', () => {
+  sincronizarDatosSilencioso();
+});
+
+async function sincronizarDatosSilencioso() {
+  try {
+    if (document.documentElement.classList.contains("qr-mode")) {
+      // En la vista pública del QR no hay panel de administrador que sincronizar;
+      // en vez de eso, volvemos a verificar el estado real del socio, por si el
+      // navegador reutilizó una pestaña vieja con la pantalla de "Bienvenido" de
+      // una asistencia anterior.
+      inicializarFlujoQR();
+      return;
+    }
+    await render();
+    await mostrarHistorial();
+  } catch (error) {
+    console.error("Error en sincronización en segundo plano:", error);
+  }
+}
+
+const SUPABASE_URL = "https://ygbiqnbygjbrmwyttkku.supabase.co";
+
+const SUPABASE_KEY = "sb_publishable_M9fPsgu2VkCyu9ro0ECx8A_no-0RLLt";
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function cyRpcSeguro(nombre, args, opciones){
+  const o = Object.assign({ intentos: 3, espera: 15000 }, opciones || {});
+  let ultimo = null;
+  for (let i = 0; i < o.intentos; i++) {
+    if (i) await new Promise(r => setTimeout(r, i === 1 ? 700 : 1800));
+    const ctrl = window.AbortController ? new AbortController() : null;
+    const reloj = ctrl ? setTimeout(() => ctrl.abort(), o.espera) : null;
+    try {
+      let q = supabaseClient.rpc(nombre, args);
+      if (ctrl && q.abortSignal) q = q.abortSignal(ctrl.signal);
+      const res = await q;
+      if (!res.error || res.error.code) return Object.assign(res, { intento: i + 1 });
+      ultimo = res;
+    } catch (e) {
+      ultimo = { data: null, error: e };
+    } finally { if (reloj) clearTimeout(reloj); }
+  }
+  return Object.assign(ultimo || { data: null, error: new Error('Sin conexión') }, { intento: o.intentos });
+}
+
+window.yaProcesandoQR = false;
+
+window._qrLockTimeout = null;
+
+function fechaHoyISO(){
+  const d = new Date();
+  const año = d.getFullYear();
+  const mes = String(d.getMonth() + 1).padStart(2, '0');
+  const dia = String(d.getDate()).padStart(2, '0');
+  return `${año}-${mes}-${dia}`;
+}
+
+function estadoSocio(s){
+  if (!s || !s.fecha_fin) return "VENCIDO";
+
+  let esInterdiario = (s.tipo_memb || "").toLowerCase().includes("interdiario");
+  
+  // Si consumió sus 15 asistencias, devolvemos "AGOTADO"
+  if (esInterdiario && s.dias_restantes <= 0) {
+    return "AGOTADO"; 
+  }
+
+  let hoy = fechaHoyISO();
+  if (s.fecha_fin < hoy) return "VENCIDO";
+
+  return "ACTIVO";
+}
+
+function playSound(status){
+  const audio = status === "ACTIVO" ? document.getElementById("soundOk") : document.getElementById("soundBad");
+  if(audio) {
+    audio.pause();
+    audio.currentTime = 0;
+    audio.play().catch(err=>{ console.log("Audio bloqueado:", err); });
+  }
+}
+
+function mostrarToast(mensaje,color="#10b981"){
+  let toast=document.createElement("div");
+  toast.className="cy-toast";
+  toast.setAttribute("role","status");
+  let texto = String(mensaje);
+  const esAdmin = !document.documentElement.classList.contains("qr-mode");
+  if (esAdmin) {
+    // En el panel: icono profesional en lugar del emoji inicial, según el tipo de aviso
+    texto = texto.replace(/^[\p{Extended_Pictographic}\uFE0F\u200D\s]+/u, "");
+    const c = String(color).toLowerCase();
+    const icono = (c === "#10b981") ? "fa-check" : (c === "#ef4444" ? "fa-xmark" : (c === "#f59e0b" ? "fa-exclamation" : "fa-info"));
+    toast.style.setProperty("--tc", c === "#10b981" ? "#34d399" : (c === "#ef4444" ? "#f06a6a" : (c === "#f59e0b" ? "#f5b53d" : c)));
+    toast.innerHTML = '<i class="fa-solid ' + icono + '"></i><span>' + texto + '</span>';
+  } else {
+    toast.innerHTML = texto;
+    toast.style.background = color;
+  }
+  document.body.appendChild(toast);
+  setTimeout(()=>{ toast.remove(); },3000);
+}
+
+function mostrarTarjetaEstado(titulo, mensaje, color="#ef4444"){
+  const div = document.getElementById("qrResult");
+  if(!div) return;
+  let icono = "ℹ️";
+  if(color=="#10b981") icono="✅";
+  if(color=="#ef4444") icono="🚫";
+  if(color=="#f59e0b") icono="⚠️";
+
+  div.innerHTML=`
+  <div class="card" style="max-width:520px;margin:25px auto;text-align:center;padding:35px;border:2px solid ${color};box-shadow:0 0 30px ${color}55;">
+    <div style="font-size:70px;margin-bottom:15px;">${icono}</div>
+    <h1 style="margin:0;font-size:32px;color:${color};">C&Y FITNESS GYM</h1>
+    <h2 style="margin-top:18px;color:${color};">${titulo}</h2>
+    <div style="margin-top:18px;font-size:20px;line-height:1.8;">${mensaje}</div>
+    <hr style="margin:25px 0;border:none;border-top:1px solid rgba(255,255,255,.15);">
+    <div style="color:#9ca3af;font-size:15px;">💪 Gracias por elegir C&Y FITNESS GYM</div>
+  </div>`;
+}
+
+function cyLimpiarTelefono(v){ let d = String(v || "").replace(/\D/g, ""); if (/^51\d{9}$/.test(d)) d = d.slice(2); return d; }
+
+function cyLimpiarDni(v){ return String(v || "").replace(/\D/g, ""); }
+
+document.addEventListener('input', (e) => {
+  const l = e.target && e.target.closest && e.target.closest('#tab2 .rg-f--mal');
+  if (l) { l.classList.remove('rg-f--mal'); const m = l.querySelector('.rg-err'); if (m) m.remove(); }
+});
+
+window.procesarIngresoSocio = function(event) {
+  event.preventDefault(); // Evita que la página se recargue
+  
+  let telefonoIngresado = cyLimpiarTelefono(document.getElementById("qrPhone").value);
+  let dniIngresado = cyLimpiarDni((document.getElementById("qrDni") || {}).value || "");
+
+  if (!/^9\d{8}$/.test(telefonoIngresado)) {
+    mostrarFormularioSocioQR("Tu número de celular debe tener 9 dígitos y empezar con 9.", { tipo: "aviso", titulo: "Revisa tu celular. ", tel: document.getElementById("qrPhone").value, dni: dniIngresado, foco: "tel" });
+    return;
+  }
+  if (!/^\d{6,12}$/.test(dniIngresado)) {
+    mostrarFormularioSocioQR("Escribe tu DNI completo (8 números).", { tipo: "aviso", titulo: "Revisa tu DNI. ", tel: telefonoIngresado, dni: dniIngresado, foco: "dni" });
+    return;
+  }
+
+  if (telefonoIngresado && dniIngresado) {
+    // Guarda número y DNI para mantener el automatismo (Android e iPhone)
+    guardarTelefonoSeguro(telefonoIngresado);
+    guardarDniSeguro(dniIngresado);
+    
+    // Oculta toda la pantalla de bienvenida (ahora es a pantalla completa) para que
+    // el resultado de la búsqueda quede visible, igual que le pasa a un socio recurrente.
+    const tarjetaInicio = document.getElementById("qrCardPrimeraVez");
+    if (tarjetaInicio) tarjetaInicio.style.display = "none";
+    document.getElementById("loginFormGym").style.display = "none";
+    document.getElementById("qrResult").innerHTML = "<div class='card' style='text-align:center'><h2>🔄 Verificando...</h2><div class='skeleton-line'></div><div class='skeleton-line' style='width:45%'></div></div>";
+    
+    // Llama a tu función original que ya tienes abajo (true = primera vez que lo ingresa a mano)
+    window.buscarQR(true);
+  }
+};
+
+window.guardarCredencialNavegador = function(telefono, dni){
+  try {
+    const userInput = document.getElementById("credSaveUser");
+    const passInput = document.getElementById("credSavePass");
+    const form = document.getElementById("credSaveForm");
+    if (!userInput || !passInput || !form) return;
+    userInput.value = telefono;
+    passInput.value = dni;
+    form.submit();
+  } catch (e) { /* si el navegador no lo soporta, no pasa nada, no interrumpe el flujo */ }
+};
+
+window.intentarRecuperarCredencialSilenciosa = async function(){
+  try {
+    if (!('credentials' in navigator) || !window.PasswordCredential) return null;
+    const cred = await navigator.credentials.get({ password: true, mediation: 'silent' });
+    if (cred && cred.id) {
+      // Versiones anteriores guardaban "gym-<teléfono>" como contraseña; ahora es el DNI
+      const dni = (cred.password && !String(cred.password).startsWith("gym-")) ? String(cred.password).replace(/\D/g,'') : null;
+      return { telefono: cred.id.replace(/\D/g,''), dni: dni };
+    }
+  } catch (e) { /* sin soporte o sin credencial guardada: seguimos con el flujo normal */ }
+  return null;
+};
+
+window.cyAvisarIntento = function(){
+  try {
+    const tel = (leerTelefonoSeguro() || "").replace(/\D/g, ""), dni = (leerDniSeguro() || "").replace(/\D/g, "");
+    if (tel && dni) supabaseClient.rpc("avisar_intento_qr", { p_telefono: tel, p_dni: dni }).then(() => {}, () => {});
+  } catch (e) {}
+};
+
+window.buscarQR = async function(esPrimeraVez){
+  let telefonoGuardado = leerTelefonoSeguro();
+  let phoneInput = document.getElementById("qrPhone");
+  let telefono = telefonoGuardado || (phoneInput ? phoneInput.value : "");
+  telefono = telefono.replace(/\D/g,'');
+  const dni = (leerDniSeguro() || "").replace(/\D/g,'');
+
+  // La vista pública no puede leer la tabla de socios: el servidor devuelve
+  // solo los datos mínimos del socio si el teléfono Y el DNI coinciden.
+  const { data: resp, error } = await cyRpcSeguro("verificar_socio_qr", { p_telefono: telefono, p_dni: dni });
+  const socio = resp && resp.ok ? resp : (resp && resp.bloqueado ? resp : null);
+  let div = document.getElementById("qrResult");
+  if(!div) return;
+  const filaAccesos0 = document.getElementById("cyPromoRow");
+  if (filaAccesos0) filaAccesos0.style.display = "";
+
+  if (error) {
+    div.innerHTML = "<div class='card qr-sinred' style='text-align:center; color:#ef4444; font-weight:700;'>⚠️ La señal está muy lenta o sin internet.<br><button type='button' class='qr-btn-principal' style='margin-top:14px;' onclick='this.disabled=true;buscarQR(" + (esPrimeraVez ? "true" : "false") + ")'><span class='icono-circulo'><i class='fa-solid fa-rotate-right'></i></span> Reintentar</button></div>";
+    return;
+  }
+  if (socio && socio.bloqueado) {
+    div.innerHTML = "<div class='card' style='text-align:center; color:#ef4444; font-weight:700;'>🚫 Demasiados intentos. Espera 15 minutos o acércate a recepción.</div>";
+    return;
+  }
+  if(!socio){
+    // No coincide: se olvida lo guardado (para no repetir el error la próxima
+    // vez) y se vuelve a mostrar el formulario con un aviso claro. Nunca se
+    // muestran datos de otro socio.
+    borrarDniSeguro();
+    borrarTelefonoSeguro();
+    div.innerHTML = "";
+    const motivo = resp && resp.motivo;
+    if (motivo === "TELEFONO_NO_COINCIDE") {
+      mostrarFormularioSocioQR("Tu DNI está inscrito con otro número de celular. Revisa que lo hayas escrito bien. Si es correcto, acércate a recepción para actualizarlo.", { tipo: "error", titulo: "Número equivocado. ", tel: telefono, dni: dni, foco: "tel" });
+    } else if (motivo === "DNI_NO_COINCIDE") {
+      mostrarFormularioSocioQR("Este celular está inscrito con otro DNI. Revisa tu DNI. Si es correcto, acércate a recepción.", { tipo: "error", titulo: "DNI equivocado. ", tel: telefono, dni: dni, foco: "dni" });
+    } else if (motivo === "DATOS_INVALIDOS") {
+      mostrarFormularioSocioQR("Revisa que tu celular tenga 9 dígitos y tu DNI 8.", { tipo: "aviso", titulo: "Datos incompletos. ", tel: telefono, dni: dni, foco: "tel" });
+    } else {
+      mostrarFormularioSocioQR("No encontramos un socio con ese celular ni con ese DNI. Si ya te inscribiste, acércate a recepción.", { tipo: "error", titulo: "Número no registrado. ", tel: telefono, dni: dni, foco: "tel" });
+    }
+    return;
+  }
+
+  socio.dni = dni;
+  window.cyCupones = socio.cupones || {};
+  window.cyFinSocio = socio.fecha_fin;
+  guardarTelefonoSeguro(telefono);
+  if (esPrimeraVez) guardarCredencialNavegador(telefono, dni);
+  let estado = estadoSocio(socio);
+
+  // 1. VALIDACIÓN DE DEUDA
+  if (parseFloat(socio.deuda || 0) > 0 && socio.fecha_deuda) {
+    const diasDeuda = Math.floor((new Date() - new Date(socio.fecha_deuda)) / 86400000);
+    if (diasDeuda > 7) {
+      div.innerHTML = `<div class="card" style="border:2px solid #ef4444; text-align:center;"><h2 style="color:#ef4444;">🚫 ACCESO BLOQUEADO</h2><h3>${escaparHTML(socio.nombre)}</h3><p>💰 Deuda pendiente: S/ ${escaparHTML(socio.deuda)}</p><p>Regularice su pago para habilitar su acceso.</p></div>`;
+      playSound("VENCIDO");
+      cyAvisarIntento();
+      return;
+    }
+  }
+
+  // 2. VALIDACIÓN DE ASISTENCIAS AGOTADAS (Planes interdiarios / por cupos)
+  const esInterdiario = (socio.tipo_memb || "").toLowerCase().includes("interdiario");
+  if ((esInterdiario && socio.dias_restantes <= 0) || estado === "AGOTADO") {
+    div.innerHTML = `<div class="card" style="border:2px solid #ef4444; text-align:center;">
+      <h2 style="color:#ef4444;">🚫 MEMBRESÍA AGOTADA</h2>
+      <h3>${escaparHTML(socio.nombre)}</h3>
+      <p>Ha consumido todas las asistencias de su plan.<br><br>Acérquese a recepción para renovar.</p>
+    </div>
+    <div class="catalogo-promo-btn" onclick="abrirPlanesDesdeVencimiento()">
+      <div style="width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#dc2626,#7f1d1d);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">📋</div>
+      <div class="catalogo-promo-text">
+        <div class="t1">Ver todos los planes</div>
+        <div class="t2">Elige el plan que mejor te convenga</div>
+      </div>
+      <div class="catalogo-promo-arrow">›</div>
+    </div>`;
+    playSound("VENCIDO");
+    cyAvisarIntento();
+    return;
+  }
+
+  // 3. VALIDACIÓN DE MEMBRESÍA VENCIDA POR FECHA
+  if(estado === "VENCIDO"){
+    div.innerHTML = `<div class="card" style="border:2px solid #ef4444; text-align:center;">
+      <h2 style="color:#ef4444;">❌ MEMBRESÍA VENCIDA</h2>
+      <h3>${escaparHTML(socio.nombre)}</h3>
+      <p>Su membresía ha vencido por fecha calendario.<br><br>Acérquese a recepción para renovar.</p>
+    </div>
+    <div class="catalogo-promo-btn" onclick="abrirPlanesDesdeVencimiento()">
+      <div style="width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#dc2626,#7f1d1d);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">📋</div>
+      <div class="catalogo-promo-text">
+        <div class="t1">Ver todos los planes</div>
+        <div class="t2">Elige el plan que mejor te convenga</div>
+      </div>
+      <div class="catalogo-promo-arrow">›</div>
+    </div>`;
+    playSound("VENCIDO");
+    cyAvisarIntento();
+    return;
+  }
+
+  // SI PASA TODAS LAS VALIDACIONES -> MUESTRA EL BOTÓN DE REGISTRO
+  window.pendingQR = socio;
+
+  // Datos reales del plan para la tarjeta (vence en, asistencias usadas)
+  const _hoy = new Date(); _hoy.setHours(0,0,0,0);
+  const _fin = new Date((socio.fecha_fin || "") + "T00:00:00");
+  const diasVence = isNaN(_fin) ? null : Math.max(0, Math.round((_fin - _hoy) / 86400000));
+  const textoVence = diasVence === null ? "—" : diasVence === 0 ? "Hoy" : diasVence === 1 ? "1 día" : diasVence + " días";
+  const totalAsis = Number(socio.dias_totales) || 0;
+  const usadasAsis = totalAsis ? Math.max(0, totalAsis - (Number(socio.dias_restantes) || 0)) : 0;
+  const fraccion = totalAsis ? Math.min(1, usadasAsis / totalAsis) : 0;
+  const deudaNum = parseFloat(socio.deuda || 0);
+  const nombreCorto = String(socio.nombre || "").trim().split(/\s+/).slice(0, 2).join(" ");
+
+  div.innerHTML = `
+  <div class="qr-hero-card cy-check">
+    <div class="cyc-head">
+      <div class="qr-logo-ring"><span class="logo-cy"></span></div>
+      <div class="cyc-hola">
+        <small>Hola,</small>
+        <h2 class="qr-titulo">${escaparHTML(nombreCorto)}</h2>
+        <div class="qr-badge"><i class="dot"></i> Socio activo</div>
+      </div>
+    </div>
+
+    <div class="cyc-stats">
+      <div class="${String(socio.tipo_memb || '').trim().length > 11 ? 'largo' : ''}"><span>Plan</span><b>${escaparHTML(socio.tipo_memb || "—")}</b></div>
+      <div class="${diasVence !== null && diasVence <= 5 ? 'warn' : ''}"><span>Vence en</span><b>${textoVence}</b></div>
+      <div><span>Asistencias</span><b>${totalAsis ? usadasAsis + '<i>/' + totalAsis + '</i>' : '—'}</b></div>
+    </div>
+    ${totalAsis ? `<div class="cyc-bar" role="progressbar" aria-label="Asistencias usadas" aria-valuemin="0" aria-valuemax="${totalAsis}" aria-valuenow="${usadasAsis}"><i style="--p:${fraccion}"></i></div>` : ''}
+    ${deudaNum > 0 ? `<div class="cyc-deuda"><i class="fa-solid fa-circle-exclamation"></i> Tienes S/ ${escaparHTML(socio.deuda)} pendiente. Págalo en recepción.</div>` : ''}
+
+    <button class="qr-btn-principal cyc-btn" onclick="confirmarAsistenciaQR()">
+      <span class="icono-circulo"><i class="fa-solid fa-fingerprint"></i><span class="cyc-scan" aria-hidden="true"></span><b class="spin" aria-hidden="true"></b></span>
+      <span class="lbl">Marcar asistencia</span>
+    </button>
+    ${window.cyCuponesBloque ? cyCuponesBloque(socio.cupones) : ''}
+
+    <div class="qr-secure-line"><i class="fa-solid fa-lock"></i> Registro seguro y rápido</div>
+  </div>`;
+};
+
+window.confirmarAsistenciaQR = async function () {
+  if(window.yaProcesandoQR) {
+    console.warn("Petición duplicada bloqueada de forma segura.");
+    return; 
+  }
+
+  const socio = window.pendingQR;
+  if (!socio) return;
+
+  try {
+    window.yaProcesandoQR = true;
+    
+    window._qrLockTimeout = setTimeout(() => {
+      window.yaProcesandoQR = false;
+    }, 60000);
+
+    const div = document.getElementById("qrResult");
+    if(div) div.innerHTML = `<div class="card" style="text-align:center; padding:30px;"><h2>⏳ Registrando asistencia...</h2></div>`;
+    
+    window.metodoIngreso = "QR";
+
+    // 🚀 1. REGISTRAR ASISTENCIA — un solo viaje a Supabase (antes eran dos:
+    // uno para revisar el estado del socio y otro para guardar la asistencia).
+    // Con internet lento se reintenta solo. Si un reintento responde "ya
+    // registrado", es porque el primer intento SÍ llegó: se muestra como éxito.
+    const { data: resultado, error: errorRpc, intento } = await cyRpcSeguro(
+      "registrar_asistencia_qr",
+      { p_telefono: (leerTelefonoSeguro() || "").replace(/\D/g,''), p_dni: socio.dni }
+    );
+
+    if (errorRpc || !resultado) {
+      console.error("Error llamando a registrar_asistencia_qr:", errorRpc);
+      mostrarTarjetaEstado("⚠️ SIN CONEXIÓN", "No se pudo registrar la asistencia: la señal está muy lenta.<br><br><button type='button' class='qr-btn-principal' onclick='this.disabled=true;confirmarAsistenciaQR()'><span class='icono-circulo'><i class='fa-solid fa-rotate-right'></i></span> Reintentar</button>", "#ef4444");
+      return;
+    }
+    if (!resultado.ok && resultado.motivo === "YA_REGISTRADO" && intento > 1) {
+      mostrarTarjetaEstado("ASISTENCIA REGISTRADA", `<b>${escaparHTML(resultado.nombre || socio.nombre)}</b><br><br>Tu asistencia de hoy quedó registrada.<br><br>💪 ¡A darle con todo hoy!`, "#10b981");
+      playSound("ACTIVO");
+      window.pendingQR = null;
+      return;
+    }
+
+    if (!resultado.ok) {
+      switch (resultado.motivo) {
+        case "AGOTADO":
+          cyAvisarIntento();
+          mostrarTarjetaEstado("🚫 MEMBRESÍA AGOTADA", `<b>${escaparHTML(resultado.nombre)}</b><br><br>Ha consumido las 15 asistencias de su plan Interdiario.<br><br>Acérquese a recepción para renovar su membresía.`);
+          break;
+        case "VENCIDO":
+          cyAvisarIntento();
+          mostrarTarjetaEstado("❌ MEMBRESÍA VENCIDA", "Su membresía ha vencido por fecha calendario.<br><br>Acérquese a recepción para renovarla.");
+          break;
+        case "DEUDA":
+          cyAvisarIntento();
+          mostrarTarjetaEstado("🚫 ACCESO BLOQUEADO", `<b>${escaparHTML(resultado.nombre)}</b><br><br>💰 Deuda pendiente: <b>S/ ${escaparHTML(resultado.deuda)}</b><br><br>Regularice su pago para habilitar su acceso.`, "#ef4444");
+          break;
+        case "BLOQUEADO":
+          mostrarTarjetaEstado("🚫 DEMASIADOS INTENTOS", "Espera 15 minutos o acércate a recepción.", "#ef4444");
+          break;
+        case "YA_REGISTRADO":
+          mostrarTarjetaEstado("⚠️ ASISTENCIA YA REGISTRADA", `<b>${escaparHTML(resultado.nombre)}</b><br><br>Tu asistencia de hoy ya fue registrada.<br><br>💪 ¡Nos vemos en tu próximo entrenamiento!`, "#f59e0b");
+          setTimeout(() => { mostrarSocio(socio); }, 2000);
+          break;
+        default:
+          mostrarTarjetaEstado("❌ NO ENCONTRADO", "No se pudo verificar su membresía. Intente nuevamente.", "#ef4444");
+      }
+      playSound("VENCIDO");
+      return;
+    }
+
+    // Sincronizamos el objeto local con la respuesta real y ya actualizada del
+    // servidor — así todo lo que sigue abajo (que ya funcionaba) no cambia.
+    socio.nombre = resultado.nombre;
+    socio.dias_restantes = resultado.dias_restantes;
+    socio.dias_totales = resultado.dias_totales;
+    socio.fecha_fin = resultado.fecha_fin;
+    socio.inicio = resultado.inicio;
+
+    // 🚀 2. OPTIMIZACIÓN: Usamos los datos ya actualizados en memoria (sin otra consulta)
+    let usadas = socio.dias_totales - socio.dias_restantes;
+
+    const dateHoy = new Date();
+    dateHoy.setHours(0,0,0,0);
+    const dateFinSocio = new Date(socio.fecha_fin + "T00:00:00");
+    const diasVigenciaReales = Math.max(0, Math.round((dateFinSocio - dateHoy) / 86400000));
+    const horaRegistro = new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+
+    if(div) {
+      div.innerHTML = `
+      <div class="qr-hero-card qr-ok">
+
+        <div class="check-burst">
+          <svg viewBox="0 0 24 24"><path d="M4 12.5L9.5 18L20 6"/></svg>
+          <span class="conf" aria-hidden="true"><i style="--a:0deg;--c:#34d399"></i><i style="--a:36deg;--c:#fbbf24"></i><i style="--a:72deg;--c:#22d3ee"></i><i style="--a:108deg;--c:#fb7185"></i><i style="--a:144deg;--c:#a78bfa"></i><i style="--a:180deg;--c:#34d399"></i><i style="--a:216deg;--c:#fbbf24"></i><i style="--a:252deg;--c:#22d3ee"></i><i style="--a:288deg;--c:#fb7185"></i><i style="--a:324deg;--c:#a78bfa"></i></span>
+        </div>
+
+        <div class="ok-pill"><i></i><span>Asistencia registrada</span></div>
+
+        <h1 class="stagger-item qr-titulo ok-brand" style="animation-delay:.05s;">
+          <span class="logo-cy"></span><span>C&Y <span class="accent">FITNESS</span></span>
+        </h1>
+
+        <h3 class="stagger-item ok-hi" style="animation-delay:.1s;"><small>¡Bienvenido de nuevo,</small><b>${escaparHTML(socio.nombre)}!</b></h3>
+
+        <div class="stagger-item qr-badge" style="animation-delay:.13s;"><i class="dot"></i> Socio Activo</div>
+
+        <div class="stagger-item qr-info-grid" style="animation-delay:.17s;">
+          <div class="box"><div class="l">Últ. asistencia</div><div class="v">Hoy</div></div>
+          <div class="box"><div class="l">Hora</div><div class="v">${horaRegistro}</div></div>
+          <div class="box"><div class="l">Plan</div><div class="v">${escaparHTML(socio.tipo_memb)}</div></div>
+        </div>
+
+        <div class="stagger-item ok-rend" style="animation-delay:.2s;">
+          <div class="rh"><span class="l"><i class="fa-solid fa-chart-line"></i>Rendimiento del plan</span><span class="okpc">${socio.dias_totales > 0 ? Math.round(Math.min(100, (usadas / socio.dias_totales) * 100)) : 0}%</span></div>
+          <div class="v"><span class="l2">Asistencias</span><span class="n"><b>${usadas}</b><i>/</i><em>${socio.dias_totales}</em></span></div>
+          <div class="ok-bar"><b style="width:${Math.min(100, (usadas / socio.dias_totales) * 100)}%"></b></div>
+        </div>
+
+        <div class="stagger-item ok-grid" style="animation-delay:.25s;">
+          <div class="ok-box"><div class="l">Fecha inicio</div><div class="v">${escaparHTML(socio.inicio)}</div></div>
+          <div class="ok-box"><div class="l">Vencimiento</div><div class="v">${escaparHTML(socio.fecha_fin)}</div></div>
+          <div class="ok-box key ${diasVigenciaReales <= 7 ? 'low' : diasVigenciaReales <= 15 ? 'warn' : ''}"><div class="l">Días restantes</div><div class="v big">${diasVigenciaReales}<small> días</small></div></div>
+          <div class="ok-box ${parseFloat(socio.deuda || 0) > 0 ? 'debt' : 'good'}"><div class="l">Estado de cuenta</div><div class="v"><span class="chip">${parseFloat(socio.deuda || 0) > 0 ? 'S/ ' + socio.deuda : 'Al día ✓'}</span></div></div>
+        </div>
+
+        <div class="stagger-item ok-foot" style="animation-delay:.3s;">¡A darle con todo hoy!</div>
+        ${window.cyCuponesBloque ? cyCuponesBloque(window.cyCupones) : ''}
+
+        <div class="qr-secure-line stagger-item" style="animation-delay:.35s;"><i class="fa-solid fa-lock"></i> Registro seguro y rápido</div>
+
+      </div>
+      `;
+    }
+
+    // v46: en esta pantalla ya no se muestran los accesos de Suplementos/Promos
+    const filaAccesos = document.getElementById("cyPromoRow");
+    if (filaAccesos) filaAccesos.style.display = "none";
+
+    window.pendingQR = null;
+  } catch (error) {
+    console.error(error);
+    mostrarTarjetaEstado("⚠️ SIN CONEXIÓN", "No se pudo registrar la asistencia.<br><br><button type='button' class='qr-btn-principal' onclick='this.disabled=true;confirmarAsistenciaQR()'><span class='icono-circulo'><i class='fa-solid fa-rotate-right'></i></span> Reintentar</button>", "#ef4444");
+  } finally {
+    clearTimeout(window._qrLockTimeout);
+    window.yaProcesandoQR = false;
+  }
+};
+
+window.wizIr = function(idPantalla){
+  const overlay = document.getElementById("wizOverlay");
+  if (overlay) overlay.style.display = 'block';
+  document.querySelectorAll('#wizOverlay .wiz-screen').forEach(el => el.style.display = 'none');
+  const destino = document.getElementById(idPantalla);
+  if (destino) destino.style.display = 'block';
+};
+
+window.wizVolver = function(){
+  // Si estamos en una sub-pantalla (horarios/planes), volvemos al hub "Conoce".
+  const horarios = document.getElementById("wizHorarios");
+  const planes = document.getElementById("wizPlanes");
+  const enSubpantalla = (horarios && horarios.style.display === 'block') || (planes && planes.style.display === 'block');
+  if (enSubpantalla) {
+    wizIr('wizConoce');
+    return;
+  }
+  // Si estamos en el hub "Conoce", cerramos la ventana flotante y volvemos al inicio.
+  const overlay = document.getElementById("wizOverlay");
+  if (overlay) overlay.style.display = 'none';
+};
+
+function promosRenovacionHTML(nombrePlan){
+  const items = [
+    { n:1, ic:'fa-tag',          t:'Renueva tu membresía <b>anticipadamente</b> y obtén hasta <b>10% de descuento</b> por renovación anticipada en el plan Mensual o Personalizado.', tag:'-10%' },
+    { n:2, ic:'fa-user-plus',    t:'Tus próximas renovaciones en el plan Mensual te dan el beneficio de traer <b>1 invitado</b> para que <b>ingrese gratis</b> por un día.', tag:'GRATIS' },
+    { n:3, ic:'fa-calendar-plus',t:'Si tu invitado se inscribe, recibes <b>+3 días adicionales</b> en tu membresía — ¡acumulables por cada nuevo miembro que invites!', tag:'+3 DÍAS' },
+    { n:4, ic:'fa-gift',         t:'Tu invitado, al inscribirse, obtiene un <b>descuento de bienvenida de hasta 10%</b> en el plan Mensual o Personalizado, y también podrá traer su propio invitado libre por un día.', tag:'BIENVENIDA' }
+  ];
+  const nota = nombrePlan === '3 Meses'
+    ? `<div class="pr-note"><i class="fa-solid fa-circle-info"></i> Estas promos aplican al renovar en plan Mensual o Personalizado.</div>` : ``;
+  return `
+  <div class="pr-wrap">
+    <div class="pr-head">
+      <span class="pr-fire">🔥</span>
+      <div class="pr-ht"><div class="a">PROMOS DE RENOVACIÓN</div><div class="b">¡Juntos entrenamos mejor!</div></div>
+      <span class="pr-chip">HASTA 10% DCTO.</span>
+    </div>
+    <div class="pr-grid">
+      ${items.map((it,i)=>`
+      <div class="pr-card" style="--i:${i}">
+        <div class="pr-top"><span class="pr-num">${it.n}</span><span class="pr-ic"><i class="fa-solid ${it.ic}"></i></span><span class="pr-tag">${it.tag}</span></div>
+        <p>${it.t}</p>
+      </div>`).join("")}
+    </div>
+    ${nota}
+  </div>`;
+}
+
+window.mostrarBienvenidaPublicaQR = function(){
+  wizIr('wizConoce');
+  // Reutiliza el botón de catálogo REAL (con miniaturas e imágenes) que ya existe
+  // en la pantalla de inicio, en vez de duplicar uno de solo texto.
+  const slot = document.getElementById("catalogoBtnWizSlot");
+  const original = document.getElementById("btnAbrirCatalogo");
+  if (slot && original && !slot.dataset.cargado) {
+    const clon = original.cloneNode(true);
+    clon.id = "btnAbrirCatalogoWiz";
+    clon.setAttribute("onclick", "abrirCatalogoModal()");
+    slot.appendChild(clon);
+    slot.dataset.cargado = "1";
+  }
+
+  const cont = document.getElementById("listaPlanesPublica");
+  if (cont && !cont.dataset.cargado) {
+    const fotoGym = "https://images.unsplash.com/photo-1744551154623-4b5336e95c28?q=80&w=500&auto=format&fit=crop";
+    const fotoCoach = "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=500&auto=format&fit=crop";
+    const fotoBaile = "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?q=80&w=500&auto=format&fit=crop";
+    const fotoGrupo = "https://images.unsplash.com/photo-1556817411-92f5ec899a55?q=80&w=500&auto=format&fit=crop";
+    const planes = [
+      { icono: "🏋️", color: "#22c55e", foto: fotoGym, nombre: "Mensual", promos: true, desc: "La opción perfecta para quienes quieren mantenerse en forma, mejorar su salud y crear hábitos duraderos.", badge: "Acceso ilimitado al gimnasio por 1 mes",
+        incluye: ["Máquinas y baile","Guía de instructor general","Asesoría nutricional opcional","Acceso en cualquier horario"] },
+      { icono: "📅", color: "#3b82f6", foto: fotoGym, nombre: "Interdiario", desc: "Perfecto para quienes tienen una rutina ocupada y quieren entrenar con flexibilidad.", badge: "Acceso 15 días corridos o interdiario hasta fecha calendario",
+        incluye: ["Máquinas y baile","Guía de instructor general","Asesoría nutricional si desea, recomendado","Super descuento especial","Acceso 15 días corridos o interdiario hasta fecha calendario"] },
+      { icono: "🗓️", color: "#a855f7", foto: fotoGym, nombre: "3 Meses", promos: true, desc: "El plan más recomendado para quienes buscan resultados reales y una transformación constante.", badge: "Acceso ilimitado por 3 meses",
+        incluye: ["El recomendado","Acceso baile y máquinas","Guía de instructor general","Asesoría nutricional opcional si desea, recomendado","Un precio especial"] },
+      { icono: "🎓", color: "#f59e0b", foto: fotoGrupo, nombre: "Estudiante", desc: "Tu etapa, tu energía. Entrena, aprende y alcanza tus metas.", badge: "Ojo presentar carnet estudiante",
+        incluye: ["Acceso máquinas y baile","Instructor general","Asesoría nutricional opcional si desea, recomendado","Descuento especial"] },
+      { icono: "👨‍🏫", color: "#ef4444", foto: fotoCoach, nombre: "Coach Personalizado", promos: true, desc: "Tu progreso, con un plan hecho para ti.", badge: "El más recomendado",
+        incluye: ["Entrenamiento acompañado por un coach","Evaluación física","Seguimiento","Corrección de técnica constante","Rutinas personalizadas con visión y misión a tus objetivos","Entrenamiento para niños, jóvenes, señores o de tercera edad","Entrenamientos de rehabilitación física general","Entrenamiento de alto rendimiento"] },
+      { icono: "💃", color: "#06b6d4", foto: fotoBaile, nombre: "Baile y Step", desc: "Disfruta, quema calorías y mejora tu condición física.", badge: "Super precio especial",
+        incluye: ["Acceso limitado solo a clases de baile y Step"] },
+      { icono: "☀️", color: "#8b5cf6", foto: fotoGym, nombre: "Diario", desc: "Entrena a tu ritmo, sin compromisos.", badge: "Precio único por día",
+        incluye: ["Acceso baile y máquinas","Instructor general"] },
+      { icono: "🎁", color: "#ec4899", foto: fotoGrupo, nombre: "Promo x3 / x4", desc: "Juntos es mejor. Entrena en grupo y obtén un super precio.", badge: "Más motivación, más resultados",
+        incluye: ["Precios super especial por inscripción en grupos de 3 o 4","Acceso baile y máquinas","Instructor general y asesoría nutricional","Acceso libre en cualquier horario"] }
+    ];
+    // Plan recomendado primero y abierto; el resto, filas que se expanden al tocar
+    const idxDest = planes.findIndex(p => p.nombre === "3 Meses");
+    if (idxDest > 0) planes.unshift(planes.splice(idxDest, 1)[0]);
+    cont.innerHTML = planes.map((p, i) => {
+      const dest = i === 0;
+      return `
+      <article class="plan${dest ? ' plan--hero open' : ''}" style="--pc:${p.color}; --ph:url('${p.foto}');">
+        ${dest ? `<div class="plan-photo"><span class="plan-ribbon">Recomendado</span></div>` : ``}
+        <div class="plan-head" role="button" tabindex="0" aria-expanded="${dest ? 'true' : 'false'}">
+          <span class="plan-ic">${p.icono}</span>
+          <span class="plan-txt">
+            <span class="plan-name">${p.nombre}</span>
+            <span class="plan-tag">${p.badge}</span>
+          </span>
+          <i class="fa-solid fa-chevron-down plan-chev"></i>
+        </div>
+        <div class="plan-body"><div class="plan-body-in"><div class="plan-pad">
+          <p class="plan-desc">${p.desc}</p>
+          <ul class="plan-list">
+            ${p.incluye.map(item => `<li><i class="fa-solid fa-check"></i><span>${item}</span></li>`).join("")}
+          </ul>
+          ${p.promos ? promosRenovacionHTML(p.nombre) : ``}
+        </div></div></div>
+      </article>`;
+    }).join("");
+    cont.dataset.cargado = "1";
+  }
+};
+
+window.abrirPlanesDesdeVencimiento = function(){
+  mostrarBienvenidaPublicaQR();
+  wizIr('wizPlanes');
+};
+
+window.abrirWhatsAppInfo = function(){
+  const numero = "51927885791";
+  const mensaje = "Hola, quiero información sobre los planes";
+  window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`, '_blank');
+};
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js')
+        .catch((err) => console.error('No se pudo registrar el Service Worker:', err));
+    });
+  }
+
+(function(){
+  try{
+    var overlay = document.getElementById('wizOverlay');
+    if(!overlay) return;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* Barra de progreso + sombra de la barra superior (v50: lecturas cacheadas y escrituras solo si cambian) */
+    var bar = document.createElement('div'); bar.id = 'wizProgress'; overlay.appendChild(bar);
+    var tick = false, ultEscala = -1, ultScrolled = false, topbars = overlay.querySelectorAll('.wiz-topbar');
+    function actualizar(){
+      tick = false;
+      var max = overlay.scrollHeight - overlay.clientHeight;
+      var y = overlay.scrollTop;
+      var esc = max > 0 ? Math.min(1, y / max) : 0;
+      if(Math.abs(esc - ultEscala) > 0.002){ ultEscala = esc; bar.style.transform = 'scaleX(' + esc.toFixed(3) + ')'; }
+      var sc = y > 8;
+      if(sc !== ultScrolled){ ultScrolled = sc; topbars.forEach(function(t){ t.classList.toggle('scrolled', sc); }); }
+    }
+    overlay.addEventListener('scroll', function(){ if(!tick){ tick = true; requestAnimationFrame(actualizar); } }, {passive:true});
+
+    /* Revelado progresivo al entrar en pantalla (una sola vez por elemento) */
+    var io = null;
+    if('IntersectionObserver' in window && !reduce){
+      io = new IntersectionObserver(function(entries){
+        var n = 0;
+        entries.forEach(function(e){
+          if(e.isIntersecting){
+            var el = e.target; el.style.transitionDelay = (Math.min(n,6) * 45) + 'ms'; n++;
+            el.classList.add('in'); io.unobserve(el);
+          }
+        });
+      }, {root: overlay, threshold: 0.08});
+      overlay.classList.add('rv-ready');
+    }
+    function registrarReveal(){
+      var sel = '.wiz-feat-card2,.plan,.wiz-info-card,.wiz-banner,.wiz-quote,.wiz-secondary-btn,.catalogo-promo-btn';
+      overlay.querySelectorAll(sel).forEach(function(el){
+        if(el.dataset.rv) return; el.dataset.rv = '1';
+        if(io){ el.classList.add('rv'); io.observe(el); }
+      });
+    }
+
+    /* v50: sin inclinación 3D (en el celular provocaba temblor/parpadeo al tocar). El feedback ahora es un simple 'presionado' por CSS. */
+
+    /* Planes: expandir/contraer al tocar */
+    var lista = document.getElementById('listaPlanesPublica');
+    function alternarPlan(head){
+      var plan = head.closest('.plan'); if(!plan) return;
+      var abierto = plan.classList.toggle('open');
+      plan.classList.add('seen');
+      head.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+    }
+    if(lista){
+      lista.addEventListener('click', function(e){ var h = e.target.closest('.plan-head'); if(h) alternarPlan(h); });
+      lista.addEventListener('keydown', function(e){
+        if(e.key !== 'Enter' && e.key !== ' ') return;
+        var h = e.target.closest('.plan-head'); if(h){ e.preventDefault(); alternarPlan(h); }
+      });
+    }
+
+    /* Horarios: "Abierto ahora" según la hora de Lima */
+    var VENTANAS = [[390, 720], [960, 1350]]; /* 6:30–12:00 y 16:00–22:30, lunes a sábado */
+    function fmt(min){ var h = Math.floor(min/60), m = min%60, ap = h >= 12 ? 'p.m.' : 'a.m.'; h = h%12 || 12; return h + ':' + (m<10?'0':'') + m + ' ' + ap; }
+    function estadoAhora(){
+      var p = new Intl.DateTimeFormat('en-US', {timeZone:'America/Lima', weekday:'short', hour:'2-digit', minute:'2-digit', hour12:false}).formatToParts(new Date());
+      var o = {}; p.forEach(function(x){ o[x.type] = x.value; });
+      var dow = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(o.weekday);
+      var min = (parseInt(o.hour,10) % 24) * 60 + parseInt(o.minute,10);
+      if(dow > 0){
+        for(var i = 0; i < VENTANAS.length; i++){
+          if(min >= VENTANAS[i][0] && min < VENTANAS[i][1]) return {abierto:true, texto:'Abierto ahora · cierra a las ' + fmt(VENTANAS[i][1]), turno:i};
+        }
+        for(var j = 0; j < VENTANAS.length; j++){
+          if(min < VENTANAS[j][0]) return {abierto:false, texto:'Cerrado ahora · abre a las ' + fmt(VENTANAS[j][0])};
+        }
+      }
+      var manana = (dow + 1) % 7;
+      return {abierto:false, texto: manana === 0 ? 'Cerrado ahora · abrimos el lunes a las ' + fmt(VENTANAS[0][0]) : 'Cerrado ahora · abrimos mañana a las ' + fmt(VENTANAS[0][0])};
+    }
+    function pintarEstado(){
+      var chip = document.getElementById('estadoAbierto'); if(!chip) return;
+      var s = estadoAhora();
+      chip.className = 'open-chip' + (s.abierto ? '' : ' cerrado');
+      chip.innerHTML = '<span class="dot"></span><span>' + s.texto + '</span>';
+      var cols = overlay.querySelectorAll('.wiz-horario-col');
+      cols.forEach(function(c, i){ c.classList.toggle('ahora', s.abierto && s.turno === i); });
+    }
+
+    /* Enganche no invasivo: tras cada cambio de pantalla se registran los reveals y se reinicia el scroll */
+    var wizIrOriginal = window.wizIr;
+    if(typeof wizIrOriginal === 'function'){
+      window.wizIr = function(id){
+        wizIrOriginal.apply(this, arguments);
+        overlay.scrollTop = 0;
+        try{ pintarEstado(); }catch(e){}
+        requestAnimationFrame(function(){ registrarReveal(); actualizar(); });
+      };
+    }
+    registrarReveal();
+  }catch(err){ console.warn('Capa de diseño v33:', err); }
+})();
+
+(function(){
+  try{
+    var hero = document.getElementById('qrCardPrimeraVez'); if(!hero) return;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduce){ hero.querySelectorAll('svg').forEach(function(s){ try{ s.pauseAnimations(); s.setCurrentTime(0.01); }catch(e){} }); }
+
+    /* Parallax del fondo con el scroll de la pantalla (solo si la pantalla es más alta que el móvil) */
+    var par = hero.querySelector('.cy-bg-par'), t = false;
+    hero.addEventListener('scroll', function(){
+      if(t) return; t = true;
+      requestAnimationFrame(function(){ t = false; if(par && !reduce) par.style.setProperty('--bgy', (-Math.min(40, hero.scrollTop * 0.12)) + 'px'); });
+    }, {passive:true});
+
+    /* Reacción del personaje y de la tarjeta; la acción original se ejecuta ~0.25 s después */
+    ['btnSoySocioQR','btnPrimeraVezQR','btnInscribirseQR'].forEach(function(id){
+      var b = document.getElementById(id); if(!b) return;
+      var libre = false, ocupado = false;
+      b.addEventListener('click', function(e){
+        if(libre){ libre = false; return; }
+        if(reduce) return;
+        e.stopImmediatePropagation(); e.preventDefault();
+        if(ocupado) return; ocupado = true;
+        b.classList.add('react');
+        setTimeout(function(){ libre = true; ocupado = false; b.classList.remove('react'); b.click(); }, 250);
+      }, true);
+    });
+  }catch(err){ console.warn('Pantalla inicial v34:', err); }
+})();
+
+(function(){
+  try{
+    document.querySelectorAll('input[placeholder],textarea[placeholder]').forEach(function(e){
+      if(!e.getAttribute('aria-label') && !(e.labels && e.labels.length)) e.setAttribute('aria-label', e.getAttribute('placeholder'));
+    });
+    document.querySelectorAll('button[title]').forEach(function(b){
+      if(!b.getAttribute('aria-label')) b.setAttribute('aria-label', b.getAttribute('title'));
+    });
+    var tabs=document.querySelectorAll('.tabs .tabbtn');
+    tabs.forEach(function(b){ if(!b.getAttribute('aria-label')){ var t=(b.innerText||'').trim(); if(t) b.setAttribute('aria-label',t); else b.setAttribute('aria-label','Escanear código QR'); } });
+  }catch(e){}
+})();
+
+(function(){
+  var DEFECTO = '2 días adicionales en tu membresía mensual';
+  var ESTILOS = { fuego:{e:'🔥',n:'Fuego'}, oro:{e:'👑',n:'Oro'}, neon:{e:'⚡',n:'Neón'}, hielo:{e:'💎',n:'Hielo'}, fiesta:{e:'🎉',n:'Fiesta'} };
+  function restante(fin){
+    var ms = new Date(fin).getTime() - Date.now(); if(!(ms > 0)) return null;
+    var m = Math.floor(ms/60000), d = Math.floor(m/1440), h = Math.floor((m%1440)/60), mi = m%60;
+    return d > 0 ? d + 'd ' + h + 'h' : (h > 0 ? h + 'h ' + mi + 'm' : Math.max(1,mi) + 'm');
+  }
+  function fechaCorta(fin){ return new Date(fin).toLocaleDateString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric',timeZone:'America/Lima'}); }
+  window.CY_PROMO = { DEFECTO: DEFECTO, ESTILOS: ESTILOS, restante: restante, fecha: fechaCorta };
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function $(id){ return document.getElementById(id); }
+  function esc(t){ return escaparHTML(t); }
+
+  /* ---------- Público ---------- */
+  var btn = $('btnInscribirseQR');
+  if(btn) btn.addEventListener('click', function(){ window.cyAbrirInscripcion(); });
+
+  window.cyAbrirInscripcion = function(){
+    var ov = $('inscOverlay'); if(!ov) return;
+    ov.style.display = 'block'; ov.scrollTop = 0;
+    $('inscError').textContent = '';
+    setTimeout(function(){ try{ $('inscDni').focus({preventScroll:true}); }catch(e){} }, 300);
+  };
+  window.cyCerrarInscripcion = function(){
+    var ov = $('inscOverlay'); if(ov) ov.style.display = 'none';
+  };
+
+  function soloDigitos(v){ return String(v||'').replace(/\D/g,''); }
+
+  window.cyEnviarPrereg = async function(e){
+    if(e) e.preventDefault();
+    var err = $('inscError'), b = $('inscEnviar');
+    if(b.disabled) return;
+    var dni = soloDigitos($('inscDni').value);
+    var nombre = $('inscNombre').value.replace(/\s+/g,' ').trim();
+    var wsp = soloDigitos($('inscWsp').value);
+    if(wsp.length === 11 && wsp.indexOf('51') === 0) wsp = wsp.slice(2);
+    if(dni.length < 6 || dni.length > 12){ err.textContent = 'Revisa tu DNI (solo números).'; $('inscDni').focus(); return; }
+    if(nombre.length < 2){ err.textContent = 'Escribe tu nombre completo.'; $('inscNombre').focus(); return; }
+    if(wsp.length < 7 || wsp.length > 15){ err.textContent = 'Revisa tu número de WhatsApp.'; $('inscWsp').focus(); return; }
+    err.textContent = '';
+    b.disabled = true; b.querySelector('span').textContent = 'Enviando…';
+    try{
+      /* El SERVIDOR decide el premio según la hora real (promoción vigente o el de siempre) */
+      var r = await supabaseClient.rpc('registrar_prospecto_qr', { p_dni: dni, p_nombre: nombre, p_whatsapp: wsp });
+      if(r && r.error){
+        var msg = String(r.error.message || '');
+        if(r.error.code === 'PGRST202' || /could not find the function/i.test(msg)){
+          /* Respaldo: si la función aún no existe en la base, se usa el registro directo con el premio de siempre */
+          var r2 = await supabaseClient.from('prospectos_qr').insert([{ dni: dni, nombre: nombre, whatsapp: wsp, premio: DEFECTO }]);
+          if(r2 && r2.error){
+            if(r2.error.code === '23505'){ cyMostrarCelebracion(null, nombre, true); return; }
+            err.textContent = 'No pudimos enviar tus datos. Inténtalo de nuevo en un momento.'; return;
+          }
+          cyMostrarCelebracion(DEFECTO, nombre, false, null); return;
+        }
+        err.textContent = (r.error.code === '22023') ? 'Revisa tus datos e inténtalo otra vez.' : 'No pudimos enviar tus datos. Inténtalo de nuevo en un momento.';
+        return;
+      }
+      var row = Array.isArray(r.data) ? r.data[0] : r.data;
+      if(!row){ err.textContent = 'No pudimos enviar tus datos. Inténtalo de nuevo en un momento.'; return; }
+      if(row.estado === 'duplicado'){ cyMostrarCelebracion(null, nombre, true); return; }
+      cyMostrarCelebracion(row.premio, nombre, false, row);
+    }catch(ex){
+      err.textContent = 'Sin conexión. Revisa tu internet e inténtalo otra vez.';
+    }finally{
+      b.disabled = false; b.querySelector('span').textContent = 'Enviar y ver mi premio';
+    }
+  };
+
+  var CONF = ['#fbbf24','#34d399','#60a5fa','#f472b6','#a78bfa','#fb923c','#f87171','#2dd4bf'];
+  function rnd(a,b){ return a + Math.random()*(b-a); }
+  function construirFx(){
+    var fx = $('celFx'); if(!fx) return; fx.innerHTML = '';
+    if(reduce) return;
+    var frag = document.createDocumentFragment(), i, el;
+    for(i=0;i<56;i++){
+      el = document.createElement('i'); el.className = 'cf';
+      var ser = i%4===0, ang = rnd(0,Math.PI*2), dist = rnd(90,Math.min(window.innerWidth,420));
+      el.style.cssText = '--w:'+(ser?4:rnd(7,12)).toFixed(1)+'px;--h:'+(ser?rnd(26,44):rnd(9,16)).toFixed(1)+'px;--r:'+(ser?'2px':(i%3?'2px':'50%'))+
+        ';--c:'+CONF[i%CONF.length]+';--bx:'+(Math.cos(ang)*dist).toFixed(0)+'px;--by:'+(Math.sin(ang)*dist*0.9-40).toFixed(0)+'px;--sw:'+rnd(-60,60).toFixed(0)+'px;--rot:'+rnd(120,420).toFixed(0)+'deg;--t:'+rnd(3.2,5.4).toFixed(2)+'s;--d:'+rnd(0,.35).toFixed(2)+'s';
+      frag.appendChild(el);
+    }
+    for(i=0;i<9;i++){
+      el = document.createElement('i'); el.className = 'bl';
+      el.style.cssText = '--x:'+rnd(2,90).toFixed(0)+'%;--s:'+rnd(38,64).toFixed(0)+'px;--c:'+CONF[(i+2)%CONF.length]+';--sw:'+rnd(-30,30).toFixed(0)+'px;--t:'+rnd(6,9.5).toFixed(1)+'s;--d:'+rnd(.2,1.8).toFixed(2)+'s';
+      frag.appendChild(el);
+    }
+    for(i=0;i<7;i++){
+      el = document.createElement('i'); el.className = 'db';
+      el.style.cssText = '--x:'+rnd(2,92).toFixed(0)+'%;--sw:'+rnd(-70,70).toFixed(0)+'px;--t:'+rnd(7,11).toFixed(1)+'s;--d:'+rnd(0,6).toFixed(1)+'s';
+      frag.appendChild(el);
+    }
+    fx.appendChild(frag);
+  }
+
+  window.cyMostrarCelebracion = function(premio, nombre, yaEstaba, info){
+    var ov = $('celebOverlay'); if(!ov) return;
+    var promo = !!(info && info.es_promo && !yaEstaba);
+    var est = promo ? (ESTILOS[info.estilo] ? info.estilo : 'fuego') : '';
+    ov.className = 'cy-ov cy-celeb' + (promo ? ' promo st-' + est : '');
+    var primero = String(nombre||'').split(' ')[0];
+    $('celNombre').textContent = primero ? ', ' + primero : '';
+    var prize = $('celPrize'), hint = $('celHint'), sub = $('celSub'), badge = $('celBadge'), desc = $('celDesc'), vence = $('celVence');
+    $('celEmoji').textContent = promo ? ESTILOS[est].e : '🎉';
+    badge.style.display = promo ? 'inline-block' : 'none';
+    if(promo) badge.textContent = ESTILOS[est].e + ' PROMO ESPECIAL';
+    desc.style.display = 'none'; vence.style.display = 'none';
+    ov.style.display = 'block'; ov.scrollTop = 0;
+    construirFx();
+    if(yaEstaba || !premio){
+      $('celebTitulo').firstChild.textContent = '¡Ya estás en la lista';
+      sub.textContent = 'Tus datos ya estaban registrados';
+      prize.textContent = '¡Te esperamos en recepción!';
+      hint.textContent = 'Menciona tu DNI para que te atiendan.';
+      return;
+    }
+    $('celebTitulo').firstChild.textContent = '¡Felicidades';
+    sub.textContent = 'Ganaste';
+    hint.textContent = 'Preséntate en recepción y menciona tu DNI para canjear tu premio. ¡Te esperamos!';
+    function detalles(){
+      if(!promo) return;
+      if(info.descripcion){ desc.textContent = info.descripcion; desc.style.display = 'block'; }
+      if(info.fin){
+        var q = restante(info.fin);
+        vence.textContent = '⏳ Válido hasta el ' + fechaCorta(info.fin) + (q ? ' · quedan ' + q : '');
+        vence.style.display = 'inline-block';
+      }
+    }
+    if(reduce){ prize.textContent = premio; detalles(); return; }
+    /* efecto "ruleta": alterna premios un instante y se detiene en el real */
+    var cola = promo ? [DEFECTO, premio, DEFECTO, premio] : [DEFECTO, '¡Sorpresa! 🎁', 'Premio especial ✨', DEFECTO];
+    prize.classList.add('girando'); var n = 0, t = setInterval(function(){
+      prize.textContent = cola[n++ % cola.length];
+      if(n > 8){ clearInterval(t); prize.textContent = premio; prize.classList.remove('girando'); detalles(); }
+    }, 110);
+  };
+
+  window.cyCerrarCelebracion = function(){
+    var ov = $('celebOverlay'); if(ov){ ov.style.display = 'none'; ov.className = 'cy-ov cy-celeb'; }
+    var fx = $('celFx'); if(fx) fx.innerHTML = '';
+    cyCerrarInscripcion();
+    var f = $('inscForm'); if(f) f.reset();
+    var h = $('qrCardPrimeraVez'); if(h) h.scrollTop = 0;
+  };
+
+  /* ---------- Promoción vigente (pantalla pública) ---------- */
+  var promoActiva = null, promoTimer = null;
+  function pintarPromoPublica(){
+    var p = promoActiva, tz = $('promoTeaser'), tile = $('tilePromo'), ip = $('inscPromo'), b = $('btnInscribirseQR');
+    var q = p ? restante(p.fin) : null;
+    if(!p || !q){
+      promoActiva = null;
+      if(tz) tz.style.display = 'none'; if(tile) tile.style.display = 'none'; if(ip) ip.style.display = 'none';
+      if(b) b.classList.remove('has-promo');
+      if(promoTimer){ clearInterval(promoTimer); promoTimer = null; }
+      return;
+    }
+    var est = ESTILOS[p.estilo] ? p.estilo : 'fuego';
+    if(tz){ tz.className = 'promo-teaser st-' + est; tz.style.display = 'flex'; }
+    if($('ptEm')) $('ptEm').textContent = ESTILOS[est].e;
+    if($('ptTx')) $('ptTx').textContent = 'Inscríbete y gana: ' + p.titulo;
+    if($('ptTime')) $('ptTime').textContent = '⏳ ' + q;
+    if(tile){ tile.style.display = 'inline-block'; tile.textContent = ESTILOS[est].e + ' PROMO'; }
+    if(b) b.classList.add('has-promo');
+    if(ip){ ip.className = 'insc-promo st-' + est; ip.style.display = 'block'; ip.textContent = ESTILOS[est].e + ' Hoy puedes ganar: ' + p.titulo + ' · termina en ' + q; }
+  }
+  window.cyCargarPromoQR = async function(){
+    try{
+      var r = await supabaseClient.rpc('premio_activo_qr');
+      var row = r && !r.error ? (Array.isArray(r.data) ? r.data[0] : r.data) : null;
+      promoActiva = row || null;
+      pintarPromoPublica();
+      if(promoActiva && !promoTimer) promoTimer = setInterval(pintarPromoPublica, 30000);
+    }catch(e){}
+  };
+
+  /* ---------- Admin ---------- */
+  var esPublico = document.documentElement.classList.contains('qr-mode');
+  if(esPublico) window.cyCargarPromoQR();
+  var cargando = false, pendientes = [], timer = null, seleccionado = null;
+
+  function pintarPendientes(){
+    var cont = $('pendLista'), cnt = $('pendCount'); if(!cont) return;
+    cont.innerHTML = '';
+    if(cnt){ cnt.style.display = pendientes.length ? 'inline-grid' : 'none'; cnt.textContent = pendientes.length; }
+    if(!pendientes.length){
+      var v = document.createElement('div'); v.className = 'pend-vacio'; v.textContent = 'No hay solicitudes pendientes';
+      cont.appendChild(v); return;
+    }
+    pendientes.forEach(function(p){
+      var wrap = document.createElement('div'); wrap.className = 'pend-wrap';
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'pend-item' + (seleccionado === p.dni ? ' sel' : '');
+      var av = document.createElement('span'); av.className = 'pend-av'; av.textContent = (p.nombre||'?').trim().charAt(0).toUpperCase();
+      var info = document.createElement('span'); info.className = 'pend-info';
+      var n = document.createElement('strong'); n.textContent = p.nombre;
+      var d = document.createElement('small');
+      var d1 = document.createElement('span'); d1.textContent = 'DNI ' + p.dni;
+      var d2 = document.createElement('span'); d2.innerHTML = '<i class="fa-brands fa-whatsapp"></i> '; d2.appendChild(document.createTextNode(p.whatsapp || ''));
+      d.appendChild(d1); d.appendChild(d2);
+      info.appendChild(n); info.appendChild(d);
+      if(p.premio){ var esPromo = p.premio !== DEFECTO; var pr = document.createElement('span'); pr.className = 'pend-premio' + (esPromo ? ' promo' : ''); pr.textContent = (esPromo ? '🔥 Promo: ' : '🎁 ') + p.premio; info.appendChild(pr); }
+      var go = document.createElement('i'); go.className = 'fa-solid fa-chevron-right pend-go';
+      b.appendChild(av); b.appendChild(info); b.appendChild(go);
+      b.addEventListener('click', function(){ elegir(p); });
+      /* X para quitar de la lista a quien ya no vendrá (pide un segundo toque para confirmar) */
+      var x = document.createElement('button'); x.type = 'button'; x.className = 'pend-x';
+      x.setAttribute('aria-label', 'Eliminar a ' + p.nombre + ' de la lista de espera');
+      x.innerHTML = '<span aria-hidden="true">✕</span>';
+      var t = null;
+      x.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        if(!x.classList.contains('conf')){
+          x.classList.add('conf'); x.innerHTML = '<span>¿Eliminar?</span>';
+          t = setTimeout(function(){ x.classList.remove('conf'); x.innerHTML = '<span aria-hidden="true">✕</span>'; }, 3000);
+          return;
+        }
+        clearTimeout(t); eliminarPendiente(p, wrap, x);
+      });
+      wrap.appendChild(b); wrap.appendChild(x);
+      cont.appendChild(wrap);
+    });
+    var hint = $('pendHint'); if(hint) hint.style.display = pendientes.length > 3 ? 'block' : 'none';
+  }
+
+  async function eliminarPendiente(p, wrap, x){
+    x.disabled = true;
+    try{
+      var r = await supabaseClient.rpc('borrar_prospecto_qr', { p_dni: String(p.dni).trim() });
+      if(r && r.error) throw r.error;
+      pendientes = pendientes.filter(function(q){ return q.dni !== p.dni; });
+      if(seleccionado === p.dni){ seleccionado = null; var av = $('avisoPremio'); if(av) av.style.display = 'none'; }
+      pintarPendientes();
+      if(typeof mostrarToast === 'function') mostrarToast('🗑️ Solicitud eliminada', '#10b981');
+    }catch(e){
+      x.disabled = false; x.classList.remove('conf'); x.innerHTML = '<span aria-hidden="true">✕</span>';
+      if(typeof mostrarToast === 'function') mostrarToast('❌ No se pudo eliminar. Intenta de nuevo.', '#ef4444');
+    }
+  }
+
+  function elegir(p){
+    seleccionado = p.dni;
+    var m = {dni:p.dni, nombre:p.nombre, telefono:p.whatsapp};
+    Object.keys(m).forEach(function(id){ var el = $(id); if(el){ el.value = m[id]; el.dispatchEvent(new Event('input',{bubbles:true})); } });
+    var av = $('avisoPremio');
+    if(av){
+      if(p.premio){ av.textContent = (p.premio !== DEFECTO ? '🔥 PROMO' : '🎁 Premio') + ' de ' + p.nombre.split(' ')[0] + ': ' + p.premio + '. Aplícalo manualmente al guardar.'; av.style.display = 'block'; }
+      else { av.style.display = 'none'; }
+    }
+    pintarPendientes();
+    var campo = $('tipo_memb'); if(campo){ campo.scrollIntoView({behavior: reduce ? 'auto' : 'smooth', block:'center'}); }
+  }
+
+  window.cyCargarProspectos = async function(manual){
+    if(esPublico || cargando) return; cargando = true;
+    var cont = $('pendLista');
+    try{
+      var r = await supabaseClient.rpc('listar_prospectos_qr');
+      if(r.error) throw r.error;
+      pendientes = r.data || [];
+      pintarPendientes();
+    }catch(e){
+      if(cont && !pendientes.length){ cont.innerHTML = ''; var v = document.createElement('div'); v.className = 'pend-vacio'; v.textContent = 'No se pudo cargar la lista de espera.'; cont.appendChild(v); }
+      if(manual && typeof mostrarToast === 'function') mostrarToast('⚠️ No se pudo actualizar la lista de espera', '#f59e0b');
+    }finally{ cargando = false; }
+  };
+
+  /* Se llama justo después de guardar un socio con éxito: quita su solicitud pendiente */
+  window.cyProspectoProcesado = async function(dni){
+    try{
+      var r = await supabaseClient.rpc('borrar_prospecto_qr', { p_dni: String(dni||'').trim() });
+      if(r && r.error) throw r.error;
+    }catch(e){ console.warn('No se pudo quitar la solicitud pendiente:', e); }
+    seleccionado = null;
+    var av = $('avisoPremio'); if(av) av.style.display = 'none';
+    cyCargarProspectos();
+  };
+
+  /* Actualización automática mientras la pestaña Registro está abierta */
+  if(!esPublico){
+    timer = setInterval(function(){
+      var t2 = $('tab2');
+      if(t2 && t2.classList.contains('active') && !document.hidden) cyCargarProspectos();
+    }, 25000);
+  }
+})();
+
+(function(){
+  try{
+    var ov = document.getElementById('wizOverlay'); if(!ov) return;
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* Luz ambiental de fondo (dos manchas muy lentas) */
+    if(!reduce && !ov.querySelector('.ap-aurora')){
+      var au = document.createElement('div'); au.className = 'ap-aurora'; au.setAttribute('aria-hidden','true');
+      au.innerHTML = '<i></i><i></i>'; ov.insertBefore(au, ov.firstChild);
+    }
+
+    /* Frase: separa en palabras para iluminarlas con el scroll */
+    var state = document.getElementById('apState'), words = [];
+    if(state && !state.dataset.split){
+      var txt = state.textContent.trim().split(/\s+/);
+      state.textContent = '';
+      txt.forEach(function(w, i){
+        var sp = document.createElement('span'); sp.className = 'w' + (i >= txt.length - 2 ? ' em' : ''); sp.textContent = w;
+        state.appendChild(sp); if(i < txt.length - 1) state.appendChild(document.createTextNode(' '));
+        words.push(sp);
+      });
+      state.dataset.split = '1';
+    }
+    if(reduce) words.forEach(function(w){ w.classList.add('on'); });
+
+    var hero = document.getElementById('apHero'), conoce = document.getElementById('wizConoce');
+    var tick = false, lastN = -1, lastHp = -1, lastT = null, heroH = 0, topbars = ov.querySelectorAll('.wiz-topbar');
+    function medirHero(){ heroH = hero ? hero.offsetHeight : 0; }
+    function frame(){
+      tick = false;
+      /* 1) todas las lecturas juntas */
+      var y = ov.scrollTop, vh = ov.clientHeight;
+      var enConoce = conoce && conoce.style.display !== 'none';
+      var rTop = (enConoce && state && words.length && !reduce) ? state.getBoundingClientRect().top : null;
+      /* 2) escrituras, solo si cambia algo */
+      var t = y > (enConoce ? vh * 0.5 : 56);
+      if(t !== lastT){ lastT = t; topbars.forEach(function(b){ b.classList.toggle('t-in', t); }); }
+      if(!enConoce) return;
+      if(hero && !reduce){
+        if(!heroH) medirHero();
+        var hp = Math.min(1, Math.max(0, y / (heroH * 0.85)));
+        if(Math.abs(hp - lastHp) > 0.004 || (hp === 0 && lastHp !== 0)){ lastHp = hp; hero.style.setProperty('--hp', hp.toFixed(3)); }
+      }
+      if(rTop !== null){
+        var ini = vh * 0.9, fin = vh * 0.34;
+        var p = Math.max(0, Math.min(1, (ini - rTop) / (ini - fin)));
+        var n = Math.round(p * words.length);
+        if(n !== lastN){ lastN = n; words.forEach(function(w, i){ w.classList.toggle('on', i < n); }); }
+      }
+    }
+    ov.addEventListener('scroll', function(){ if(!tick){ tick = true; requestAnimationFrame(frame); } }, {passive:true});
+    window.addEventListener('resize', function(){ heroH = 0; if(!tick){ tick = true; requestAnimationFrame(frame); } });
+
+    /* Aparición escalonada de las piezas nuevas */
+    var io = null;
+    if('IntersectionObserver' in window && !reduce){
+      io = new IntersectionObserver(function(es){
+        var n = 0;
+        es.forEach(function(e){
+          if(!e.isIntersecting) return;
+          var el = e.target; el.style.transitionDelay = (Math.min(n, 4) * 90) + 'ms'; n++;
+          el.classList.add('ap-in'); io.unobserve(el);
+          if(el.parentNode && el.parentNode.id === 'apStats') contar(el.querySelector('b'));
+        });
+      }, {root: ov, threshold: 0.15});
+      ov.classList.add('ap-ok');
+      ov.querySelectorAll('.ap-rv').forEach(function(el){ io.observe(el); });
+    }
+    /* Animaciones continuas: solo corren mientras el elemento está a la vista */
+    if('IntersectionObserver' in window){
+      var vivo = new IntersectionObserver(function(es){ es.forEach(function(e){ e.target.classList.toggle('live', e.isIntersecting); }); }, {root: ov, threshold: 0.01});
+      ov.querySelectorAll('.ap-eq,.ap-btn-main,.ap-hero,.pr-wrap').forEach(function(el){ vivo.observe(el); });
+      window.cyObservarVivo = function(el){ vivo.observe(el); };
+    }
+
+    /* Números que suben al aparecer */
+    function contar(b){
+      if(!b || !b.dataset.n || b.dataset.hecho) return; b.dataset.hecho = '1';
+      var fin = parseInt(b.dataset.n, 10), t0 = null, dur = 900;
+      b.textContent = '0';
+      function paso(t){ if(t0 === null) t0 = t; var k = Math.min(1, (t - t0) / dur); k = 1 - Math.pow(1 - k, 3); b.textContent = Math.round(fin * k); if(k < 1) requestAnimationFrame(paso); }
+      requestAnimationFrame(paso);
+    }
+
+    /* Tras cada cambio de pantalla: volver arriba y recalcular */
+    var prev = window.wizIr;
+    if(typeof prev === 'function'){
+      window.wizIr = function(){
+        var r = prev.apply(this, arguments);
+        lastN = -1; lastHp = -1; lastT = null; heroH = 0; ov.scrollTop = 0;
+        if(hero) hero.style.setProperty('--hp', '0');
+        requestAnimationFrame(frame);
+        return r;
+      };
+    }
+
+    /* v50: mientras una ventana cubre la pantalla, lo que queda debajo no se anima (ahorra GPU/batería y evita tirones) */
+    var cubiertos = ['wizOverlay','inscOverlay','celebOverlay'].map(function(id){ return document.getElementById(id); }).filter(Boolean);
+    function revisarCobertura(){
+      var cubierto = cubiertos.some(function(el){ return el.style.display && el.style.display !== 'none'; });
+      var ya = document.documentElement.classList.contains('cy-covered');
+      if(cubierto === ya) return;
+      document.documentElement.classList.toggle('cy-covered', cubierto);
+      document.querySelectorAll('#qrCardPrimeraVez svg').forEach(function(sv){ try{ cubierto ? sv.pauseAnimations() : sv.unpauseAnimations(); }catch(e){} });
+    }
+    if(window.MutationObserver){
+      var mo = new MutationObserver(revisarCobertura);
+      cubiertos.forEach(function(el){ mo.observe(el, {attributes:true, attributeFilter:['style']}); });
+    }
+    revisarCobertura();
+    frame();
+  }catch(err){ console.warn('Capa v49:', err); }
+})();
+
+(function(){ try{ var h=new Date().getHours(), c=document.documentElement.classList;
+  c.add(h>=5&&h<12 ? "tod-am" : (h>=19||h<5) ? "tod-night" : "tod-pm"); }catch(e){} })();
+
+(function(){
+  var MESES = ['ene','feb','mar','abr','may','jun','jul','ago','set','oct','nov','dic'];
+  function dm(iso){ // '2026-10-21' -> '21/10'
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ''); return m ? m[3] + '/' + m[2] : '';
+  }
+  function diaMes(iso){ // '2026-11-01' -> '1 nov'
+    var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso || ''); return m ? (+m[3]) + ' ' + MESES[+m[2] - 1] : '';
+  }
+  function cuando(ts){
+    try { return new Date(ts).toLocaleString('es-PE', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'America/Lima' }); }
+    catch(e){ return ''; }
+  }
+  function ticket(tipo, c){
+    var e = c.estado, inv = tipo === 'invitado';
+    var top = inv
+      ? '<span class="cup-ic" aria-hidden="true"><i class="fa-solid fa-user-plus"></i></span>' +
+        '<b class="cup-t">Pase de invitado</b><small class="cup-s">Trae a un amigo gratis una vez al mes.</small>'
+      : '<span class="cup-big">10%</span>' +
+        '<b class="cup-t">Pago anticipado</b><small class="cup-s">Renueva tu plan hasta el ' + dm(c.hasta) + '.</small>';
+    var bot;
+    if (e === 'disponible') {
+      bot = '<button type="button" class="cup-btn" data-cupon="' + tipo + '">' + (inv ? 'Usar pase' : 'Usar 10%') + '</button>';
+    } else if (e === 'usado') {
+      bot = '<p class="cup-nota"><b>Usado ' + cuando(c.usado_en) + '</b>' +
+        (inv ? 'Nuevo pase el ' + diaMes(c.proximo) + '.' : 'Renueva en recepción hasta el ' + dm(c.hasta) + '.') + '</p>';
+    } else {
+      bot = '<p class="cup-nota"><b>Vencido</b>Se activa de nuevo al renovar.</p>';
+    }
+    return '<div class="cup cup--' + (inv ? 'inv' : 'dto') + ' is-' + e + '" data-tipo="' + tipo + '">' +
+      '<div class="cup-top">' + top + '</div>' +
+      '<div class="cup-cut" aria-hidden="true"></div>' +
+      '<div class="cup-bot">' + bot + '</div>' +
+      (e === 'usado' ? '<span class="cup-sello" aria-hidden="true">Usado</span>' : '') +
+    '</div>';
+  }
+  function interior(c){
+    c = c || {}; var h = '';
+    if (c.invitado) h += ticket('invitado', c.invitado);
+    if (c.descuento) h += ticket('descuento', c.descuento);
+    return h;
+  }
+  window.cyCuponesBloque = function(c){
+    var h = interior(c);
+    return h ? '<div class="cyc-cupones">' + h + '</div>' : '';
+  };
+  function repintar(recien){
+    document.querySelectorAll('.cyc-cupones').forEach(function(box){
+      box.innerHTML = interior(window.cyCupones);
+      if (recien) { var t = box.querySelector('.cup[data-tipo="' + recien + '"]'); if (t) t.classList.add('recien'); }
+    });
+  }
+
+  /* ---------- Hoja inferior (confirmar / resultado) ---------- */
+  var hoja, resolver;
+  function abrirHoja(o){
+    if (!hoja) {
+      hoja = document.createElement('div');
+      hoja.className = 'cup-hoja-fondo';
+      hoja.innerHTML = '<div class="cup-hoja" role="dialog" aria-modal="true" aria-labelledby="cupHojaT">' +
+        '<div class="cup-hoja-ic" aria-hidden="true"></div><h3 id="cupHojaT"></h3><p></p>' +
+        '<div class="cup-hoja-acc"><button type="button" class="cup-h-si"></button><button type="button" class="cup-h-no"></button></div></div>';
+      document.body.appendChild(hoja);
+      hoja.addEventListener('click', function(e){ if (e.target === hoja) cerrar(false); });
+      hoja.querySelector('.cup-h-si').addEventListener('click', function(){ cerrar(true); });
+      hoja.querySelector('.cup-h-no').addEventListener('click', function(){ cerrar(false); });
+    }
+    hoja.querySelector('.cup-hoja-ic').innerHTML = o.icono;
+    hoja.querySelector('h3').textContent = o.titulo;
+    hoja.querySelector('p').textContent = o.texto;
+    var si = hoja.querySelector('.cup-h-si'), no = hoja.querySelector('.cup-h-no');
+    si.textContent = o.si; no.textContent = o.no || ''; no.style.display = o.no ? '' : 'none';
+    hoja.className = 'cup-hoja-fondo ' + (o.clase || '');
+    hoja.offsetWidth; hoja.classList.add('abierta');
+    setTimeout(function(){ try { si.focus({ preventScroll:true }); } catch(e){} }, 50);
+    return new Promise(function(r){ resolver = r; });
+  }
+  function cerrar(v){
+    if (!hoja) return;
+    hoja.classList.remove('abierta');
+    var r = resolver; resolver = null; if (r) r(v);
+  }
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && hoja && hoja.classList.contains('abierta')) cerrar(false); });
+
+  /* ---------- Fiesta: globos, mancuernas y serpentinas ---------- */
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function fiesta(){
+    if (reduce) return;
+    var capa = document.createElement('div'); capa.className = 'cup-fiesta'; capa.setAttribute('aria-hidden', 'true');
+    var colores = ['#34d399', '#10b981', '#fbbf24', '#f59e0b', '#ffffff', '#e11d48', '#5eead4'];
+    var h = '', i, x, c;
+    for (i = 0; i < 9; i++) { // globos que suben
+      x = 4 + i * 11 + Math.random() * 5; c = colores[i % colores.length];
+      h += '<span class="gl" style="--x:' + x + '%;--c:' + c + ';--d:' + (Math.random() * .5).toFixed(2) + 's;--t:' + (2.6 + Math.random() * .9).toFixed(2) + 's;--w:' + (Math.random() * 30 - 15).toFixed(0) + 'px"><i></i></span>';
+    }
+    for (i = 0; i < 8; i++) { // mancuernas que caen girando
+      x = Math.random() * 92; c = colores[(i + 2) % colores.length];
+      h += '<span class="mc" style="--x:' + x.toFixed(1) + '%;--c:' + c + ';--d:' + (Math.random() * .6).toFixed(2) + 's;--t:' + (1.9 + Math.random() * .9).toFixed(2) + 's;--r:' + (Math.random() > .5 ? 540 : -540) + 'deg"><i class="fa-solid fa-dumbbell"></i></span>';
+    }
+    for (i = 0; i < 34; i++) { // serpentinas y papel picado
+      x = Math.random() * 100; c = colores[i % colores.length];
+      h += '<span class="sp' + (i % 3 === 0 ? ' larga' : '') + '" style="--x:' + x.toFixed(1) + '%;--c:' + c + ';--d:' + (Math.random() * .7).toFixed(2) + 's;--t:' + (1.8 + Math.random() * 1.2).toFixed(2) + 's;--r:' + (Math.random() * 720 - 360).toFixed(0) + 'deg;--dx:' + (Math.random() * 80 - 40).toFixed(0) + 'px"></span>';
+    }
+    capa.innerHTML = '<span class="flash"></span>' + h;
+    document.body.appendChild(capa);
+    setTimeout(function(){ capa.remove(); }, 4200);
+  }
+
+  /* ---------- Usar cupón ---------- */
+  var ocupado = false;
+  function finSocio(){ return dm(window.cyFinSocio); }
+  document.addEventListener('click', async function(e){
+    var b = e.target.closest && e.target.closest('.cup-btn[data-cupon]');
+    if (!b || ocupado) return;
+    var tipo = b.getAttribute('data-cupon'), inv = tipo === 'invitado';
+    var c = (window.cyCupones || {})[tipo]; if (!c) return;
+
+    var sigue = await abrirHoja(inv ? {
+      clase: 'inv', icono: '<i class="fa-solid fa-user-plus"></i>',
+      titulo: '¿Usar tu pase de invitado ahora?',
+      texto: 'Hazlo frente a recepción. Tienes 1 pase por mes y no se acumula.',
+      si: 'Sí, usar ahora', no: 'Ahora no'
+    } : {
+      clase: 'dto', icono: '<span>10%</span>',
+      titulo: '¿Usar tu 10% de descuento?',
+      texto: 'Se aplica al renovar o reservar tu plan en recepción hasta el ' + dm(c.hasta) + '. Úsalo frente a recepción.',
+      si: 'Sí, usar ahora', no: 'Ahora no'
+    });
+    if (!sigue) return;
+
+    ocupado = true;
+    b.disabled = true; b.classList.add('cargando');
+    try {
+      var tel = (leerTelefonoSeguro() || '').replace(/\D/g, ''), dni = (leerDniSeguro() || '').replace(/\D/g, '');
+      // Con internet lento se reintenta solo; si el reintento dice "ya usado",
+      // es porque el primer intento sí llegó: se muestra como usado con éxito.
+      var r = await cyRpcSeguro('usar_cupon_qr', { p_telefono: tel, p_dni: dni, p_tipo: tipo });
+      var d = r && r.data;
+      if (r.error || !d) throw r.error || new Error('sin respuesta');
+      if (!d.ok && d.motivo === 'USADO' && r.intento > 1) d.ok = true;
+      if (d.cupones) window.cyCupones = d.cupones;
+      if (d.ok) {
+        repintar(tipo);
+        fiesta();
+        setTimeout(function(){
+          abrirHoja(inv ? {
+            clase: 'inv ok', icono: '<i class="fa-solid fa-champagne-glasses"></i>',
+            titulo: '¡Pase de invitado usado!',
+            texto: 'Muéstrale esta pantalla a recepción: tu invitado entra gratis hoy.',
+            si: 'Listo'
+          } : {
+            clase: 'dto ok', icono: '<i class="fa-solid fa-champagne-glasses"></i>',
+            titulo: '¡Cupón de 10% usado!',
+            texto: 'Acércate a recepción para renovar o reservar tu membresía antes de tu fecha de vencimiento (' + finSocio() + ').',
+            si: 'Entendido'
+          });
+        }, reduce ? 0 : 900);
+      } else {
+        repintar();
+        var t = { USADO: 'Este cupón ya fue usado.', VENCIDO: 'Este cupón ya venció. Se activa de nuevo al renovar.',
+                  NO_APLICA: 'Este cupón no aplica a tu plan.', BLOQUEADO: 'Demasiados intentos. Espera 15 minutos.',
+                  NO_ENCONTRADO: 'No pudimos verificar tus datos. Vuelve a escanear el QR.' }[d.motivo] || 'No se pudo usar el cupón.';
+        abrirHoja({ clase: 'error', icono: '<i class="fa-solid fa-circle-exclamation"></i>', titulo: 'No se pudo usar', texto: t, si: 'Entendido' });
+      }
+    } catch (err) {
+      console.warn('usar_cupon_qr:', err);
+      b.disabled = false; b.classList.remove('cargando');
+      abrirHoja({ clase: 'error', icono: '<i class="fa-solid fa-wifi"></i>', titulo: 'Sin conexión', texto: 'Revisa tu internet e inténtalo otra vez.', si: 'Entendido' });
+    } finally {
+      ocupado = false;
+    }
+  });
+})();
+
+document.addEventListener("click", function(e){
+  var b = e.target.closest && e.target.closest(".qr-hero-card .qr-btn-principal[onclick]");
+  if (!b) return;
+  b.classList.add("is-loading");
+  setTimeout(function(){ b.classList.remove("is-loading"); }, 6000);
+}, true);
+</script>
+</body>
+</html>

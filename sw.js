@@ -30,7 +30,7 @@
 // vieja y toma la nueva automáticamente.
 // ============================================================
 
-const CACHE_NAME = 'cy-fitness-gym-v76';
+const CACHE_NAME = 'cy-fitness-gym-v77';
 
 // Dominios externos de los que es seguro guardar copia (son archivos estáticos:
 // librerías, íconos, fuentes, fotos — nunca datos de socios). Cualquier petición
@@ -146,7 +146,9 @@ self.addEventListener('fetch', (event) => {
   // Tu propia página: responde al instante con la copia guardada (si existe),
   // y en paralelo va a buscar la versión más reciente para la próxima vez.
   event.respondWith(
-    caches.match(peticion).then((respuestaGuardada) => {
+    // ignoreSearch: el QR abre gym.html?qr=1; sin esto esa dirección nunca
+    // estaba en caché y cada escaneo esperaba la red completa.
+    caches.match(peticion, { ignoreSearch: true }).then((respuestaGuardada) => {
       const peticionRed = fetch(peticion)
         .then((respuestaFresca) => {
           if (respuestaFresca && respuestaFresca.status === 200) {

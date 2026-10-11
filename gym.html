@@ -4203,6 +4203,7 @@ window.enviarInvitacionWhatsApp = function() {
   }
   function detener(){
     turno++;
+    if (esAppNativa()) { try { window.AndroidApp.detener(); } catch(e){} }
     try { if (fuente) fuente.stop(); } catch(e){}
     fuente = null;
     if (tieneVoz) speechSynthesis.cancel();

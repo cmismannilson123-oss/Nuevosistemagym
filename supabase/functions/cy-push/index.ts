@@ -95,6 +95,23 @@ async function enviarFcm(tokens: string[], datos: Record<string, string>): Promi
   return ok;
 }
 
+// Saludo de bienvenida, igual criterio que el panel (terminación del nombre)
+function saludoVoz(nombre: string): string {
+  const n = String(nombre || "").trim().split(/\s+/)[0].toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const esFem = /a$/.test(n) && !/(ma|pa|ta)$/.test(n) || /(eth|lyn|line|elle|ette)$/.test(n);
+  const esMasc = /o$/.test(n) || /[bcdfgjklmnprstvxz]$/.test(n);
+  if (esFem) return `Bienvenida, ${nombre}`;
+  if (esMasc) return `Bienvenido, ${nombre}`;
+  return `Te damos la bienvenida, ${nombre}`;
+}
+
+// Lo que la voz dice al recepcionista/socio, según el caso (acordado con el panel)
+const MOTIVO_VOZ: Record<string, string> = {
+  VENCIDO: "Tu membresía venció. Por favor, acércate a recepción, en un momento te atendemos.",
+  AGOTADO: "Ya usaste todas las asistencias de tu plan. Por favor, acércate a recepción, en un momento te atendemos.",
+  DEUDA: "Por favor, acércate a recepción, en un momento te atendemos.",
+};
+
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "set", "oct", "nov", "dic"];
 const hoyLima = () => new Date(Date.now() - 5 * 3600e3).toISOString().slice(0, 10);
 const primerNombre = (n: string) => String(n || "Socio").trim().split(/\s+/).slice(0, 2).join(" ");
@@ -137,7 +154,9 @@ async function mensajeIngreso(ev: { dni: string; nombre: string; metodo?: string
     metodo: ev.metodo === "QR" ? "QR" : "Manual",
     tipo: "ingreso",
     url: "./?app=panel",
-    voz: `Ingresó ${primerNombre(nombre)}. ${deuda > 0 ? `Tiene deuda de ${deuda} soles` : "Estado activo"}.`,
+    voz: deuda > 0
+      ? `${primerNombre(nombre)}, tiene una deuda de ${deuda} soles. Por favor, acércate a recepción.`
+      : `${saludoVoz(primerNombre(nombre))}.${diasVence !== null && diasVence <= 3 && diasVence >= 0 ? ` Tu membresía vence en ${diasVence} ${diasVence === 1 ? "día" : "días"}.` : ""}`,
   };
 }
 
@@ -162,7 +181,7 @@ Deno.serve(async (req) => {
       aviso = {
         title: `⛔ ${nombre} intentó ingresar`,
         body: `${motivos[ev.motivo] ?? "No puede ingresar"} — está esperando en recepción`,
-        voz: `${primerNombre(nombre)} intentó ingresar. ${motivos[ev.motivo] ?? "No puede ingresar"}.`,
+        voz: `${primerNombre(nombre)}. ${MOTIVO_VOZ[ev.motivo] ?? "Por favor, acércate a recepción."}`,
         tag: "intento-" + ev.dni,
         dni: ev.dni, nombre, motivo: ev.motivo, metodo: "QR", tipo: "intento",
         url: "./?app=panel",

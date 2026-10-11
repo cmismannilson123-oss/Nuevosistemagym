@@ -133,5 +133,9 @@ class MainActivity : AppCompatActivity() {
         // El panel pide leer un anuncio escrito por el personal
         @JavascriptInterface
         fun hablar(texto: String) = VozAnuncio.hablar(texto)
+
+        // Botón de detener del panel: corta lo que la app está diciendo
+        @JavascriptInterface
+        fun detener() = VozAnuncio.detener()
     }
 }

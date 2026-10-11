@@ -27,6 +27,11 @@ object VozAnuncio {
         }
     }
 
+    fun detener() {
+        pendientes.clear()
+        tts?.stop()
+    }
+
     fun hablar(texto: String) {
         if (texto.isBlank()) return
         if (!listo) { pendientes.add(texto); return }

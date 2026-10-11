@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.cyfitness.admin",
+        "sha256_cert_fingerprints": ["66:B3:58:77:09:95:8A:41:41:B5:FE:D8:98:F1:9A:7A:44:3F:5F:DF:0F:35:4B:58:CA:69:EB:94:E4:9C:2C:98"]
+      }
+    }]

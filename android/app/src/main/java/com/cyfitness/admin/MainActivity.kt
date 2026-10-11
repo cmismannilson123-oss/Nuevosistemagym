@@ -12,10 +12,13 @@ import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessaging
+import org.json.JSONObject
+import java.net.URL
 
 // Pantalla principal: muestra el panel de recepción (la misma página web de siempre)
 // y le entrega al panel el token de Firebase de este celular.
@@ -56,6 +59,7 @@ class MainActivity : AppCompatActivity() {
         FirebaseMessaging.getInstance().token.addOnSuccessListener { token ->
             guardarToken(token)
         }
+        comprobarActualizacion()
 
         if (savedInstanceState != null) web.restoreState(savedInstanceState)
         else web.loadUrl(PANEL_URL)
@@ -68,6 +72,41 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         if (web.canGoBack()) web.goBack() else super.onBackPressed()
+    }
+
+    // Lee version.json de tu sitio. Si hay un número mayor que esta app, ofrece actualizar.
+    // Sin internet o sin archivo no pasa nada.
+    private fun comprobarActualizacion() {
+        Thread {
+            try {
+                val base = Uri.parse(PANEL_URL)
+                val origen = "${base.scheme}://${base.host}"
+                val texto = URL("$origen/version.json").openConnection().apply {
+                    connectTimeout = 8000
+                    readTimeout = 8000
+                }.getInputStream().bufferedReader().readText()
+                val json = JSONObject(texto)
+                if (json.getInt("codigo") > BuildConfig.VERSION_CODE) {
+                    val ruta = json.getString("apk")
+                    val enlace = if (ruta.startsWith("http")) ruta else origen + ruta
+                    runOnUiThread { mostrarActualizacion(enlace) }
+                }
+            } catch (e: Exception) {
+                // Sin internet o sin version.json: se sigue normal
+            }
+        }.start()
+    }
+
+    private fun mostrarActualizacion(enlace: String) {
+        if (isFinishing) return
+        AlertDialog.Builder(this)
+            .setTitle("Hay una versión nueva")
+            .setMessage("Descarga la actualización y confirma la instalación. Tus datos se mantienen.")
+            .setPositiveButton("Actualizar") { _, _ ->
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(enlace)))
+            }
+            .setNegativeButton("Más tarde", null)
+            .show()
     }
 
     private fun guardarToken(token: String) {

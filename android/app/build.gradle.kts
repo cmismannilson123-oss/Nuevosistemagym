@@ -16,7 +16,8 @@ android {
         applicationId = "com.cyfitness.admin"
         minSdk = 26
         targetSdk = 34
-        versionCode = 100
+        // Cada compilación en GitHub tiene un número mayor: así Android siempre la acepta encima
+        versionCode = (System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 1) + 100
         versionName = "2.0"
     }
 
@@ -36,6 +37,10 @@ android {
             isMinifyEnabled = false
             if (firmaRuta != null) signingConfig = signingConfigs.getByName("release")
         }
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     compileOptions {

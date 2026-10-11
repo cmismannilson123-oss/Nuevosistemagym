@@ -27,6 +27,74 @@ async function leerConfig() {
   return config;
 }
 
+
+// ---------- Firebase (FCM): la app Android del administrador ----------
+// Usa la cuenta de servicio guardada como secreto FCM_SERVICE_ACCOUNT. El envío
+// es "de datos" con prioridad alta: llega aunque la pantalla esté apagada y la
+// app nativa lo lee en voz alta.
+let fcmCuenta: { project_id: string; client_email: string; private_key: string } | null = null;
+let fcmAcceso: { token: string; vence: number } | null = null;
+
+function b64url(bytes: Uint8Array | string): string {
+  const b = typeof bytes === "string" ? new TextEncoder().encode(bytes) : bytes;
+  let s = "";
+  for (const x of b) s += String.fromCharCode(x);
+  return btoa(s).replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_");
+}
+
+async function accesoFcm(): Promise<string | null> {
+  const crudo = Deno.env.get("FCM_SERVICE_ACCOUNT");
+  if (!crudo) return null;                       // sin cuenta: se omite Firebase
+  if (!fcmCuenta) fcmCuenta = JSON.parse(crudo);
+  if (fcmAcceso && fcmAcceso.vence > Date.now() + 60_000) return fcmAcceso.token;
+  const ahora = Math.floor(Date.now() / 1000);
+  const cabecera = b64url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
+  const cuerpo = b64url(JSON.stringify({
+    iss: fcmCuenta!.client_email,
+    scope: "https://www.googleapis.com/auth/firebase.messaging",
+    aud: "https://oauth2.googleapis.com/token",
+    iat: ahora, exp: ahora + 3600,
+  }));
+  const pem = fcmCuenta!.private_key.replace(/-----[^-]+-----/g, "").replace(/\s/g, "");
+  const der = Uint8Array.from(atob(pem), (c) => c.charCodeAt(0));
+  const clave = await crypto.subtle.importKey("pkcs8", der, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["sign"]);
+  const firma = new Uint8Array(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", clave, new TextEncoder().encode(cabecera + "." + cuerpo)));
+  const r = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({ grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer", assertion: cabecera + "." + cuerpo + "." + b64url(firma) }),
+  });
+  if (!r.ok) { console.error("FCM token falló", r.status); return null; }
+  const j = await r.json();
+  fcmAcceso = { token: j.access_token, vence: Date.now() + (j.expires_in ?? 3600) * 1000 };
+  return fcmAcceso.token;
+}
+
+// Envía el mismo aviso a cada celular de la app nativa. Devuelve cuántos lo recibieron.
+async function enviarFcm(tokens: string[], datos: Record<string, string>): Promise<number> {
+  if (!tokens.length) return 0;
+  const acceso = await accesoFcm();
+  if (!acceso) return 0;
+  let ok = 0;
+  const muertos: string[] = [];
+  await Promise.all(tokens.map(async (token) => {
+    const r = await fetch(`https://fcm.googleapis.com/v1/projects/${fcmCuenta!.project_id}/messages:send`, {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + acceso, "Content-Type": "application/json" },
+      body: JSON.stringify({ message: { token, data: datos, android: { priority: "HIGH", ttl: "3600s" } } }),
+    });
+    if (r.ok) ok++;
+    else {
+      const txt = await r.text();
+      // Token que ya no existe (app desinstalada): se borra
+      if (r.status === 404 || txt.includes("UNREGISTERED")) muertos.push(token);
+      else console.error("FCM falló", r.status, txt.slice(0, 200));
+    }
+  }));
+  if (muertos.length) await sb.from("fcm_tokens").delete().in("token", muertos);
+  return ok;
+}
+
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "set", "oct", "nov", "dic"];
 const hoyLima = () => new Date(Date.now() - 5 * 3600e3).toISOString().slice(0, 10);
 const primerNombre = (n: string) => String(n || "Socio").trim().split(/\s+/).slice(0, 2).join(" ");
@@ -94,6 +162,7 @@ Deno.serve(async (req) => {
       aviso = {
         title: `⛔ ${nombre} intentó ingresar`,
         body: `${motivos[ev.motivo] ?? "No puede ingresar"} — está esperando en recepción`,
+        voz: `${primerNombre(nombre)} intentó ingresar. ${motivos[ev.motivo] ?? "No puede ingresar"}.`,
         tag: "intento-" + ev.dni,
         dni: ev.dni, nombre, motivo: ev.motivo, metodo: "QR", tipo: "intento",
         url: "./?app=panel",
@@ -111,8 +180,18 @@ Deno.serve(async (req) => {
 
     const { data: subs, error } = await consulta;
     if (error) throw error;
+    // Celulares con la app nativa (Firebase). En "prueba" solo los de quien la pidió.
+    let qFcm = sb.from("fcm_tokens").select("token");
+    if (ev.tipo === "prueba" && ev.user_id) qFcm = qFcm.eq("user_id", ev.user_id);
+    const { data: fcmTokens } = await qFcm;
+    const datosFcm: Record<string, string> = {};
+    for (const [k, v] of Object.entries(aviso)) if (v !== undefined && v !== null) datosFcm[k] = String(v);
+    datosFcm.tipo = String(aviso.tipo ?? ev.tipo);
+    // Si Firebase falla, el aviso por Web Push sigue su camino
+    const enviadosFcm = await enviarFcm((fcmTokens ?? []).map((t) => t.token), datosFcm)
+      .catch((e) => { console.error("FCM error", (e as Error).message); return 0; });
     const payload = JSON.stringify(aviso);
-    let enviados = 0;
+    let enviados = enviadosFcm;
     const vencidos: number[] = [];
     await Promise.all((subs ?? []).map(async (s) => {
       try {

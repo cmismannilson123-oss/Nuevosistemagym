@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "898389453342",
+    "project_id": "cy-fitness-gym",
+    "storage_bucket": "cy-fitness-gym.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:898389453342:android:f19b4cbf7983fc6ede5c0f",
+        "android_client_info": {
+          "package_name": "com.cyfitness.admin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5yIQbMo8F6Cvikz35JEjiT8nB2SrEDOw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

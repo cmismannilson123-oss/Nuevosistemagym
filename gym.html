@@ -3934,7 +3934,10 @@ window.enviarInvitacionWhatsApp = function() {
 
   const soportaPush = () => ('serviceWorker' in navigator) && ('PushManager' in window) && ('Notification' in window);
   const instalada = () => (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
-  const vozActiva = () => leer(LS.voz, '0') === '1';
+  // En la app Android del administrador la voz la lee la propia app (con la pantalla apagada),
+  // así que la página no habla para no repetir cada aviso.
+  const esAppNativa = () => !!window.AndroidApp;
+  const vozActiva = () => !esAppNativa() && leer(LS.voz, '0') === '1';
   const avisarIntentos = () => leer(LS.intentos, '1') === '1';
   const b64aBytes = (b64) => {
     const p = '='.repeat((4 - b64.length % 4) % 4);
@@ -3950,6 +3953,24 @@ window.enviarInvitacionWhatsApp = function() {
     if (instalada()) return;
     if (promptInstalar) { promptInstalar.prompt(); try { await promptInstalar.userChoice; } catch(e){} promptInstalar = null; pintar(); return; }
     nota('En Chrome: toca los tres puntos ⋮ (arriba a la derecha) y elige “Instalar aplicación” o “Agregar a la pantalla principal”.', 'info');
+  }
+
+  // ---------- App Android: registra el celular para recibir avisos ----------
+  // El token lo entrega la app (puente AndroidApp). Se guarda en la base cuando hay sesión.
+  if (esAppNativa()) {
+    let intentosToken = 0;
+    const tokenTimer = setInterval(async () => {
+      intentosToken++;
+      try {
+        const { data } = await supabaseClient.auth.getSession();
+        const token = window.AndroidApp.tokenFcm();
+        if (data && data.session && token) {
+          const { error } = await supabaseClient.rpc('guardar_fcm_token', { p_token: token, p_dispositivo: window.AndroidApp.nombreDispositivo() });
+          if (!error) clearInterval(tokenTimer);
+        }
+      } catch (e) {}
+      if (intentosToken > 40) clearInterval(tokenTimer);
+    }, 15000);
   }
 
   // ---------- Notificaciones push ----------
@@ -4311,7 +4332,8 @@ window.enviarInvitacionWhatsApp = function() {
     }
     const pushBtn = $('avPushBtn'), pushTxt = $('avPushTxt'), prueba = $('avPrueba');
     let activo = false;
-    if (!soportaPush()) { pushBtn.textContent = 'No disponible'; pushBtn.disabled = true; }
+    if (esAppNativa()) { pushBtn.textContent = 'En la app'; pushBtn.disabled = true; pushBtn.classList.add('ok'); pushTxt.textContent = 'Las notificaciones llegan desde la app de Android, también con la pantalla apagada.'; }
+    else if (!soportaPush()) { pushBtn.textContent = 'No disponible'; pushBtn.disabled = true; }
     else {
       let sub = null; try { sub = await suscripcionActual(); } catch(e){}
       // En la app instalada la comprobación del navegador puede tardar; si ya se activó aquí, cuenta como activo

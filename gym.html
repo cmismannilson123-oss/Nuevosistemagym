@@ -4345,6 +4345,12 @@ window.enviarInvitacionWhatsApp = function() {
         : (Notification.permission === 'denied' ? 'Bloqueadas en este celular. Permítelas en los ajustes del sitio.' : 'Te llega un aviso cada vez que un socio ingresa, aunque la app esté cerrada.');
     }
     if (prueba) prueba.hidden = !activo;
+    // En la app Android la voz la lee la propia app: se ocultan las opciones de voz de la página
+    if (esAppNativa()) {
+      document.querySelectorAll('.av-op--voz, .av-op--anuncio, .av-anuncio').forEach((el) => { el.hidden = true; });
+      const subVoz = document.querySelector('.av-op--voz + .av-sub');
+      if (subVoz) subVoz.hidden = true;
+    }
     const vozBtn = $('avVozBtn');
     if (vozBtn) { const on = vozActiva(); vozBtn.textContent = on ? 'Apagar' : 'Activar'; vozBtn.classList.toggle('ok', on); vozBtn.setAttribute('aria-pressed', String(on)); }
     const chk = $('avVozIntentos'); if (chk) chk.checked = avisarIntentos();

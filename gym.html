@@ -109,6 +109,9 @@
 <div class="container">
   <div id="publicCheckin" style="display:none; padding:20px;">
 
+    <!-- Instalar esta página como app (aparece solo en Chrome de Android, cuando se puede instalar) -->
+    <button type="button" id="btnInstalarQR" class="qr-btn-principal" style="display:none; margin:0 0 14px; width:100%;"><i class="fa-solid fa-mobile-screen-button"></i> Instalar la app del gimnasio</button>
+
     <!-- Aviso: se muestra solo si detectamos un mini-navegador (WhatsApp/Instagram/etc.) o cookies/almacenamiento bloqueado -->
     <div id="avisoNavegador" style="display:none; background:rgba(245,158,11,.12); border:1px solid rgba(245,158,11,.4); border-radius:14px; padding:14px 16px; margin-bottom:14px;">
       <div style="display:flex; gap:10px; align-items:flex-start;">
@@ -4296,6 +4299,7 @@ window.enviarInvitacionWhatsApp = function() {
   function anunciar(){
     const t = ($('avAnuncioTxt').value || '').trim();
     if (!t) { nota('Escribe un mensaje o toca uno de los sugeridos.', 'info'); $('avAnuncioTxt').focus(); return; }
+    if (esAppNativa()) { window.AndroidApp.hablar(t); nota('Anuncio reproducido en el celular.', 'ok'); return; }
     if (!tieneVoz) { nota('Este navegador no tiene voz. Usa Google Chrome.', 'mal'); return; }
     detener();
     const conTimbre = $('avTimbre').checked;
@@ -4347,7 +4351,7 @@ window.enviarInvitacionWhatsApp = function() {
     if (prueba) prueba.hidden = !activo;
     // En la app Android la voz la lee la propia app: se ocultan las opciones de voz de la página
     if (esAppNativa()) {
-      document.querySelectorAll('.av-op--voz, .av-op--anuncio, .av-anuncio').forEach((el) => { el.hidden = true; });
+      document.querySelectorAll('.av-op--voz').forEach((el) => { el.hidden = true; });
       const subVoz = document.querySelector('.av-op--voz + .av-sub');
       if (subVoz) subVoz.hidden = true;
     }
@@ -4628,6 +4632,23 @@ window.cyConfirmarIngreso = function(nombre){
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   function $(id){ return document.getElementById(id); }
   function esc(t){ return escaparHTML(t); }
+
+  /* ---------- Instalar la página del QR como app (Chrome en Android) ---------- */
+  (function(){
+    var btnI = document.getElementById('btnInstalarQR');
+    if (!btnI) return;
+    var yaInstalada = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
+    if (yaInstalada) return;
+    var evInstalar = null;
+    window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); evInstalar = e; btnI.style.display = ''; });
+    window.addEventListener('appinstalled', function(){ btnI.style.display = 'none'; });
+    btnI.addEventListener('click', async function(){
+      if (!evInstalar) return;
+      evInstalar.prompt();
+      try { await evInstalar.userChoice; } catch(e){}
+      evInstalar = null; btnI.style.display = 'none';
+    });
+  })();
 
   /* ---------- Público ---------- */
   var btn = $('btnInscribirseQR');

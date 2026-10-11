@@ -90,5 +90,9 @@ class MainActivity : AppCompatActivity() {
 
         @JavascriptInterface
         fun nombreDispositivo(): String = "App Android · ${Build.MODEL}"
+
+        // El panel pide leer un anuncio escrito por el personal
+        @JavascriptInterface
+        fun hablar(texto: String) = VozAnuncio.hablar(texto)
     }
 }

@@ -3925,7 +3925,7 @@ window.enviarInvitacionWhatsApp = function() {
 (function(){
   if (document.documentElement.classList.contains('qr-mode')) return;
   const VAPID = 'BAGbwqTYN3ORt7VRygX0uhX_5ZT3FiWJhFMvlSzwsDK0zcjK0Y-OiLArjBgJae3clm27Rp4EZRLFnFcmyu9TTws';
-  const LS = { voz: 'cy_voz_recepcion', intentos: 'cy_voz_intentos', vozNombre: 'cy_voz_nombre', mios: 'cy_anuncios_mios', timbre: 'cy_anuncio_timbre' };
+  const LS = { voz: 'cy_voz_recepcion', intentos: 'cy_voz_intentos', vozNombre: 'cy_voz_nombre', mios: 'cy_anuncios_mios', timbre: 'cy_anuncio_timbre', push: 'cy_push_activo' };
   const $ = (id) => document.getElementById(id);
   const leer = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch(e){ return d; } };
   const escribir = (k, v) => { try { localStorage.setItem(k, v); } catch(e){} };
@@ -3974,11 +3974,13 @@ window.enviarInvitacionWhatsApp = function() {
     let sub = await reg.pushManager.getSubscription();
     if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64aBytes(VAPID) });
     await guardarSuscripcion(sub);
+    escribir(LS.push, '1');
     nota('Listo. Te llegará un aviso con cada ingreso. Toca “Enviar una notificación de prueba” para comprobarlo.', 'ok');
   }
   async function desactivarPush(){
     const sub = await suscripcionActual();
     if (sub) { try { await supabaseClient.from('push_suscripciones').delete().eq('endpoint', sub.endpoint); } catch(e){} await sub.unsubscribe(); }
+    escribir(LS.push, '0');
     nota('Notificaciones apagadas en este celular.', 'info');
   }
   async function probar(){
@@ -4312,7 +4314,8 @@ window.enviarInvitacionWhatsApp = function() {
     if (!soportaPush()) { pushBtn.textContent = 'No disponible'; pushBtn.disabled = true; }
     else {
       let sub = null; try { sub = await suscripcionActual(); } catch(e){}
-      activo = !!sub && Notification.permission === 'granted';
+      // En la app instalada la comprobación del navegador puede tardar; si ya se activó aquí, cuenta como activo
+      activo = Notification.permission === 'granted' && (!!sub || leer(LS.push, '0') === '1');
       pushBtn.disabled = false;
       pushBtn.textContent = activo ? 'Apagar' : 'Activar';
       pushBtn.classList.toggle('ok', activo);
@@ -4372,7 +4375,7 @@ window.enviarInvitacionWhatsApp = function() {
     ocupado = true; b.classList.add('cargando');
     try {
       if (a === 'instalar') await instalar();
-      else if (a === 'push') { const sub = await suscripcionActual().catch(() => null); if (sub && Notification.permission === 'granted') await desactivarPush(); else await activarPush(); }
+      else if (a === 'push') { const sub = await suscripcionActual().catch(() => null); const activo = Notification.permission === 'granted' && (!!sub || leer(LS.push, '0') === '1'); if (activo) await desactivarPush(); else await activarPush(); }
       else if (a === 'prueba') await probar();
       else if (a === 'voz') {
         const on = !vozActiva();

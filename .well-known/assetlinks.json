@@ -1,8 +1,14 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "com.cyfitness.admin",
-        "sha256_cert_fingerprints": ["66:B3:58:77:09:95:8A:41:41:B5:FE:D8:98:F1:9A:7A:44:3F:5F:DF:0F:35:4B:58:CA:69:EB:94:E4:9C:2C:98"]
-      }
-    }]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.cyfitness.admin",
+      "sha256_cert_fingerprints": [
+        "2C:F2:59:5A:E9:F2:E6:A6:F1:BB:5A:6A:1D:88:5D:14:96:49:2E:4F:D5:29:A6:BE:1A:FD:CC:F2:7E:84:E1:C4"
+      ]
+    }
+  }
+]

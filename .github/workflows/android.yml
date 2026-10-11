@@ -1,13 +1,9 @@
 name: Compilar APK del administrador
 
 # Compila la app Android (android/) en los servidores de GitHub y deja el APK
-# firmado para descargar en la pestaña Actions. Se ejecuta a mano o al cambiar android/.
+# firmado para descargar en la pestaña Actions. Se ejecuta a mano (Actions → Run workflow).
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "android/**"
-      - ".github/workflows/android.yml"
 
 jobs:
   apk:

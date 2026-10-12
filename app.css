@@ -4167,3 +4167,28 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 #cyAvisos .av-estado:empty{ display:none; }
 #cyAvisos .av-estado.ok{ color:#ddd6fe; background:linear-gradient(90deg,rgba(167,139,250,.18),rgba(236,72,153,.12)); }
 #cyAvisos .av-estado.mal{ color:#fde68a; background:rgba(251,191,36,.12); }
+
+/* Promos: los dos campos de fecha caben en su columna (antes se salían a la derecha) */
+.prem-fechas > div{ min-width:0; }
+.prem-fechas input{ width:100%; min-width:0; box-sizing:border-box; }
+
+/* Tarjeta para instalar la app desde la página del QR */
+.cy-instalar{
+  display:none; align-items:center; gap:14px;
+  margin:0 0 16px; padding:14px 16px; border-radius:18px;
+  background:linear-gradient(135deg, rgba(16,185,129,.16), rgba(16,185,129,.04));
+  border:1px solid rgba(16,185,129,.35);
+}
+.cy-instalar__ico{
+  flex:0 0 44px; height:44px; border-radius:14px; display:grid; place-items:center;
+  background:rgba(16,185,129,.18); color:#34d399; font-size:20px;
+}
+.cy-instalar__txt{ flex:1; min-width:0; }
+.cy-instalar__txt b{ display:block; font-size:15px; color:#f1f5f9; }
+.cy-instalar__txt small{ display:block; margin-top:2px; font-size:12.5px; line-height:1.35; color:#94a3b8; }
+.cy-instalar__btn{
+  flex:0 0 auto; border:0; border-radius:12px; padding:10px 14px; cursor:pointer;
+  font-weight:700; font-size:14px; color:#052e1f; background:#34d399;
+}
+.cy-instalar__btn:active{ transform:scale(.97); }
+.cy-instalar .cy-instalar__btn{ width:auto; min-width:0; flex:0 0 auto; white-space:nowrap; letter-spacing:.2px; box-shadow:0 6px 14px -6px rgba(52,211,153,.55); }

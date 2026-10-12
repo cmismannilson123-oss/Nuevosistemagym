@@ -110,7 +110,14 @@
   <div id="publicCheckin" style="display:none; padding:20px;">
 
     <!-- Instalar esta página como app (aparece solo en Chrome de Android, cuando se puede instalar) -->
-    <button type="button" id="btnInstalarQR" class="qr-btn-principal" style="display:none; margin:0 0 14px; width:100%;"><i class="fa-solid fa-mobile-screen-button"></i> Instalar la app del gimnasio</button>
+    <div class="cy-instalar" id="cardInstalarQR" role="region" aria-label="Instalar la app">
+      <span class="cy-instalar__ico" aria-hidden="true"><i class="fa-solid fa-mobile-screen-button"></i></span>
+      <div class="cy-instalar__txt">
+        <b>Instala la app del gimnasio</b>
+        <small>Registra tu ingreso más rápido, sin escanear.</small>
+      </div>
+      <button type="button" id="btnInstalarQR" class="cy-instalar__btn">Instalar</button>
+    </div>
 
     <!-- Aviso: se muestra solo si detectamos un mini-navegador (WhatsApp/Instagram/etc.) o cookies/almacenamiento bloqueado -->
     <div id="avisoNavegador" style="display:none; background:rgba(245,158,11,.12); border:1px solid rgba(245,158,11,.4); border-radius:14px; padding:14px 16px; margin-bottom:14px;">
@@ -4651,17 +4658,18 @@ window.cyConfirmarIngreso = function(nombre){
   /* ---------- Instalar la página del QR como app (Chrome en Android) ---------- */
   (function(){
     var btnI = document.getElementById('btnInstalarQR');
-    if (!btnI) return;
+    var cardI = document.getElementById('cardInstalarQR');
+    if (!btnI || !cardI) return;
     var yaInstalada = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
     if (yaInstalada) return;
     var evInstalar = null;
-    window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); evInstalar = e; btnI.style.display = ''; });
-    window.addEventListener('appinstalled', function(){ btnI.style.display = 'none'; });
+    window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); evInstalar = e; cardI.style.display = 'flex'; });
+    window.addEventListener('appinstalled', function(){ cardI.style.display = 'none'; });
     btnI.addEventListener('click', async function(){
       if (!evInstalar) return;
       evInstalar.prompt();
       try { await evInstalar.userChoice; } catch(e){}
-      evInstalar = null; btnI.style.display = 'none';
+      evInstalar = null; cardI.style.display = 'none';
     });
   })();
 

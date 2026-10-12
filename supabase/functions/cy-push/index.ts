@@ -182,8 +182,10 @@ Deno.serve(async (req) => {
         title: `⛔ ${nombre} intentó ingresar`,
         body: `${motivos[ev.motivo] ?? "No puede ingresar"} — está esperando en recepción`,
         voz: ev.motivo === "DEUDA"
-          ? `Membresía bloqueada, ${nombre}. Deuda pendiente.`
-          : `Membresía vencida o agotada, ${nombre}.`,
+          ? `Membresía bloqueada, deuda pendiente, ${nombre}.`
+          : ev.motivo === "AGOTADO"
+            ? `Membresía agotada, ${nombre}.`
+            : `Membresía vencida, ${nombre}.`,
         tag: "intento-" + ev.dni,
         dni: ev.dni, nombre, motivo: ev.motivo, metodo: "QR", tipo: "intento",
         url: "./?app=panel",

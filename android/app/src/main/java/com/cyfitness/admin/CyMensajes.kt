@@ -28,8 +28,13 @@ class CyMensajes : FirebaseMessagingService() {
         val voz = datos["voz"] ?: ""
         val etiqueta = datos["tag"] ?: "cy-aviso"
 
-        mostrarNotificacion(titulo, cuerpo, etiqueta)
-        VozAnuncio.hablar(voz)
+        val prefs = getSharedPreferences(MainActivity.PREFS, Context.MODE_PRIVATE)
+        if (prefs.getBoolean("ingresos_on", true)) mostrarNotificacion(titulo, cuerpo, etiqueta)
+        // Con la app cerrada el motor de voz no está iniciado: se inicia aquí antes de hablar
+        if (prefs.getBoolean("voz_on", true) && voz.isNotBlank()) {
+            VozAnuncio.iniciar(applicationContext)
+            VozAnuncio.hablar(voz)
+        }
     }
 
     private fun mostrarNotificacion(titulo: String, cuerpo: String, etiqueta: String) {

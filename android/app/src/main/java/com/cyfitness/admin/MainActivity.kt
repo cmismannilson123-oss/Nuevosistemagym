@@ -137,5 +137,15 @@ class MainActivity : AppCompatActivity() {
         // Botón de detener del panel: corta lo que la app está diciendo
         @JavascriptInterface
         fun detener() = VozAnuncio.detener()
+
+        // Pausar/reanudar avisos de ingreso y voz desde el panel (se guardan en el celular)
+        @JavascriptInterface
+        fun obtenerPref(clave: String): Boolean =
+            getSharedPreferences(PREFS, MODE_PRIVATE).getBoolean(clave, true)
+
+        @JavascriptInterface
+        fun guardarPref(clave: String, valor: Boolean) {
+            getSharedPreferences(PREFS, MODE_PRIVATE).edit().putBoolean(clave, valor).apply()
+        }
     }
 }

@@ -4337,7 +4337,14 @@ window.enviarInvitacionWhatsApp = function() {
     }
     const pushBtn = $('avPushBtn'), pushTxt = $('avPushTxt'), prueba = $('avPrueba');
     let activo = false;
-    if (esAppNativa()) { pushBtn.textContent = 'En la app'; pushBtn.disabled = true; pushBtn.classList.add('ok'); pushTxt.textContent = 'Las notificaciones llegan desde la app de Android, también con la pantalla apagada.'; }
+    if (esAppNativa()) {
+      const avisos = window.AndroidApp.obtenerPref('ingresos_on');
+      pushBtn.disabled = false;
+      pushBtn.textContent = avisos ? 'Pausar' : 'Reanudar';
+      pushBtn.classList.toggle('ok', avisos);
+      pushTxt.textContent = avisos ? 'Activadas: te llega un aviso con cada ingreso, aunque la app esté cerrada.' : 'Pausadas: no llegará ningún aviso hasta que lo reanudes.';
+      activo = avisos;
+    }
     else if (!soportaPush()) { pushBtn.textContent = 'No disponible'; pushBtn.disabled = true; }
     else {
       let sub = null; try { sub = await suscripcionActual(); } catch(e){}
@@ -4352,12 +4359,17 @@ window.enviarInvitacionWhatsApp = function() {
     if (prueba) prueba.hidden = !activo;
     // En la app Android la voz la lee la propia app: se ocultan las opciones de voz de la página
     if (esAppNativa()) {
-      document.querySelectorAll('.av-op--voz').forEach((el) => { el.hidden = true; });
+      // La voz de la página no se usa en la app; solo se ocultan sus opciones de página
       const subVoz = document.querySelector('.av-op--voz + .av-sub');
       if (subVoz) subVoz.hidden = true;
     }
     const vozBtn = $('avVozBtn');
-    if (vozBtn) { const on = vozActiva(); vozBtn.textContent = on ? 'Apagar' : 'Activar'; vozBtn.classList.toggle('ok', on); vozBtn.setAttribute('aria-pressed', String(on)); }
+    if (vozBtn) {
+      const on = esAppNativa() ? window.AndroidApp.obtenerPref('voz_on') : vozActiva();
+      vozBtn.textContent = on ? 'Pausar' : 'Reanudar';
+      vozBtn.classList.toggle('ok', on);
+      vozBtn.setAttribute('aria-pressed', String(on));
+    }
     const chk = $('avVozIntentos'); if (chk) chk.checked = avisarIntentos();
     const tim = $('avTimbre'); if (tim) tim.checked = leer(LS.timbre, '1') === '1';
     llenarVoces(); pintarSugeridos(); pintarAnuncio(); contar();
@@ -4408,6 +4420,8 @@ window.enviarInvitacionWhatsApp = function() {
     ocupado = true; b.classList.add('cargando');
     try {
       if (a === 'instalar') await instalar();
+      else if (a === 'push' && esAppNativa()) { window.AndroidApp.guardarPref('ingresos_on', !window.AndroidApp.obtenerPref('ingresos_on')); await pintar(); }
+      else if (a === 'voz' && esAppNativa()) { window.AndroidApp.guardarPref('voz_on', !window.AndroidApp.obtenerPref('voz_on')); await pintar(); }
       else if (a === 'push') { const sub = await suscripcionActual().catch(() => null); const activo = Notification.permission === 'granted' && (!!sub || leer(LS.push, '0') === '1'); if (activo) await desactivarPush(); else await activarPush(); }
       else if (a === 'prueba') await probar();
       else if (a === 'voz') {

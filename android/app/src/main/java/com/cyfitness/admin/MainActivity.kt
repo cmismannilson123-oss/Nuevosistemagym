@@ -138,6 +138,11 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun detener() = VozAnuncio.detener()
 
+        // Guarda el comprobante de pago (imagen PNG) en Descargas
+        @JavascriptInterface
+        fun guardarComprobante(dataUrl: String, nombre: String): Boolean =
+            Comprobantes.guardarEnDescargas(this@MainActivity, dataUrl, nombre)
+
         // Pausar/reanudar avisos de ingreso y voz desde el panel (se guardan en el celular)
         @JavascriptInterface
         fun obtenerPref(clave: String): Boolean =

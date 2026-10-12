@@ -1526,13 +1526,20 @@ async function enviarReciboPremium(){
       voucher.style.opacity = "0";
     }
 
-    // Descarga del comprobante
-    const a = document.createElement("a");
-    a.href = img;
-    a.download = `voucher-${dni}-${numero}.png`;
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => { if (a.parentNode) a.parentNode.removeChild(a); }, 100);
+    // Descarga del comprobante. Dentro de la app Android la descarga normal no funciona:
+    // la app lo guarda en Descargas.
+    const nombreArchivo = `voucher-${dni}-${numero}.png`;
+    if (window.AndroidApp) {
+      const guardado = window.AndroidApp.guardarComprobante(img, nombreArchivo);
+      mostrarToast(guardado ? "✅ Comprobante guardado en Descargas" : "⚠️ No se pudo guardar el comprobante", guardado ? "#10b981" : "#ef4444");
+    } else {
+      const a = document.createElement("a");
+      a.href = img;
+      a.download = nombreArchivo;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => { if (a.parentNode) a.parentNode.removeChild(a); }, 100);
+    }
 
     // Abrir WhatsApp enseguida: en celular directo a la app, con respaldo a la web
     setTimeout(() => {

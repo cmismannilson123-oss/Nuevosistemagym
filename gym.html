@@ -1530,8 +1530,10 @@ async function enviarReciboPremium(){
     // la app lo guarda en Descargas.
     const nombreArchivo = `voucher-${dni}-${numero}.png`;
     if (window.AndroidApp) {
-      const guardado = window.AndroidApp.guardarComprobante(img, nombreArchivo);
-      mostrarToast(guardado ? "✅ Comprobante guardado en Descargas" : "⚠️ No se pudo guardar el comprobante", guardado ? "#10b981" : "#ef4444");
+      // En la app: se guarda en Descargas y se abre WhatsApp con la imagen adjunta
+      const listo = window.AndroidApp.compartirComprobante(img, nombreArchivo, mensaje);
+      mostrarToast(listo ? "✅ Comprobante listo: elige el chat en WhatsApp" : "⚠️ No se pudo preparar el comprobante", listo ? "#10b981" : "#ef4444");
+      return;
     } else {
       const a = document.createElement("a");
       a.href = img;
@@ -4357,6 +4359,10 @@ window.enviarInvitacionWhatsApp = function() {
       pushBtn.textContent = avisos ? 'Pausar' : 'Reanudar';
       pushBtn.classList.toggle('ok', avisos);
       pushTxt.textContent = avisos ? 'Activadas: te llega un aviso con cada ingreso, aunque la app esté cerrada.' : 'Pausadas: no llegará ningún aviso hasta que lo reanudes.';
+      try {
+        const log = JSON.parse(window.AndroidApp.ultimosAvisos() || '[]');
+        if (log.length) pushTxt.textContent += ' Último aviso: ' + log[0].hora + ' · ' + (log[0].voz ? 'se leyó en voz' : 'sin voz') + '.';
+      } catch (e) {}
       activo = avisos;
     }
     else if (!soportaPush()) { pushBtn.textContent = 'No disponible'; pushBtn.disabled = true; }

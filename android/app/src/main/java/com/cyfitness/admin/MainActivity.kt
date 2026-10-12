@@ -138,10 +138,15 @@ class MainActivity : AppCompatActivity() {
         @JavascriptInterface
         fun detener() = VozAnuncio.detener()
 
-        // Guarda el comprobante de pago (imagen PNG) en Descargas
+        // Comprobante de pago: se guarda en Descargas y se abre WhatsApp con la imagen adjunta
         @JavascriptInterface
-        fun guardarComprobante(dataUrl: String, nombre: String): Boolean =
-            Comprobantes.guardarEnDescargas(this@MainActivity, dataUrl, nombre)
+        fun compartirComprobante(dataUrl: String, nombre: String, mensaje: String): Boolean =
+            Comprobantes.procesar(this@MainActivity, dataUrl, nombre, mensaje)
+
+        // Últimos avisos recibidos en este celular (para revisar que llegaron y se leyeron)
+        @JavascriptInterface
+        fun ultimosAvisos(): String =
+            getSharedPreferences(PREFS, MODE_PRIVATE).getString("avisos_log", "[]") ?: "[]"
 
         // Pausar/reanudar avisos de ingreso y voz desde el panel (se guardan en el celular)
         @JavascriptInterface

@@ -30,11 +30,18 @@ class CyMensajes : FirebaseMessagingService() {
 
         val prefs = getSharedPreferences(MainActivity.PREFS, Context.MODE_PRIVATE)
         if (prefs.getBoolean("ingresos_on", true)) mostrarNotificacion(titulo, cuerpo, etiqueta)
-        // Con la app cerrada el motor de voz no está iniciado: se inicia aquí antes de hablar
-        if (prefs.getBoolean("voz_on", true) && voz.isNotBlank()) {
-            VozAnuncio.iniciar(applicationContext)
-            VozAnuncio.hablar(voz)
-        }
+        // El motor de voz lo inicia CyApp al arrancar el proceso; aquí solo se lee el aviso
+        val leido = prefs.getBoolean("voz_on", true) && VozAnuncio.hablar(voz)
+        registrar(prefs, titulo, leido)
+    }
+
+    // Guarda los últimos 20 avisos: hora, título y si se leyó en voz
+    private fun registrar(prefs: android.content.SharedPreferences, titulo: String, leido: Boolean) {
+        val previo = try { org.json.JSONArray(prefs.getString("avisos_log", "[]")) } catch (e: Exception) { org.json.JSONArray() }
+        val hora = java.text.SimpleDateFormat("HH:mm", java.util.Locale("es", "PE")).format(java.util.Date())
+        val nuevo = org.json.JSONArray().put(org.json.JSONObject().put("hora", hora).put("titulo", titulo).put("voz", leido))
+        for (i in 0 until minOf(previo.length(), 19)) nuevo.put(previo.get(i))
+        prefs.edit().putString("avisos_log", nuevo.toString()).apply()
     }
 
     private fun mostrarNotificacion(titulo: String, cuerpo: String, etiqueta: String) {
@@ -53,6 +60,8 @@ class CyMensajes : FirebaseMessagingService() {
         )
         val aviso = NotificationCompat.Builder(this, CANAL)
             .setSmallIcon(R.mipmap.ic_launcher)
+            .setWhen(System.currentTimeMillis())
+            .setShowWhen(true)
             .setContentTitle(titulo)
             .setContentText(cuerpo)
             .setStyle(NotificationCompat.BigTextStyle().bigText(cuerpo))
@@ -63,7 +72,8 @@ class CyMensajes : FirebaseMessagingService() {
             .setContentIntent(abrir)
             .build()
         try {
-            NotificationManagerCompat.from(this).notify(etiqueta, 1, aviso)
+            // Un aviso por cada ingreso: la etiqueta es única y el número no se reutiliza
+            NotificationManagerCompat.from(this).notify(etiqueta, System.currentTimeMillis().toInt(), aviso)
         } catch (e: SecurityException) {
             // Sin permiso de notificaciones: el aviso igual se lee en voz alta
         }

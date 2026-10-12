@@ -15,13 +15,15 @@ import java.io.File
 // Comprobante de pago: se guarda en Descargas y se abre WhatsApp con la imagen adjunta.
 object Comprobantes {
 
-    fun procesar(act: MainActivity, dataUrl: String, nombre: String, mensaje: String): Boolean {
+    // telefono: número con código de país (51…). Así WhatsApp abre directo el chat de ese socio.
+    fun procesar(act: MainActivity, dataUrl: String, nombre: String, mensaje: String, telefono: String): Boolean {
         return try {
             val bytes = Base64.decode(dataUrl.substringAfter("base64,"), Base64.DEFAULT)
             guardarEnDescargas(act, bytes, nombre)
             val carpeta = File(act.cacheDir, "comprobantes").apply { mkdirs() }
             val archivo = File(carpeta, nombre).apply { writeBytes(bytes) }
-            act.runOnUiThread { compartir(act, archivo, mensaje) }
+            val jid = telefono.filter { it.isDigit() }.takeIf { it.length >= 8 }?.let { "$it@s.whatsapp.net" }
+            act.runOnUiThread { compartir(act, archivo, mensaje, jid) }
             true
         } catch (e: Exception) {
             false
@@ -47,15 +49,20 @@ object Comprobantes {
         }
     }
 
-    private fun compartir(act: Activity, archivo: File, mensaje: String) {
+    private fun compartir(act: Activity, archivo: File, mensaje: String, jid: String?) {
         val uri = FileProvider.getUriForFile(act, act.packageName + ".fileprovider", archivo)
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "image/png"
             putExtra(Intent.EXTRA_STREAM, uri)
             putExtra(Intent.EXTRA_TEXT, mensaje)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            whatsapp(act)?.let { setPackage(it) }
+            whatsapp(act)?.let { paquete ->
+                setPackage(paquete)
+                // WhatsApp abre directamente el chat de ese número (sin buscar el contacto)
+                if (jid != null) putExtra("jid", jid)
+            }
         }
+        // Sin WhatsApp instalado, se muestra el selector de apps
         val abrir = if (intent.`package` != null) intent else Intent.createChooser(intent, "Enviar comprobante")
         act.startActivity(abrir)
     }

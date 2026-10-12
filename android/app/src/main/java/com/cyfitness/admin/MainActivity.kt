@@ -140,8 +140,8 @@ class MainActivity : AppCompatActivity() {
 
         // Comprobante de pago: se guarda en Descargas y se abre WhatsApp con la imagen adjunta
         @JavascriptInterface
-        fun compartirComprobante(dataUrl: String, nombre: String, mensaje: String): Boolean =
-            Comprobantes.procesar(this@MainActivity, dataUrl, nombre, mensaje)
+        fun compartirComprobante(dataUrl: String, nombre: String, mensaje: String, telefono: String): Boolean =
+            Comprobantes.procesar(this@MainActivity, dataUrl, nombre, mensaje, telefono)
 
         // Últimos avisos recibidos en este celular (para revisar que llegaron y se leyeron)
         @JavascriptInterface

@@ -1531,7 +1531,7 @@ async function enviarReciboPremium(){
     const nombreArchivo = `voucher-${dni}-${numero}.png`;
     if (window.AndroidApp) {
       // En la app: se guarda en Descargas y se abre WhatsApp con la imagen adjunta
-      const listo = window.AndroidApp.compartirComprobante(img, nombreArchivo, mensaje);
+      const listo = window.AndroidApp.compartirComprobante(img, nombreArchivo, mensaje, "51" + telefono);
       mostrarToast(listo ? "✅ Comprobante listo: elige el chat en WhatsApp" : "⚠️ No se pudo preparar el comprobante", listo ? "#10b981" : "#ef4444");
       return;
     } else {

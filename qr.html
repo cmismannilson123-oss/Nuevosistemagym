@@ -47,7 +47,8 @@
       <span class="cy-instalar__ico" aria-hidden="true"><i class="fa-solid fa-mobile-screen-button"></i></span>
       <div class="cy-instalar__txt">
         <b>Instala la app del gimnasio</b>
-        <small>Registra tu ingreso más rápido, sin escanear.</small>
+        <small>Registra tu ingreso más rápido, sin escanear. Así no volverás a escribir tus datos.</small>
+        <div class="cy-instalar__pasos" id="pasosInstalarQR" hidden><span>1. Toca Compartir &#8593;</span><span>2. Agregar a pantalla de inicio</span></div>
       </div>
       <button type="button" id="btnInstalarQR" class="cy-instalar__btn">Instalar</button>
     </div>
@@ -1610,9 +1611,13 @@ if ('serviceWorker' in navigator) {
   (function(){
     var btnI = document.getElementById('btnInstalarQR');
     var cardI = document.getElementById('cardInstalarQR');
-    if (!btnI || !cardI) return;
+    var pasosI = document.getElementById('pasosInstalarQR');
+    if (!btnI || !cardI || !pasosI) return;
     var yaInstalada = (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true;
     if (yaInstalada) return;
+    // iPhone/iPad: no hay instalación con un toque; se muestran los pasos para Agregar a pantalla de inicio
+    var esIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+    if (esIOS) { pasosI.hidden = false; btnI.hidden = true; cardI.style.display = 'flex'; return; }
     var evInstalar = null;
     window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); evInstalar = e; cardI.style.display = 'flex'; });
     window.addEventListener('appinstalled', function(){ cardI.style.display = 'none'; });

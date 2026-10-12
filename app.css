@@ -4192,3 +4192,7 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 }
 .cy-instalar__btn:active{ transform:scale(.97); }
 .cy-instalar .cy-instalar__btn{ width:auto; min-width:0; flex:0 0 auto; white-space:nowrap; letter-spacing:.2px; box-shadow:0 6px 14px -6px rgba(52,211,153,.55); }
+.cy-instalar__pasos{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.cy-instalar__pasos[hidden]{ display:none; }
+.cy-instalar__pasos span{ font-size:12px; color:#cbd5e1; padding:4px 10px; border-radius:999px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); white-space:nowrap; }
+.cy-instalar__btn[hidden]{ display:none; }

@@ -5,12 +5,14 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Base64
 import androidx.core.content.FileProvider
 import java.io.File
+import java.net.URLEncoder
 
 // Comprobante de pago: se guarda en Descargas y se abre WhatsApp con la imagen adjunta.
 object Comprobantes {
@@ -22,8 +24,14 @@ object Comprobantes {
             guardarEnDescargas(act, bytes, nombre)
             val carpeta = File(act.cacheDir, "comprobantes").apply { mkdirs() }
             val archivo = File(carpeta, nombre).apply { writeBytes(bytes) }
-            val jid = telefono.filter { it.isDigit() }.takeIf { it.length >= 8 }?.let { "$it@s.whatsapp.net" }
-            act.runOnUiThread { compartir(act, archivo, mensaje, jid) }
+            val numero = telefono.filter { it.isDigit() }
+            val paquete = whatsapp(act)
+            act.runOnUiThread {
+                // Con WhatsApp y número válido: abre el chat de ese socio con el mensaje listo.
+                // El comprobante ya está en Descargas para adjuntarlo.
+                if (paquete != null && numero.length >= 8) abrirChat(act, mensaje, numero, paquete)
+                else compartir(act, archivo, mensaje)
+            }
             true
         } catch (e: Exception) {
             false
@@ -49,22 +57,25 @@ object Comprobantes {
         }
     }
 
-    private fun compartir(act: Activity, archivo: File, mensaje: String, jid: String?) {
+    // Abre el chat del número directamente en WhatsApp con el mensaje escrito (sin contacto guardado)
+    private fun abrirChat(act: Activity, mensaje: String, numero: String, paquete: String) {
+        val texto = URLEncoder.encode(mensaje, "UTF-8").replace("+", "%20")
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$numero?text=$texto")).apply {
+            setPackage(paquete)
+        }
+        act.startActivity(intent)
+    }
+
+    // Sin número o sin WhatsApp: se comparte la imagen con el selector de apps
+    private fun compartir(act: Activity, archivo: File, mensaje: String) {
         val uri = FileProvider.getUriForFile(act, act.packageName + ".fileprovider", archivo)
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "image/png"
             putExtra(Intent.EXTRA_STREAM, uri)
             putExtra(Intent.EXTRA_TEXT, mensaje)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            whatsapp(act)?.let { paquete ->
-                setPackage(paquete)
-                // WhatsApp abre directamente el chat de ese número (sin buscar el contacto)
-                if (jid != null) putExtra("jid", jid)
-            }
         }
-        // Sin WhatsApp instalado, se muestra el selector de apps
-        val abrir = if (intent.`package` != null) intent else Intent.createChooser(intent, "Enviar comprobante")
-        act.startActivity(abrir)
+        act.startActivity(Intent.createChooser(intent, "Enviar comprobante"))
     }
 
     // WhatsApp normal o WhatsApp Business, el que esté instalado

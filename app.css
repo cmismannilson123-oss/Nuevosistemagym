@@ -4346,3 +4346,11 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 @media (prefers-reduced-motion: reduce){
   #wizHorarios *, #estadoAbierto .dot{ animation:none !important; }
 }
+
+/* Cupón de invitado: bloque dorado llamativo con brillo suave */
+.pp-cupon{ position:relative; overflow:hidden; margin-top:12px; padding:12px 14px; border-radius:16px; background:linear-gradient(135deg,#fde047 0%,#facc15 45%,#f59e0b 100%); border:none; box-shadow:0 12px 26px -12px rgba(250,204,21,.7); color:#1c1917; font-size:14px; font-weight:600; align-items:center; }
+.pp-cupon i{ color:#1c1917; font-size:18px; margin-top:0; }
+.pp-cupon b{ color:#000; font-weight:900; }
+.pp-cupon::after{ content:""; position:absolute; top:0; bottom:0; left:0; width:40%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent); transform:translateX(-120%); animation:pp-brillo 3.4s 0.8s ease-in-out infinite; pointer-events:none; }
+@keyframes pp-brillo{ 0%{ transform:translateX(-120%); } 60%,100%{ transform:translateX(260%); } }
+@media (prefers-reduced-motion: reduce){ .pp-cupon::after{ animation:none; } }

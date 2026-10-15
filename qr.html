@@ -1337,7 +1337,7 @@ window.wizVolver = function(){
 };
 
 const PLANES_PUBLICOS = [
-  { id:"mensual", nombre:"Mensual", precio:60, antes:65, periodo:"por 1 mes", renov:true, invitado:true, destacado:false,
+  { id:"mensual", nombre:"Mensual", precio:60, periodo:"por 1 mes", renov:true, invitado:true, destacado:false,
     img:"images/planes/mensual.svg", pc:"#22c55e",
     desc:"La opción perfecta para quienes quieren mantenerse en forma, mejorar su salud y crear hábitos duraderos.",
     badge:"Acceso ilimitado al gimnasio por 1 mes",
@@ -1388,12 +1388,18 @@ function linkWspPlan(p){
   return `https://wa.me/${WSP_PLANES}?text=${encodeURIComponent(texto)}`;
 }
 
+function ahorroHTML(p){
+  if (p.id !== "trimestral") return "";
+  const mensual = PLANES_PUBLICOS.find(x => x.id === "mensual");
+  const ahorro = mensual.precio * 3 - p.precio;
+  return `<div class="pp-ahorro"><i class="fa-solid fa-piggy-bank"></i><span>Pagas <b>S/ ${Math.round(p.precio / 3)} al mes</b> y ahorras <b>S/ ${ahorro}</b> frente a 3 meses de Mensual.</span></div>`;
+}
+
 function tarjetaPlanHTML(p, i){
   const renovacion = p.renov ? Math.round(p.precio * 0.9) : null;
   const precioHTML = p.precios
     ? `<div class="pp-grupo">${p.precios.map(g => `<div class="pp-grupo-item"><small>${g.txt}</small><b><span class="pp-moneda">S/</span>${g.precio}</b></div>`).join("")}</div>`
     : `<div class="pp-precio">
-         ${p.antes ? `<span class="pp-antes"><span class="pp-tach">S/ ${p.antes}</span></span>` : ""}
          <span class="pp-ahora"><span class="pp-moneda">S/</span>${p.precio}</span>
          ${p.periodo ? `<span class="pp-per">${p.periodo}</span>` : ""}
        </div>`;
@@ -1418,7 +1424,8 @@ function tarjetaPlanHTML(p, i){
         <p class="pp-badge">${p.badge}</p>
       </div>
       ${precioHTML}
-      ${p.renov ? `<div class="pp-renov"><i class="fa-solid fa-tag"></i><span>Renovación anticipada <b>S/ ${renovacion}</b></span><em>−10%</em></div>` : ""}
+      ${ahorroHTML(p)}
+      ${p.renov ? `<div class="pp-renov"><i class="fa-solid fa-tag"></i><span>Renovando antes de vencer <s class="pp-antes">S/ ${p.precio}</s> <b>S/ ${renovacion}</b></span><em>−10%</em></div>` : ""}
       ${p.invitado ? `<div class="pp-cupon"><i class="fa-solid fa-ticket"></i><span>1 invitado con <b>ingreso libre por un día</b>, cada mes</span></div>` : ""}
       <p class="pp-desc">${p.desc}</p>
       <ul class="pp-lista pp-incluye">

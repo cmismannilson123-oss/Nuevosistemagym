@@ -1348,7 +1348,7 @@ const PLANES_PUBLICOS = [
     desc:"La opción perfecta para quienes quieren mantenerse en forma, mejorar su salud y crear hábitos duraderos.",
     badge:"Acceso ilimitado al gimnasio por 1 mes",
     incluye:["Máquinas y baile","Guía de instructor general","Asesoría nutricional opcional","Acceso en cualquier horario"] },
-  { id:"interdiario", nombre:"Interdiario", precio:40, periodo:"", renov:false, invitado:false, destacado:false,
+  { id:"interdiario", nombre:"Interdiario", precio:40, antes:45, periodo:"", renov:false, invitado:false, destacado:false,
     img:"images/planes/interdiario.svg", pc:"#3b82f6",
     desc:"Perfecto para quienes tienen una rutina ocupada y quieren entrenar con flexibilidad.",
     badge:"Acceso 15 días corridos o interdiario hasta fecha calendario",
@@ -1358,7 +1358,7 @@ const PLANES_PUBLICOS = [
     desc:"El plan más recomendado para quienes buscan resultados reales y una transformación constante.",
     badge:"Acceso ilimitado por 3 meses",
     incluye:["El recomendado","Acceso baile y máquinas","Guía de instructor general","Asesoría nutricional opcional si desea, recomendado","Un precio especial"] },
-  { id:"estudiante", nombre:"Estudiante", precio:50, periodo:"", renov:false, invitado:true, destacado:false,
+  { id:"estudiante", nombre:"Estudiante", precio:50, antes:60, periodo:"", renov:false, invitado:true, destacado:false,
     img:"images/planes/estudiante.svg", pc:"#f59e0b",
     desc:"Tu etapa, tu energía. Entrena, aprende y alcanza tus metas.",
     badge:"Ojo presentar carnet estudiante",
@@ -1406,6 +1406,7 @@ function tarjetaPlanHTML(p, i){
   const precioHTML = p.precios
     ? `<div class="pp-grupo">${p.precios.map(g => `<div class="pp-grupo-item"><small>${g.txt}</small><b><span class="pp-moneda">S/</span><span class="pp-num" data-v="${g.precio}">${g.precio}</span></b><span class="pp-per">por persona</span></div>`).join("")}</div>`
     : `<div class="pp-precio">
+         ${p.antes ? `<span class="pp-antes">S/ ${p.antes}</span>` : ""}
          <span class="pp-ahora"><span class="pp-moneda">S/</span><span class="pp-num" data-v="${p.precio}">${p.precio}</span></span>
          ${p.periodo ? `<span class="pp-per">${p.periodo}</span>` : ""}
        </div>`;

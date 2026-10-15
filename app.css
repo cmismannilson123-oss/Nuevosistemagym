@@ -4310,3 +4310,39 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 .hz-chip i{ color:#34d399; }
 #wizHorarios .wiz-whatsapp-btn{ position:static; margin-top:18px; }
 @media (prefers-reduced-motion: reduce){ .hz-turno{ transition:none; } }
+
+/* ===== Horarios y ubicación: animaciones (solo transform y opacity) =====
+   Las animaciones de entrada se reinician solas cada vez que se abre la pantalla
+   (al pasar de display:none a visible el navegador vuelve a reproducirlas). */
+@keyframes hz-subir{ from{ opacity:0; transform:translateY(16px); } to{ opacity:1; transform:none; } }
+@keyframes hz-latido{ 0%,100%{ box-shadow:0 0 0 0 rgba(52,211,153,.5); } 70%{ box-shadow:0 0 0 9px rgba(52,211,153,0); } }
+@keyframes hz-resplandor{ 0%,100%{ box-shadow:0 14px 28px -18px #34d399; } 50%{ box-shadow:0 14px 34px -10px #34d399; } }
+@keyframes hz-brillo{ 0%{ transform:translateX(-120%); } 60%,100%{ transform:translateX(120%); } }
+@keyframes hz-pin{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-5px); } }
+@keyframes hz-onda{ 0%{ transform:scale(.7); opacity:.9; } 100%{ transform:scale(1.6); opacity:0; } }
+@keyframes hz-girar{ to{ transform:rotate(360deg); } }
+@keyframes hz-flotar{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-3px); } }
+@keyframes hz-pulso-wsp{ 0%,100%{ box-shadow:0 8px 22px rgba(37,211,102,.35); } 50%{ box-shadow:0 8px 30px rgba(37,211,102,.6); } }
+
+#wizHorarios .open-chip, #wizHorarios .hz-card, #wizHorarios .hz-servicios{ animation:hz-subir .55s cubic-bezier(.2,.8,.2,1) both; }
+#wizHorarios .hz-card:nth-of-type(2){ animation-delay:.08s; }
+#wizHorarios .hz-card:nth-of-type(3){ animation-delay:.16s; }
+#wizHorarios .hz-card:nth-of-type(4){ animation-delay:.24s; }
+#wizHorarios .hz-servicios{ animation-delay:.32s; }
+#wizHorarios .wiz-whatsapp-btn{ animation:hz-subir .55s .4s cubic-bezier(.2,.8,.2,1) both, hz-pulso-wsp 2.8s 1.2s ease-in-out infinite; }
+#wizHorarios .hz-turno{ animation:hz-subir .5s cubic-bezier(.2,.8,.2,1) both; }
+#wizHorarios .hz-turno:nth-child(2){ animation-delay:.08s; }
+
+#estadoAbierto:not(.cerrado) .dot{ animation:hz-latido 1.8s ease-out infinite; }
+#wizHorarios .hz-turno.ahora{ animation:hz-subir .5s cubic-bezier(.2,.8,.2,1) both, hz-resplandor 2.4s .5s ease-in-out infinite; }
+#wizHorarios .hz-girar{ animation:hz-girar 18s linear infinite; }
+#wizHorarios .hz-flotar{ animation:hz-flotar 3.2s ease-in-out infinite; }
+
+#wizHorarios .hz-mapa-btn{ position:relative; overflow:hidden; }
+#wizHorarios .hz-mapa-btn::after{ content:""; position:absolute; top:0; bottom:0; left:0; width:45%; background:linear-gradient(90deg,transparent,rgba(16,185,129,.22),transparent); animation:hz-brillo 3.6s 1s ease-in-out infinite; pointer-events:none; }
+#wizHorarios .hz-pin{ animation:hz-pin 2.4s ease-in-out infinite; transform-box:fill-box; }
+#wizHorarios .hz-onda{ animation:hz-onda 2.4s ease-out infinite; transform-box:fill-box; transform-origin:center; }
+
+@media (prefers-reduced-motion: reduce){
+  #wizHorarios *, #estadoAbierto .dot{ animation:none !important; }
+}

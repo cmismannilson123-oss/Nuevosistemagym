@@ -3376,9 +3376,9 @@ function ahorroHTML(p){
 function tarjetaPlanHTML(p, i){
   const renovacion = p.renov ? Math.round(p.precio * 0.9) : null;
   const precioHTML = p.precios
-    ? `<div class="pp-grupo">${p.precios.map(g => `<div class="pp-grupo-item"><small>${g.txt}</small><b><span class="pp-moneda">S/</span>${g.precio}</b></div>`).join("")}</div>`
+    ? `<div class="pp-grupo">${p.precios.map(g => `<div class="pp-grupo-item"><small>${g.txt}</small><b><span class="pp-moneda">S/</span><span class="pp-num" data-v="${g.precio}">${g.precio}</span></b></div>`).join("")}</div>`
     : `<div class="pp-precio">
-         <span class="pp-ahora"><span class="pp-moneda">S/</span>${p.precio}</span>
+         <span class="pp-ahora"><span class="pp-moneda">S/</span><span class="pp-num" data-v="${p.precio}">${p.precio}</span></span>
          ${p.periodo ? `<span class="pp-per">${p.periodo}</span>` : ""}
        </div>`;
   const beneficios = p.renov ? `
@@ -3418,17 +3418,35 @@ function tarjetaPlanHTML(p, i){
   </article>`;
 }
 
+// Cuenta de 0 hasta el precio (easeOutCubic, ~900 ms), solo en las tarjetas que entran en pantalla
+function contarPrecios(tarjeta){
+  tarjeta.querySelectorAll(".pp-num").forEach((el, k) => {
+    const final = Number(el.dataset.v);
+    const inicio = performance.now() + k * 120;
+    const duracion = 900;
+    const paso = (ahora) => {
+      const t = Math.min(Math.max((ahora - inicio) / duracion, 0), 1);
+      el.textContent = Math.round(final * (1 - Math.pow(1 - t, 3)));
+      if (t < 1) requestAnimationFrame(paso);
+      else el.textContent = final;
+    };
+    requestAnimationFrame(paso);
+  });
+}
+
 function renderPlanesPublicos(cont){
   cont.innerHTML = `<div class="pp-list js-anim">${PLANES_PUBLICOS.map(tarjetaPlanHTML).join("")}</div>`;
+  const animar = !window.matchMedia || !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (animar) cont.querySelectorAll(".pp-num").forEach(n => { n.textContent = "0"; });
   // Las animaciones de precio se disparan cuando la tarjeta entra en pantalla (una sola vez)
   const tarjetas = cont.querySelectorAll(".pp-card");
   if ("IntersectionObserver" in window) {
     const io = new IntersectionObserver((entradas) => {
-      entradas.forEach(e => { if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); } });
+      entradas.forEach(e => { if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); if (animar) contarPrecios(e.target); } });
     }, { threshold: 0.2 });
     tarjetas.forEach(t => io.observe(t));
   } else {
-    tarjetas.forEach(t => t.classList.add("is-in"));
+    tarjetas.forEach(t => { t.classList.add("is-in"); cont.querySelectorAll(".pp-num").forEach(n => { n.textContent = n.dataset.v; }); });
   }
   cont.addEventListener("click", (e) => {
     const boton = e.target.closest(".pp-ver-mas");

@@ -4229,7 +4229,7 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 .pp-moneda{ font-size:.5em; vertical-align:top; margin-right:3px; color:var(--pc); }
 .pp-per{ font-size:13px; color:#94a3b8; }
 .js-anim .pp-card.is-in .pp-antes::after{ animation:pp-tachar .5s cubic-bezier(.4,0,.2,1) .25s forwards; }
-.js-anim .pp-card.is-in .pp-ahora{ animation:pp-subir .55s cubic-bezier(.2,.8,.2,1) .85s both; }
+
 @keyframes pp-tachar{ to{ transform:scaleX(1); } }
 @keyframes pp-subir{ from{ opacity:0; transform:translateY(10px) scale(.96); } to{ opacity:1; transform:none; } }
 
@@ -4268,7 +4268,6 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 
 @media (prefers-reduced-motion: reduce){
   .js-anim .pp-card.is-in .pp-antes::after{ animation:none; transform:scaleX(1); }
-  .js-anim .pp-card.is-in .pp-ahora{ animation:none; opacity:1; transform:none; }
   .pp-card, .pp-wsp{ transition:none; }
 }
 

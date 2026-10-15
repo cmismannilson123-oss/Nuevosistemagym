@@ -3418,12 +3418,12 @@ function tarjetaPlanHTML(p, i){
   </article>`;
 }
 
-// Cuenta de 0 hasta el precio (easeOutCubic, ~900 ms), solo en las tarjetas que entran en pantalla
+// Cuenta de 0 hasta el precio (easeOutCubic, ~1,2 s), solo en las tarjetas que entran en pantalla
 function contarPrecios(tarjeta){
   tarjeta.querySelectorAll(".pp-num").forEach((el, k) => {
     const final = Number(el.dataset.v);
     const inicio = performance.now() + k * 120;
-    const duracion = 900;
+    const duracion = 1200;
     const paso = (ahora) => {
       const t = Math.min(Math.max((ahora - inicio) / duracion, 0), 1);
       el.textContent = Math.round(final * (1 - Math.pow(1 - t, 3)));

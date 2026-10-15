@@ -4277,3 +4277,36 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 .pp-ahorro b{ color:#fff; }
 .pp-renov .pp-antes{ font-size:14px; }
 .pp-renov .pp-antes::after{ background:#f43f5e; }
+
+/* ===== Horarios y ubicación (v98): mismo lenguaje visual que "Nuestros planes" ===== */
+#wizHorarios .hz-card{ background:linear-gradient(180deg,#131a23 0%,#0c1117 100%); border:1px solid rgba(255,255,255,.08); border-radius:22px; padding:18px; margin-top:14px; }
+.hz-titulo{ display:flex; align-items:center; gap:8px; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:#34d399; font-weight:800; }
+.hz-titulo i{ font-size:13px; }
+.hz-titulo span{ margin-left:auto; color:#94a3b8; text-transform:none; letter-spacing:0; font-weight:600; font-size:13px; }
+.hz-turnos{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px; }
+.hz-turno{ border-radius:18px; padding:16px 10px; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); text-align:center; transition:border-color .4s ease, background .4s ease, box-shadow .4s ease; }
+.hz-turno.ahora{ border-color:#34d399; background:rgba(52,211,153,.08); box-shadow:0 14px 28px -18px #34d399; }
+.hz-ico{ width:44px; height:44px; border-radius:50%; margin:0 auto 10px; display:grid; place-items:center; font-size:17px; background:rgba(255,255,255,.06); color:#fff; }
+.hz-ico.sol{ color:#fbbf24; }
+.hz-ico.luna{ color:#93c5fd; }
+.hz-ico.baile{ color:#e879f9; flex:0 0 auto; margin:0; }
+.hz-nombre{ font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:#94a3b8; font-weight:800; }
+.hz-hora{ font-size:30px; font-weight:800; color:#fff; line-height:1.1; margin-top:4px; }
+.hz-hora small{ font-size:13px; color:#94a3b8; font-weight:700; }
+.hz-hora-sm{ font-size:22px; }
+.hz-hasta{ font-size:13px; color:#cbd5e1; margin-top:4px; }
+.hz-sub{ font-size:13px; color:#94a3b8; margin:4px 0 0; }
+.hz-sub i{ color:#34d399; margin-right:4px; }
+#wizHorarios .hz-baile{ display:flex; gap:14px; align-items:center; }
+.hz-baile-txt{ min-width:0; }
+.hz-baile-txt .hz-nombre{ color:#e2e8f0; }
+.hz-dir{ font-size:18px; font-weight:700; color:#fff; margin:12px 0 0; }
+.hz-mapa{ margin-top:14px; border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,.08); }
+.hz-mapa svg{ width:100%; height:auto; display:block; }
+.hz-mapa-btn{ display:flex; align-items:center; justify-content:center; gap:8px; margin-top:14px; padding:13px 16px; border-radius:999px; background:#fff; color:#0b0f14; font-weight:800; font-size:15px; text-decoration:none; transition:transform .15s ease; -webkit-tap-highlight-color:transparent; }
+.hz-mapa-btn:active{ transform:scale(.98); }
+.hz-servicios{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+.hz-chip{ display:inline-flex; align-items:center; gap:8px; padding:9px 12px; border-radius:999px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); font-size:13px; color:#e2e8f0; }
+.hz-chip i{ color:#34d399; }
+#wizHorarios .wiz-whatsapp-btn{ position:static; margin-top:18px; }
+@media (prefers-reduced-motion: reduce){ .hz-turno{ transition:none; } }

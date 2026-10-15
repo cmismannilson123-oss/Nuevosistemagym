@@ -288,51 +288,57 @@
       <div class="ap-large"><small>Entrena con nosotros</small><h2>Horarios y ubicación</h2></div>
 
       <div id="estadoAbierto" class="open-chip cerrado"></div>
-      <div class="wiz-info-card">
-        <div class="lbl">🕐 HORARIOS</div>
-        <div class="wiz-horario-split">
-          <div class="wiz-horario-col">
-            <div class="wiz-horario-ico sol">☀️</div>
-            <div class="d1">MAÑANAS</div>
-            <div class="d2">Lunes a Sábado</div>
-            <div class="wiz-horario-pill">6:30 a.m. - 12:00 p.m.</div>
+
+      <section class="hz-card">
+        <div class="hz-titulo"><i class="fa-regular fa-clock"></i> Horarios <span>Lunes a sábado</span></div>
+        <div class="hz-turnos">
+          <div class="hz-turno">
+            <div class="hz-ico sol"><i class="fa-solid fa-sun"></i></div>
+            <div class="hz-nombre">Mañanas</div>
+            <div class="hz-hora">6:30 <small>a.m.</small></div>
+            <div class="hz-hasta">hasta las 12:00 p.m.</div>
           </div>
-          <div class="wiz-horario-col">
-            <div class="wiz-horario-ico luna">🌙</div>
-            <div class="d1">TARDES</div>
-            <div class="d2">Lunes a Sábado</div>
-            <div class="wiz-horario-pill">4:00 p.m. - 10:30 p.m.</div>
+          <div class="hz-turno">
+            <div class="hz-ico luna"><i class="fa-solid fa-moon"></i></div>
+            <div class="hz-nombre">Tardes</div>
+            <div class="hz-hora">4:00 <small>p.m.</small></div>
+            <div class="hz-hasta">hasta las 10:30 p.m.</div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="wiz-info-card wiz-baile-card">
-        <div class="wiz-baile-row">
-          <div class="wiz-horario-ico baile">💃</div>
-          <div>
-            <div class="d1">BAILE &amp; <span style="color:#e879f9;">STEP</span></div>
-            <div class="d2">Lunes a Viernes</div>
-            <div class="wiz-horario-pill baile">7:00 p.m. - 9:00 p.m.</div>
-          </div>
+      <section class="hz-card hz-baile">
+        <div class="hz-ico baile"><i class="fa-solid fa-music"></i></div>
+        <div class="hz-baile-txt">
+          <div class="hz-nombre">Baile &amp; Step</div>
+          <div class="hz-hora hz-hora-sm">7:00 <small>p.m.</small> – 9:00 <small>p.m.</small></div>
+          <div class="hz-sub">Lunes a viernes</div>
         </div>
-        <div class="wiz-baile-banner">Baile<br>Step</div>
-      </div>
+      </section>
 
-      <div class="wiz-info-card">
-        <div class="lbl">📍 UBICACIÓN</div>
-        <div class="wiz-ubicacion-row">
-          <div>
-            <div class="d1"><i class="fa-solid fa-location-dot" style="color:#dc2626; margin-right:6px;"></i>Av. San Juan Evangelista 110</div>
-            <div class="d2" style="margin-top:8px;"><i class="fa-solid fa-shield-halved" style="color:#34d399; margin-right:6px;"></i>Fácil acceso y zona segura</div>
-          </div>
-          <div class="wiz-mini-mapa"><div class="pin">📍</div></div>
+      <section class="hz-card">
+        <div class="hz-titulo"><i class="fa-solid fa-location-dot"></i> Ubicación</div>
+        <p class="hz-dir">Av. San Juan Evangelista 110</p>
+        <p class="hz-sub"><i class="fa-solid fa-shield-halved"></i> Fácil acceso y zona segura</p>
+        <div class="hz-mapa" aria-hidden="true">
+          <svg viewBox="0 0 320 120" preserveAspectRatio="xMidYMid slice">
+            <rect width="320" height="120" fill="#0b1118"/>
+            <path d="M0 40 H320 M0 85 H320 M70 0 V120 M200 0 V120 M260 0 V120" stroke="#1e293b" stroke-width="10"/>
+            <path d="M0 62 Q120 40 320 70" stroke="#334155" stroke-width="4" fill="none"/>
+            <circle cx="200" cy="60" r="34" fill="#34d399" fill-opacity="0.12"/>
+            <path d="M200 48 c-8 0-14 6-14 14 c0 10 14 22 14 22 s14-12 14-22 c0-8-6-14-14-14z" fill="#34d399"/>
+            <circle cx="200" cy="62" r="5" fill="#0b1118"/>
+          </svg>
         </div>
-      </div>
+        <a class="hz-mapa-btn" href="https://www.google.com/maps/search/?api=1&amp;query=Av.+San+Juan+Evangelista+110" target="_blank" rel="noopener">
+          <i class="fa-solid fa-diamond-turn-right"></i> Cómo llegar
+        </a>
+      </section>
 
-      <div class="wiz-banner">
-        <div class="bi">🏋️</div>
-        <div class="bt">Instalaciones modernas</div>
-        <div class="bd">para tu máximo rendimiento</div>
+      <div class="hz-servicios">
+        <span class="hz-chip"><i class="fa-solid fa-dumbbell"></i> Máquinas de calidad</span>
+        <span class="hz-chip"><i class="fa-solid fa-person-running"></i> Clases de baile y step</span>
+        <span class="hz-chip"><i class="fa-solid fa-heart-pulse"></i> Asesoría nutricional</span>
       </div>
 
       <button type="button" id="btnWhatsAppInfoQR" class="wiz-whatsapp-btn" onclick="abrirWhatsAppInfo()">
@@ -1602,7 +1608,7 @@ if ('serviceWorker' in navigator) {
       var s = estadoAhora();
       chip.className = 'open-chip' + (s.abierto ? '' : ' cerrado');
       chip.innerHTML = '<span class="dot"></span><span>' + s.texto + '</span>';
-      var cols = overlay.querySelectorAll('.wiz-horario-col');
+      var cols = overlay.querySelectorAll('.hz-turno');
       cols.forEach(function(c, i){ c.classList.toggle('ahora', s.abierto && s.turno === i); });
     }
 

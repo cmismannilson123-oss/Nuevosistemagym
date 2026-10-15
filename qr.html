@@ -1404,7 +1404,7 @@ function ahorroHTML(p){
 function tarjetaPlanHTML(p, i){
   const renovacion = p.renov ? Math.round(p.precio * 0.9) : null;
   const precioHTML = p.precios
-    ? `<div class="pp-grupo">${p.precios.map(g => `<div class="pp-grupo-item"><small>${g.txt}</small><b><span class="pp-moneda">S/</span><span class="pp-num" data-v="${g.precio}">${g.precio}</span></b></div>`).join("")}</div>`
+    ? `<div class="pp-grupo">${p.precios.map(g => `<div class="pp-grupo-item"><small>${g.txt}</small><b><span class="pp-moneda">S/</span><span class="pp-num" data-v="${g.precio}">${g.precio}</span></b><span class="pp-per">por persona</span></div>`).join("")}</div>`
     : `<div class="pp-precio">
          <span class="pp-ahora"><span class="pp-moneda">S/</span><span class="pp-num" data-v="${p.precio}">${p.precio}</span></span>
          ${p.periodo ? `<span class="pp-per">${p.periodo}</span>` : ""}

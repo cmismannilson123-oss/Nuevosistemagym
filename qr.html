@@ -1336,31 +1336,123 @@ window.wizVolver = function(){
   if (overlay) overlay.style.display = 'none';
 };
 
-function promosRenovacionHTML(nombrePlan){
-  const items = [
-    { n:1, ic:'fa-tag',          t:'Renueva tu membresía <b>anticipadamente</b> y obtén hasta <b>10% de descuento</b> por renovación anticipada en el plan Mensual o Personalizado.', tag:'-10%' },
-    { n:2, ic:'fa-user-plus',    t:'Tus próximas renovaciones en el plan Mensual te dan el beneficio de traer <b>1 invitado</b> para que <b>ingrese gratis</b> por un día.', tag:'GRATIS' },
-    { n:3, ic:'fa-calendar-plus',t:'Si tu invitado se inscribe, recibes <b>+3 días adicionales</b> en tu membresía — ¡acumulables por cada nuevo miembro que invites!', tag:'+3 DÍAS' },
-    { n:4, ic:'fa-gift',         t:'Tu invitado, al inscribirse, obtiene un <b>descuento de bienvenida de hasta 10%</b> en el plan Mensual o Personalizado, y también podrá traer su propio invitado libre por un día.', tag:'BIENVENIDA' }
-  ];
-  const nota = nombrePlan === '3 Meses'
-    ? `<div class="pr-note"><i class="fa-solid fa-circle-info"></i> Estas promos aplican al renovar en plan Mensual o Personalizado.</div>` : ``;
+const PLANES_PUBLICOS = [
+  { id:"mensual", nombre:"Mensual", precio:60, antes:65, periodo:"por 1 mes", renov:true, invitado:true, destacado:false,
+    img:"images/planes/mensual.svg", pc:"#22c55e",
+    desc:"La opción perfecta para quienes quieren mantenerse en forma, mejorar su salud y crear hábitos duraderos.",
+    badge:"Acceso ilimitado al gimnasio por 1 mes",
+    incluye:["Máquinas y baile","Guía de instructor general","Asesoría nutricional opcional","Acceso en cualquier horario"] },
+  { id:"interdiario", nombre:"Interdiario", precio:40, periodo:"", renov:false, invitado:false, destacado:false,
+    img:"images/planes/interdiario.svg", pc:"#3b82f6",
+    desc:"Perfecto para quienes tienen una rutina ocupada y quieren entrenar con flexibilidad.",
+    badge:"Acceso 15 días corridos o interdiario hasta fecha calendario",
+    incluye:["Máquinas y baile","Guía de instructor general","Asesoría nutricional si desea, recomendado","Super descuento especial","Acceso 15 días corridos o interdiario hasta fecha calendario"] },
+  { id:"trimestral", nombre:"3 Meses", precio:150, periodo:"por 3 meses", renov:false, invitado:true, destacado:true,
+    img:"images/planes/trimestral.svg", pc:"#a855f7",
+    desc:"El plan más recomendado para quienes buscan resultados reales y una transformación constante.",
+    badge:"Acceso ilimitado por 3 meses",
+    incluye:["El recomendado","Acceso baile y máquinas","Guía de instructor general","Asesoría nutricional opcional si desea, recomendado","Un precio especial"] },
+  { id:"estudiante", nombre:"Estudiante", precio:50, periodo:"", renov:false, invitado:true, destacado:false,
+    img:"images/planes/estudiante.svg", pc:"#f59e0b",
+    desc:"Tu etapa, tu energía. Entrena, aprende y alcanza tus metas.",
+    badge:"Ojo presentar carnet estudiante",
+    incluye:["Acceso máquinas y baile","Instructor general","Asesoría nutricional opcional si desea, recomendado","Descuento especial"] },
+  { id:"coach", nombre:"Coach Personalizado", precio:160, periodo:"", renov:true, invitado:true, destacado:false,
+    img:"images/planes/coach.svg", pc:"#ef4444",
+    desc:"Tu progreso, con un plan hecho para ti.",
+    badge:"El más recomendado",
+    incluye:["Entrenamiento acompañado por un coach","Evaluación física","Seguimiento","Corrección de técnica constante","Rutinas personalizadas con visión y misión a tus objetivos","Entrenamiento para niños, jóvenes, señores o de tercera edad","Entrenamientos de rehabilitación física general","Entrenamiento de alto rendimiento"] },
+  { id:"baile", nombre:"Baile y Step", precio:50, periodo:"", renov:false, invitado:true, destacado:false,
+    img:"images/planes/baile.svg", pc:"#06b6d4",
+    desc:"Disfruta, quema calorías y mejora tu condición física.",
+    badge:"Super precio especial",
+    incluye:["Acceso limitado solo a clases de baile y Step"] },
+  { id:"diario", nombre:"Diario", precio:5, periodo:"por día", renov:false, invitado:false, destacado:false,
+    img:"images/planes/diario.svg", pc:"#8b5cf6",
+    desc:"Entrena a tu ritmo, sin compromisos.",
+    badge:"Precio único por día",
+    incluye:["Acceso baile y máquinas","Instructor general"] },
+  { id:"grupo", nombre:"Promo x3 / x4", precios:[{ txt:"Grupo de 3", precio:55 }, { txt:"Grupo de 4", precio:50 }], renov:false, invitado:true, destacado:false,
+    img:"images/planes/grupo.svg", pc:"#ec4899",
+    desc:"Juntos es mejor. Entrena en grupo y obtén un super precio.",
+    badge:"Más motivación, más resultados",
+    incluye:["Precios super especial por inscripción en grupos de 3 o 4","Acceso baile y máquinas","Instructor general y asesoría nutricional","Acceso libre en cualquier horario"] }
+];
+
+const WSP_PLANES = "51927885791";
+
+function linkWspPlan(p){
+  const texto = p.precios
+    ? "Hola, quiero la promo para grupos (x3 o x4). ¿Me ayudan a inscribirme?"
+    : `Hola, quiero el plan ${p.nombre}${p.precio ? ` (S/ ${p.precio}${p.periodo ? " " + p.periodo : ""})` : ""}. ¿Me ayudan a inscribirme?`;
+  return `https://wa.me/${WSP_PLANES}?text=${encodeURIComponent(texto)}`;
+}
+
+function tarjetaPlanHTML(p, i){
+  const renovacion = p.renov ? Math.round(p.precio * 0.9) : null;
+  const precioHTML = p.precios
+    ? `<div class="pp-grupo">${p.precios.map(g => `<div class="pp-grupo-item"><small>${g.txt}</small><b><span class="pp-moneda">S/</span>${g.precio}</b></div>`).join("")}</div>`
+    : `<div class="pp-precio">
+         ${p.antes ? `<span class="pp-antes"><span class="pp-tach">S/ ${p.antes}</span></span>` : ""}
+         <span class="pp-ahora"><span class="pp-moneda">S/</span>${p.precio}</span>
+         ${p.periodo ? `<span class="pp-per">${p.periodo}</span>` : ""}
+       </div>`;
+  const beneficios = p.renov ? `
+      <div class="pp-extra">
+        <div class="pp-extra-t">Beneficios de renovación</div>
+        <ul class="pp-lista">
+          <li><i class="fa-solid fa-user-plus"></i><span>Si tu invitado se inscribe, recibes <b>+3 días</b> adicionales en tu membresía.</span></li>
+          <li><i class="fa-solid fa-gift"></i><span>Tu invitado obtiene <b>10% de descuento</b> de bienvenida.</span></li>
+        </ul>
+      </div>` : "";
+  const masDe4 = p.incluye.length > 4;
   return `
-  <div class="pr-wrap">
-    <div class="pr-head">
-      <span class="pr-fire">🔥</span>
-      <div class="pr-ht"><div class="a">PROMOS DE RENOVACIÓN</div><div class="b">¡Juntos entrenamos mejor!</div></div>
-      <span class="pr-chip">HASTA 10% DCTO.</span>
+  <article class="pp-card${p.destacado ? " pp-destacado" : ""}" style="--pc:${p.pc};--d:${(i * 0.07).toFixed(2)}s">
+    <div class="pp-arte">
+      <img src="${p.img}" alt="" width="800" height="450" loading="lazy" decoding="async">
+      ${p.destacado ? `<span class="pp-cinta">Recomendado</span>` : ""}
     </div>
-    <div class="pr-grid">
-      ${items.map((it,i)=>`
-      <div class="pr-card" style="--i:${i}">
-        <div class="pr-top"><span class="pr-num">${it.n}</span><span class="pr-ic"><i class="fa-solid ${it.ic}"></i></span><span class="pr-tag">${it.tag}</span></div>
-        <p>${it.t}</p>
-      </div>`).join("")}
+    <div class="pp-cuerpo">
+      <div class="pp-cabeza">
+        <h3 class="pp-nombre">${p.nombre}</h3>
+        <p class="pp-badge">${p.badge}</p>
+      </div>
+      ${precioHTML}
+      ${p.renov ? `<div class="pp-renov"><i class="fa-solid fa-tag"></i><span>Renovación anticipada <b>S/ ${renovacion}</b></span><em>−10%</em></div>` : ""}
+      ${p.invitado ? `<div class="pp-cupon"><i class="fa-solid fa-ticket"></i><span>1 invitado con <b>ingreso libre por un día</b>, cada mes</span></div>` : ""}
+      <p class="pp-desc">${p.desc}</p>
+      <ul class="pp-lista pp-incluye">
+        ${p.incluye.map((t, k) => `<li class="${k > 3 ? "pp-extra-item" : ""}"><i class="fa-solid fa-check"></i><span>${t}</span></li>`).join("")}
+      </ul>
+      ${masDe4 ? `<button type="button" class="pp-ver-mas" aria-expanded="false">Ver todo (${p.incluye.length})</button>` : ""}
+      ${beneficios}
+      <a class="pp-wsp" href="${linkWspPlan(p)}" target="_blank" rel="noopener">
+        <i class="fa-brands fa-whatsapp"></i><span>Quiero este plan</span><i class="fa-solid fa-arrow-right pp-flecha"></i>
+      </a>
     </div>
-    ${nota}
-  </div>`;
+  </article>`;
+}
+
+function renderPlanesPublicos(cont){
+  cont.innerHTML = `<div class="pp-list js-anim">${PLANES_PUBLICOS.map(tarjetaPlanHTML).join("")}</div>`;
+  // Las animaciones de precio se disparan cuando la tarjeta entra en pantalla (una sola vez)
+  const tarjetas = cont.querySelectorAll(".pp-card");
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((entradas) => {
+      entradas.forEach(e => { if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); } });
+    }, { threshold: 0.2 });
+    tarjetas.forEach(t => io.observe(t));
+  } else {
+    tarjetas.forEach(t => t.classList.add("is-in"));
+  }
+  cont.addEventListener("click", (e) => {
+    const boton = e.target.closest(".pp-ver-mas");
+    if (!boton) return;
+    const tarjeta = boton.closest(".pp-card");
+    const abierto = tarjeta.classList.toggle("pp-abierto");
+    boton.setAttribute("aria-expanded", abierto ? "true" : "false");
+    boton.textContent = abierto ? "Ver menos" : `Ver todo (${tarjeta.querySelectorAll(".pp-incluye li").length})`;
+  });
 }
 
 window.mostrarBienvenidaPublicaQR = function(){
@@ -1379,53 +1471,7 @@ window.mostrarBienvenidaPublicaQR = function(){
 
   const cont = document.getElementById("listaPlanesPublica");
   if (cont && !cont.dataset.cargado) {
-    const fotoGym = "https://images.unsplash.com/photo-1744551154623-4b5336e95c28?q=80&w=500&auto=format&fit=crop";
-    const fotoCoach = "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=500&auto=format&fit=crop";
-    const fotoBaile = "https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?q=80&w=500&auto=format&fit=crop";
-    const fotoGrupo = "https://images.unsplash.com/photo-1556817411-92f5ec899a55?q=80&w=500&auto=format&fit=crop";
-    const planes = [
-      { icono: "🏋️", color: "#22c55e", foto: fotoGym, nombre: "Mensual", promos: true, desc: "La opción perfecta para quienes quieren mantenerse en forma, mejorar su salud y crear hábitos duraderos.", badge: "Acceso ilimitado al gimnasio por 1 mes",
-        incluye: ["Máquinas y baile","Guía de instructor general","Asesoría nutricional opcional","Acceso en cualquier horario"] },
-      { icono: "📅", color: "#3b82f6", foto: fotoGym, nombre: "Interdiario", desc: "Perfecto para quienes tienen una rutina ocupada y quieren entrenar con flexibilidad.", badge: "Acceso 15 días corridos o interdiario hasta fecha calendario",
-        incluye: ["Máquinas y baile","Guía de instructor general","Asesoría nutricional si desea, recomendado","Super descuento especial","Acceso 15 días corridos o interdiario hasta fecha calendario"] },
-      { icono: "🗓️", color: "#a855f7", foto: fotoGym, nombre: "3 Meses", promos: true, desc: "El plan más recomendado para quienes buscan resultados reales y una transformación constante.", badge: "Acceso ilimitado por 3 meses",
-        incluye: ["El recomendado","Acceso baile y máquinas","Guía de instructor general","Asesoría nutricional opcional si desea, recomendado","Un precio especial"] },
-      { icono: "🎓", color: "#f59e0b", foto: fotoGrupo, nombre: "Estudiante", desc: "Tu etapa, tu energía. Entrena, aprende y alcanza tus metas.", badge: "Ojo presentar carnet estudiante",
-        incluye: ["Acceso máquinas y baile","Instructor general","Asesoría nutricional opcional si desea, recomendado","Descuento especial"] },
-      { icono: "👨‍🏫", color: "#ef4444", foto: fotoCoach, nombre: "Coach Personalizado", promos: true, desc: "Tu progreso, con un plan hecho para ti.", badge: "El más recomendado",
-        incluye: ["Entrenamiento acompañado por un coach","Evaluación física","Seguimiento","Corrección de técnica constante","Rutinas personalizadas con visión y misión a tus objetivos","Entrenamiento para niños, jóvenes, señores o de tercera edad","Entrenamientos de rehabilitación física general","Entrenamiento de alto rendimiento"] },
-      { icono: "💃", color: "#06b6d4", foto: fotoBaile, nombre: "Baile y Step", desc: "Disfruta, quema calorías y mejora tu condición física.", badge: "Super precio especial",
-        incluye: ["Acceso limitado solo a clases de baile y Step"] },
-      { icono: "☀️", color: "#8b5cf6", foto: fotoGym, nombre: "Diario", desc: "Entrena a tu ritmo, sin compromisos.", badge: "Precio único por día",
-        incluye: ["Acceso baile y máquinas","Instructor general"] },
-      { icono: "🎁", color: "#ec4899", foto: fotoGrupo, nombre: "Promo x3 / x4", desc: "Juntos es mejor. Entrena en grupo y obtén un super precio.", badge: "Más motivación, más resultados",
-        incluye: ["Precios super especial por inscripción en grupos de 3 o 4","Acceso baile y máquinas","Instructor general y asesoría nutricional","Acceso libre en cualquier horario"] }
-    ];
-    // Plan recomendado primero y abierto; el resto, filas que se expanden al tocar
-    const idxDest = planes.findIndex(p => p.nombre === "3 Meses");
-    if (idxDest > 0) planes.unshift(planes.splice(idxDest, 1)[0]);
-    cont.innerHTML = planes.map((p, i) => {
-      const dest = i === 0;
-      return `
-      <article class="plan${dest ? ' plan--hero open' : ''}" style="--pc:${p.color}; --ph:url('${p.foto}');">
-        ${dest ? `<div class="plan-photo"><span class="plan-ribbon">Recomendado</span></div>` : ``}
-        <div class="plan-head" role="button" tabindex="0" aria-expanded="${dest ? 'true' : 'false'}">
-          <span class="plan-ic">${p.icono}</span>
-          <span class="plan-txt">
-            <span class="plan-name">${p.nombre}</span>
-            <span class="plan-tag">${p.badge}</span>
-          </span>
-          <i class="fa-solid fa-chevron-down plan-chev"></i>
-        </div>
-        <div class="plan-body"><div class="plan-body-in"><div class="plan-pad">
-          <p class="plan-desc">${p.desc}</p>
-          <ul class="plan-list">
-            ${p.incluye.map(item => `<li><i class="fa-solid fa-check"></i><span>${item}</span></li>`).join("")}
-          </ul>
-          ${p.promos ? promosRenovacionHTML(p.nombre) : ``}
-        </div></div></div>
-      </article>`;
-    }).join("");
+    renderPlanesPublicos(cont);
     cont.dataset.cargado = "1";
   }
 };

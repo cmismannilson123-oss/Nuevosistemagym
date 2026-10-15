@@ -4206,3 +4206,68 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 #cardInstalarQR .cy-instalar__btn{ flex:0 0 auto; width:auto; min-height:0; height:auto; padding:9px 14px; margin:0; font-size:14px; line-height:1.2; border-radius:12px; }
 #cardInstalarQR .cy-instalar__pasos{ margin-top:6px; }
 #cardInstalarQR .cy-instalar__pasos span{ font-size:11.5px; padding:3px 9px; }
+
+/* ===== Nuestros planes (v97): tarjetas con imagen, precio animado y WhatsApp por plan ===== */
+.pp-list{ display:grid; grid-template-columns:1fr; gap:18px; max-width:560px; margin:0 auto; }
+@media (min-width:720px){ .pp-list{ grid-template-columns:1fr 1fr; max-width:none; } }
+
+.pp-card{ background:linear-gradient(180deg,#131a23 0%,#0c1117 100%); border:1px solid rgba(255,255,255,.08); border-radius:22px; overflow:hidden; box-shadow:0 20px 40px -24px rgba(0,0,0,.7); }
+.pp-destacado{ border:1.5px solid var(--pc); box-shadow:0 22px 44px -22px var(--pc); }
+
+.pp-arte{ position:relative; aspect-ratio:16/9; background:#0b0f14; }
+.pp-arte img{ width:100%; height:100%; object-fit:cover; display:block; }
+.pp-cinta{ position:absolute; top:12px; left:12px; background:var(--pc); color:#fff; padding:6px 12px; border-radius:999px; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
+
+.pp-cuerpo{ padding:16px 18px 18px; }
+.pp-nombre{ margin:0; font-size:22px; font-weight:800; color:#fff; letter-spacing:-.01em; }
+.pp-badge{ margin:4px 0 0; font-size:13px; color:#94a3b8; line-height:1.35; }
+
+.pp-precio{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; margin:14px 0 4px; }
+.pp-antes{ position:relative; display:inline-block; color:#7c8a9c; font-weight:700; font-size:16px; }
+.pp-antes::after{ content:""; position:absolute; left:-3px; right:-3px; top:50%; height:2px; background:#f43f5e; border-radius:2px; transform:scaleX(0); transform-origin:left center; }
+.pp-ahora{ font-size:44px; font-weight:800; color:#fff; line-height:1; }
+.pp-moneda{ font-size:.5em; vertical-align:top; margin-right:3px; color:var(--pc); }
+.pp-per{ font-size:13px; color:#94a3b8; }
+.js-anim .pp-card.is-in .pp-antes::after{ animation:pp-tachar .5s cubic-bezier(.4,0,.2,1) .25s forwards; }
+.js-anim .pp-card.is-in .pp-ahora{ animation:pp-subir .55s cubic-bezier(.2,.8,.2,1) .85s both; }
+@keyframes pp-tachar{ to{ transform:scaleX(1); } }
+@keyframes pp-subir{ from{ opacity:0; transform:translateY(10px) scale(.96); } to{ opacity:1; transform:none; } }
+
+.pp-grupo{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0 4px; }
+.pp-grupo-item{ background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:2px; }
+.pp-grupo-item small{ color:#94a3b8; font-size:13px; }
+.pp-grupo-item b{ font-size:30px; color:#fff; line-height:1.1; }
+.pp-grupo-item .pp-moneda{ color:var(--pc); }
+
+.pp-renov{ display:flex; align-items:center; gap:8px; margin-top:12px; padding:10px 12px; border-radius:14px; background:rgba(34,197,94,.08); border:1px dashed rgba(34,197,94,.45); font-size:14px; color:#d1fae5; }
+.pp-renov i{ color:#22c55e; }
+.pp-renov b{ color:#fff; }
+.pp-renov em{ margin-left:auto; font-style:normal; font-weight:800; color:#22c55e; background:rgba(34,197,94,.15); border-radius:999px; padding:3px 9px; font-size:12px; }
+
+.pp-cupon{ display:flex; gap:8px; align-items:flex-start; margin-top:10px; padding:10px 12px; border-radius:14px; background:rgba(250,204,21,.07); border:1px solid rgba(250,204,21,.25); font-size:14px; color:#fef3c7; }
+.pp-cupon i{ color:#facc15; margin-top:2px; }
+.pp-cupon b{ color:#fff; }
+
+.pp-desc{ margin:14px 0 8px; font-size:14px; color:#cbd5e1; line-height:1.5; }
+.pp-lista{ list-style:none; margin:0; padding:0; display:grid; gap:8px; }
+.pp-lista li{ display:flex; gap:10px; align-items:flex-start; font-size:14px; color:#e2e8f0; line-height:1.4; }
+.pp-lista li > i{ color:var(--pc); margin-top:3px; flex:0 0 auto; width:14px; text-align:center; }
+.pp-extra-item{ display:none; }
+.pp-abierto .pp-extra-item{ display:flex; }
+.pp-ver-mas{ margin-top:10px; background:none; border:0; padding:4px 0; color:var(--pc); font-weight:700; font-size:14px; cursor:pointer; }
+
+.pp-extra{ margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,.08); }
+.pp-extra-t{ font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:#94a3b8; font-weight:800; margin-bottom:8px; }
+
+.pp-wsp{ display:flex; align-items:center; gap:10px; justify-content:center; margin-top:16px; padding:14px 18px; border-radius:999px; background:#25d366; color:#fff; font-weight:800; font-size:15px; text-decoration:none; box-shadow:0 10px 24px -12px rgba(37,211,102,.6); transition:transform .15s ease; -webkit-tap-highlight-color:transparent; }
+.pp-wsp:active{ transform:scale(.98); }
+.pp-flecha{ margin-left:auto; }
+
+/* La pantalla de planes no tapa las tarjetas con el botón flotante: queda al final */
+#wizPlanes .wiz-whatsapp-btn{ position:static; margin-top:18px; }
+
+@media (prefers-reduced-motion: reduce){
+  .js-anim .pp-card.is-in .pp-antes::after{ animation:none; transform:scaleX(1); }
+  .js-anim .pp-card.is-in .pp-ahora{ animation:none; opacity:1; transform:none; }
+  .pp-card, .pp-wsp{ transition:none; }
+}

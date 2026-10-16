@@ -398,3 +398,12 @@ html.qr-mode .qr-titulo-letras.vis .qr-ltr{ animation:qrLetra .62s cubic-bezier(
   html.qr-mode .qr-titulo-letras.vis .qr-ltr{ animation:none; }
 }
 html.qr-mode #wizConoce h2,html.qr-mode #wizPlanes h2,html.qr-mode #wizHorarios h2{ font-family:'Barlow Condensed',sans-serif !important; font-weight:900 !important; text-transform:uppercase; color:var(--carbon) !important; line-height:.92 !important; }
+
+/* ---------- Pantalla de búsqueda: "Hoy vas por más." (maqueta aprobada) ---------- */
+html.qr-mode .qr-hero-fullbleed .qr-sub .qr-acento{ color:var(--rojo) !important; }
+html.qr-mode .qr-intro-busqueda{ text-align:center; font-family:'Archivo',system-ui,sans-serif; font-size:15px; color:var(--tinta-suave) !important; margin:0 0 14px !important; animation:qrSube .6s .1s cubic-bezier(.2,.8,.2,1) both; }
+html.qr-mode #loginFormGym input{ animation:qrSube .6s cubic-bezier(.2,.8,.2,1) both; }
+html.qr-mode #loginFormGym input:nth-of-type(2){ animation-delay:.08s; }
+html.qr-mode #loginFormGym .qr-btn-principal{ animation:qrSube .6s .2s cubic-bezier(.2,.8,.2,1) both; }
+html.qr-mode .qr-hero-fullbleed .qr-sub:has(.qr-acento){ font-family:'Barlow Condensed',sans-serif !important; font-weight:900 !important; font-size:44px !important; line-height:.92 !important; text-transform:uppercase; color:var(--carbon) !important; margin-top:14px !important; }
+html.qr-mode .qr-hero-fullbleed .qr-sub .qr-acento{ font-weight:900; }

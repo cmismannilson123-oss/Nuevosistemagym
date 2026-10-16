@@ -870,6 +870,17 @@ async function inicializarFlujoQRInterno(){
         btnSoySocio.onclick = () => {
           if (opciones) opciones.style.display = "none";
           if (formGym) formGym.style.display = "block";
+          // Modo QR: título motivador para quien va a marcar su asistencia
+          const subtitulo = document.querySelector("#qrCardPrimeraVez .qr-sub");
+          if (subtitulo && !subtitulo.dataset.original) subtitulo.dataset.original = subtitulo.textContent;
+          if (subtitulo) subtitulo.innerHTML = 'Hoy vas <span class="qr-acento">por más.</span>';
+          if (formGym && !document.getElementById("qrIntroBusqueda")) {
+            const intro = document.createElement("p");
+            intro.id = "qrIntroBusqueda";
+            intro.className = "qr-intro-busqueda";
+            intro.textContent = "Ingresa tu DNI o celular para marcar tu asistencia.";
+            formGym.insertBefore(intro, formGym.firstChild);
+          }
           const phoneInput = document.getElementById("qrPhone");
           if (phoneInput) phoneInput.focus();
         };

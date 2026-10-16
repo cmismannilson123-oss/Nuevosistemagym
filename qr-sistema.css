@@ -407,3 +407,12 @@ html.qr-mode #loginFormGym input:nth-of-type(2){ animation-delay:.08s; }
 html.qr-mode #loginFormGym .qr-btn-principal{ animation:qrSube .6s .2s cubic-bezier(.2,.8,.2,1) both; }
 html.qr-mode .qr-hero-fullbleed .qr-sub:has(.qr-acento){ font-family:'Barlow Condensed',sans-serif !important; font-weight:900 !important; font-size:44px !important; line-height:.92 !important; text-transform:uppercase; color:var(--carbon) !important; margin-top:14px !important; }
 html.qr-mode .qr-hero-fullbleed .qr-sub .qr-acento{ font-weight:900; }
+
+/* Entrada de los campos de búsqueda: solo aparición (sin subir), para que no se vea flotando */
+html.qr-mode .qr-intro-busqueda{ animation:qrAparece .45s ease-out both !important; }
+html.qr-mode #loginFormGym input,
+html.qr-mode #loginFormGym .qr-btn-principal{ animation:qrAparece .45s ease-out both !important; }
+html.qr-mode #loginFormGym input:nth-of-type(2){ animation-delay:.06s !important; }
+html.qr-mode #loginFormGym .qr-btn-principal{ animation-delay:.12s !important; }
+@keyframes qrAparece{ from{ opacity:0; } to{ opacity:1; } }
+html.qr-mode .qr-hero-fullbleed .qr-sub:has(.qr-acento){ animation:qrAparece .45s ease-out both !important; }

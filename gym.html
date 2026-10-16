@@ -3070,11 +3070,8 @@ window.buscarQR = async function(esPrimeraVez){
     borrarTelefonoSeguro();
     div.innerHTML = "";
     const motivo = resp && resp.motivo;
-    if (motivo === "TELEFONO_NO_COINCIDE") {
-      mostrarFormularioSocioQR("Tu DNI está inscrito con otro número de celular. Revisa que lo hayas escrito bien. Si es correcto, acércate a recepción para actualizarlo.", { tipo: "error", titulo: "Número equivocado. ", tel: telefono, dni: dni, foco: "tel" });
-    } else if (motivo === "DNI_NO_COINCIDE") {
-      mostrarFormularioSocioQR("Este celular está inscrito con otro DNI. Revisa tu DNI. Si es correcto, acércate a recepción.", { tipo: "error", titulo: "DNI equivocado. ", tel: telefono, dni: dni, foco: "dni" });
-    } else if (motivo === "DATOS_INVALIDOS") {
+    // El servidor responde igual si el celular o el DNI no coinciden (no revela qué socios existen)
+    if (motivo === "DATOS_INVALIDOS") {
       mostrarFormularioSocioQR("Revisa que tu celular tenga 9 dígitos y tu DNI 8.", { tipo: "aviso", titulo: "Datos incompletos. ", tel: telefono, dni: dni, foco: "tel" });
     } else {
       mostrarFormularioSocioQR("No encontramos un socio con ese celular ni con ese DNI. Si ya te inscribiste, acércate a recepción.", { tipo: "error", titulo: "Número no registrado. ", tel: telefono, dni: dni, foco: "tel" });

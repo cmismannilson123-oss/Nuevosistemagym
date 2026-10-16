@@ -308,3 +308,29 @@ html.qr-mode #inscOverlay .wiz-title{ font-weight:900 !important; text-transform
   html.qr-mode .qr-btn-principal .lbl-wiz b{ font-size:18px !important; }
   html.qr-mode .qr-btn-principal .lbl-wiz small{ font-size:12px !important; }
 }
+
+/* ---------- Legibilidad: contraste corregido en bloques y banners ---------- */
+html.qr-mode .pp-ahorro{ background:var(--carbon) !important; border:0 !important; color:var(--tiza) !important; }
+html.qr-mode .pp-ahorro b{ color:#fff !important; }
+html.qr-mode .pp-ahorro i{ color:var(--rojo) !important; }
+html.qr-mode .catalogo-promo-btn{ background:var(--carbon) !important; border:0 !important; color:var(--tiza) !important; box-shadow:none !important; border-radius:22px !important; }
+html.qr-mode .catalogo-promo-btn *{ color:var(--tiza) !important; }
+html.qr-mode .catalogo-promo-btn small,html.qr-mode .catalogo-promo-btn span{ opacity:.9; }
+html.qr-mode .catalogo-promo-btn b,html.qr-mode .catalogo-promo-btn strong{ font-family:'Barlow Condensed',sans-serif; font-weight:900; text-transform:uppercase; }
+
+/* Encabezado de las pantallas: fijo y sólido para que el contenido no se encime */
+html.qr-mode .wiz-overlay .wiz-topbar{ position:sticky; top:0; z-index:6; background:var(--tiza) !important; padding:10px 0 12px; margin-bottom:6px; }
+html.qr-mode .wiz-overlay::before,
+html.qr-mode .wiz-overlay::after,
+html.qr-mode .cy-ov::before,
+html.qr-mode .cy-ov::after{ display:none !important; }
+
+/* Destellos más sutiles: aparecen menos y sin tapar el texto */
+html.qr-mode .cy-tile--socio::after{ background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent) !important; }
+html.qr-mode #inscOverlay .insc-send::after{ background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent) !important; }
+html.qr-mode .wiz-overlay .wiz-topbar{ box-shadow:0 -70px 0 0 var(--tiza), 0 -160px 0 0 var(--tiza), 0 6px 14px -10px rgba(20,19,17,.35); }
+html.qr-mode .wiz-overlay .wiz-topbar + *{ margin-top:0; }
+html.qr-mode #wizPlanes .wiz-topbar,
+html.qr-mode #wizHorarios .wiz-topbar,
+html.qr-mode #wizConoce .wiz-topbar,
+html.qr-mode #inscOverlay .wiz-topbar{ background:var(--tiza) !important; position:sticky; top:0; z-index:6; }

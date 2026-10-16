@@ -334,3 +334,27 @@ html.qr-mode #wizPlanes .wiz-topbar,
 html.qr-mode #wizHorarios .wiz-topbar,
 html.qr-mode #wizConoce .wiz-topbar,
 html.qr-mode #inscOverlay .wiz-topbar{ background:var(--tiza) !important; position:sticky; top:0; z-index:6; }
+
+/* ---------- Fondo general: tiza sólido, sin degradados verdes de fondo ---------- */
+html.qr-mode{ background:var(--tiza) !important; background-image:none !important; }
+html.qr-mode body{ background-image:none !important; }
+
+/* ---------- Muñeco de "Soy socio": trazos en carbón sobre el plato tiza ---------- */
+html.qr-mode .cy-tile--socio .cy-ico svg [stroke="#e2e8f0"],
+html.qr-mode .cy-tile--socio .cy-ico svg [stroke="#f1f5f9"],
+html.qr-mode .cy-tile--socio .cy-ico svg [stroke="#cbd5e1"],
+html.qr-mode .cy-tile--socio .cy-ico svg [stroke="#f8fafc"]{ stroke:var(--carbon) !important; }
+html.qr-mode .cy-tile--socio .cy-ico svg [fill="#f8fafc"],
+html.qr-mode .cy-tile--socio .cy-ico svg [fill="#e2e8f0"]{ fill:var(--carbon) !important; }
+
+/* ---------- Flecha animada en Conocer e Inscribirme (igual que "Soy socio") ---------- */
+html.qr-mode .qr-btn-principal.cy-tile--nuevo,
+html.qr-mode .qr-btn-principal.cy-tile--inscribir{ position:relative; padding-right:64px !important; }
+html.qr-mode .qr-btn-principal.cy-tile--nuevo::after,
+html.qr-mode .qr-btn-principal.cy-tile--inscribir::after{
+  content:""; position:absolute; right:16px; bottom:16px; width:36px; height:36px; border-radius:50%;
+  background:var(--tiza) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M9 5l7 7-7 7' fill='none' stroke='%23141311' stroke-width='2.8' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/16px no-repeat;
+  animation:qrFlecha 1.8s ease-in-out infinite;
+}
+@keyframes qrFlecha{ 0%,60%,100%{ transform:translateX(0); } 75%{ transform:translateX(5px); } 88%{ transform:translateX(-1px); } }
+@media (prefers-reduced-motion: reduce){ html.qr-mode .qr-btn-principal::after{ animation:none !important; } }

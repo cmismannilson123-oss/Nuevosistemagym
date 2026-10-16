@@ -374,18 +374,49 @@
         </div>
       </section>
 
-      <section class="hz-card hz-baile">
-        <div class="hz-ico baile"><i class="fa-solid fa-music"></i></div>
-        <div class="hz-baile-txt">
+      <section class="hz-card hz-baile" id="hzBaile">
+        <div class="hz-baile-izq">
           <div class="hz-nombre">Baile &amp; Step</div>
           <div class="hz-hora hz-hora-sm">7:00 <small>p.m.</small> – 9:00 <small>p.m.</small></div>
           <div class="hz-sub">Lunes a viernes</div>
+          <div id="estadoBaile" class="hz-estado-baile espera"><span class="hz-punto"></span><span class="hz-estado-txt">Esperando la hora de clase</span></div>
+        </div>
+        <div class="hz-mascota" aria-hidden="true">
+          <svg class="hz-m-bailar" viewBox="0 0 120 120">
+            <ellipse cx="60" cy="110" rx="26" ry="4" fill="#000" opacity=".35"/>
+            <g class="hz-cuerpo">
+              <g class="hz-pierna hz-pi"><path d="M54 80 L46 106" stroke="#1e293b" stroke-width="8" stroke-linecap="round"/></g>
+              <g class="hz-pierna hz-pd"><path d="M66 80 L76 106" stroke="#1e293b" stroke-width="8" stroke-linecap="round"/></g>
+              <rect x="45" y="50" width="30" height="36" rx="13" fill="#e879f9"/>
+              <g class="hz-brazo hz-bi"><path d="M50 58 L34 44" stroke="#e879f9" stroke-width="8" stroke-linecap="round"/></g>
+              <g class="hz-brazo hz-bd"><path d="M70 58 L88 42" stroke="#e879f9" stroke-width="8" stroke-linecap="round"/></g>
+              <circle cx="60" cy="38" r="13" fill="#f1c7a4"/>
+              <path d="M47 36 Q48 24 60 24 Q72 24 73 36 Q66 29 60 29 Q54 29 47 36Z" fill="#1f2937"/>
+              <circle cx="60" cy="21" r="5" fill="#1f2937"/>
+            </g>
+            <path class="hz-nota" d="M96 26 v-14 l9 -2 v12" stroke="#f0abfc" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <svg class="hz-m-sentada" viewBox="0 0 120 120">
+            <ellipse cx="60" cy="110" rx="28" ry="4" fill="#000" opacity=".35"/>
+            <rect x="30" y="92" width="60" height="6" rx="3" fill="#334155"/>
+            <rect x="36" y="98" width="5" height="12" fill="#334155"/>
+            <rect x="79" y="98" width="5" height="12" fill="#334155"/>
+            <g class="hz-respira">
+              <path d="M56 86 L82 86 L82 100" stroke="#1e293b" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+              <rect x="46" y="50" width="28" height="36" rx="12" fill="#e879f9"/>
+              <path d="M50 60 L48 84" stroke="#e879f9" stroke-width="8" stroke-linecap="round"/>
+              <path d="M70 60 L72 82" stroke="#e879f9" stroke-width="8" stroke-linecap="round"/>
+              <circle cx="60" cy="38" r="13" fill="#f1c7a4"/>
+              <path d="M47 36 Q48 24 60 24 Q72 24 73 36 Q66 29 60 29 Q54 29 47 36Z" fill="#1f2937"/>
+              <circle cx="60" cy="21" r="5" fill="#1f2937"/>
+            </g>
+          </svg>
         </div>
       </section>
 
       <section class="hz-card">
         <div class="hz-titulo"><i class="fa-solid fa-location-dot"></i> Ubicación</div>
-        <p class="hz-dir">Av. San Juan Evangelista 110</p>
+        <p class="hz-dir">Av. San Juan Evangelista 232</p>
         <p class="hz-sub"><i class="fa-solid fa-shield-halved"></i> Fácil acceso y zona segura</p>
         <div class="hz-mapa" aria-hidden="true">
           <svg viewBox="0 0 320 120" preserveAspectRatio="xMidYMid slice">
@@ -397,7 +428,7 @@
             <circle cx="200" cy="62" r="5" fill="#0b1118"/>
           </svg>
         </div>
-        <a class="hz-mapa-btn" href="https://www.google.com/maps/search/?api=1&amp;query=Av.+San+Juan+Evangelista+110" target="_blank" rel="noopener">
+        <a class="hz-mapa-btn" href="https://www.google.com/maps/search/?api=1&amp;query=232+Av.+San+Juan+Evangelista+Huancavelica" target="_blank" rel="noopener">
           <i class="fa-solid fa-diamond-turn-right"></i> Cómo llegar
         </a>
       </section>
@@ -3448,8 +3479,18 @@ function renderPlanesPublicos(cont){
   // Las animaciones de precio se disparan cuando la tarjeta entra en pantalla (una sola vez)
   const tarjetas = cont.querySelectorAll(".pp-card");
   if ("IntersectionObserver" in window) {
+    // Cada vez que la tarjeta entra en pantalla (al abrir "Nuestros planes" o al volver a verla) la animación se vuelve a ejecutar
     const io = new IntersectionObserver((entradas) => {
-      entradas.forEach(e => { if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); if (animar) contarPrecios(e.target); } });
+      entradas.forEach(e => {
+        const t = e.target;
+        if (e.isIntersecting) {
+          t.classList.remove("is-in"); void t.offsetWidth; t.classList.add("is-in");
+          if (animar) contarPrecios(t);
+        } else {
+          t.classList.remove("is-in");
+          if (animar) t.querySelectorAll(".pp-num").forEach(n => { n.textContent = "0"; });
+        }
+      });
     }, { threshold: 0.2 });
     tarjetas.forEach(t => io.observe(t));
   } else {
@@ -3576,7 +3617,7 @@ window.enviarInvitacionWhatsApp = function() {
                   `⏰ *NUESTROS HORARIOS DE ATENCIÓN:*\n` +
                   `• 🏋️‍♂️ *Gimnasio:* Lunes a Sábado de *6:30 AM a 10:30 PM* (Ingresa a la hora que quieras y las veces que desees).\n` +
                   `• 💃 *Clases de Baile y Step:* Lunes a Viernes de *7:00 PM a 9:00 PM*.\n\n` +
-                  `📍 *UBICACIÓN:* Av. San Juan Evangelista 110 - Ascensión HVCA\n\n` +
+                  `📍 *UBICACIÓN:* Av. San Juan Evangelista 232 - Ascensión HVCA\n\n` +
                   `🎁 🔥 *¡ATENCIÓN!* 🔥 🎁\n` +
                   `*Responde a este mensaje y obtén un descuento de hasta el 15% de descuento por bienvenida por tu primera inscripción.* ⚡🤩`;
 
@@ -4652,7 +4693,20 @@ window.enviarInvitacionWhatsApp = function() {
       var manana = (dow + 1) % 7;
       return {abierto:false, texto: manana === 0 ? 'Cerrado ahora · abrimos el lunes a las ' + fmt(VENTANAS[0][0]) : 'Cerrado ahora · abrimos mañana a las ' + fmt(VENTANAS[0][0])};
     }
+    // Baile: lunes a viernes de 7:00 p.m. a 9:00 p.m. (hora del celular)
+    function pintarBaile(){
+      var caja = document.getElementById('hzBaile'); if(!caja) return;
+      var ahora = new Date(), dia = ahora.getDay(), minutos = ahora.getHours() * 60 + ahora.getMinutes();
+      var enClase = dia >= 1 && dia <= 5 && minutos >= 19 * 60 && minutos < 21 * 60;
+      caja.classList.toggle('en-clase', enClase);
+      var est = document.getElementById('estadoBaile');
+      if(est){
+        est.className = 'hz-estado-baile ' + (enClase ? 'en-clase' : 'espera');
+        est.querySelector('.hz-estado-txt').textContent = enClase ? '¡Estamos bailando! Ven y únete' : 'Esperando la hora de clase';
+      }
+    }
     function pintarEstado(){
+      try{ pintarBaile(); }catch(e){}
       var chip = document.getElementById('estadoAbierto'); if(!chip) return;
       var s = estadoAhora();
       chip.className = 'open-chip' + (s.abierto ? '' : ' cerrado');
@@ -4660,6 +4714,12 @@ window.enviarInvitacionWhatsApp = function() {
       var cols = overlay.querySelectorAll('.hz-turno');
       cols.forEach(function(c, i){ c.classList.toggle('ahora', s.abierto && s.turno === i); });
     }
+
+    /* Mientras se ve la pantalla de horarios, el estado se actualiza solo (cada 30 s) */
+    setInterval(function(){
+      var h = document.getElementById('wizHorarios');
+      if(h && h.style.display === 'block'){ try{ pintarEstado(); }catch(e){} }
+    }, 30000);
 
     /* Enganche no invasivo: tras cada cambio de pantalla se registran los reveals y se reinicia el scroll */
     var wizIrOriginal = window.wizIr;

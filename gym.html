@@ -5880,5 +5880,42 @@ document.addEventListener("click", function(e){
   setTimeout(function(){ b.classList.remove("is-loading"); }, 6000);
 }, true);
 </script>
+
+<script>
+/* Flujo QR: aparición al hacer scroll y letras de los títulos (solo modo QR, respeta reducir movimiento) */
+(function(){
+  if(!document.documentElement.classList.contains('qr-mode')) return;
+  if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if(!('IntersectionObserver' in window)) return;
+  var titulos = 'ap-large h2, .ap-hero-copy h2, .ap-cta h4';
+  document.querySelectorAll('#wizConoce .ap-large h2, #wizPlanes .ap-large h2, #wizHorarios .ap-large h2, #wizConoce .ap-hero-copy h2').forEach(function(h){
+    if(h.dataset.ltr) return; h.dataset.ltr = '1';
+    var i = 0; h.classList.add('qr-titulo-letras');
+    h.childNodes.forEach(function(n){ });
+    var partes = h.innerHTML.split(/(<[^>]+>)/);
+    h.innerHTML = partes.map(function(p){
+      if(p.charAt(0) === '<') return p;
+      return p.split('').map(function(c){
+        if(c === ' ') return ' ';
+        return '<span class="qr-ltr" style="--i:' + (i++) + '">' + c + '</span>';
+      }).join('');
+    }).join('');
+  });
+  var sel = '#wizConoce .wiz-feat-card2, #wizPlanes .pp-card, #wizHorarios .hz-card, #wizHorarios .hz-servicios, #inscOverlay .insc-card';
+  document.querySelectorAll(sel).forEach(function(el){ el.classList.add('qr-rev'); });
+  var io = new IntersectionObserver(function(entradas){
+    entradas.forEach(function(e){
+      var t = e.target;
+      if(e.isIntersecting){
+        t.classList.add('vis');
+        if(t.classList.contains('qr-titulo-letras')) t.classList.add('vis');
+      } else {
+        t.classList.remove('vis');
+      }
+    });
+  }, { threshold: 0.2 });
+  document.querySelectorAll(sel + ', #wizConoce .ap-large h2, #wizPlanes .ap-large h2, #wizHorarios .ap-large h2, #wizConoce .ap-hero-copy h2').forEach(function(el){ io.observe(el); });
+})();
+</script>
 </body>
 </html>

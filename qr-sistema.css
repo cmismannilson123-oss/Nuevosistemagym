@@ -358,3 +358,43 @@ html.qr-mode .qr-btn-principal.cy-tile--inscribir::after{
 }
 @keyframes qrFlecha{ 0%,60%,100%{ transform:translateX(0); } 75%{ transform:translateX(5px); } 88%{ transform:translateX(-1px); } }
 @media (prefers-reduced-motion: reduce){ html.qr-mode .qr-btn-principal::after{ animation:none !important; } }
+
+/* ===== Revisión de color: menos negro, rojo como acento, tarjetas completas ===== */
+html.qr-mode #wizConoce .ap-cta{ background:#fff !important; border:2px solid var(--carbon) !important; box-shadow:none !important; border-radius:26px !important; }
+html.qr-mode #wizConoce .ap-cta h4{ color:var(--carbon) !important; font-family:'Barlow Condensed',sans-serif !important; font-weight:900 !important; text-transform:uppercase; font-size:34px !important; line-height:.92 !important; }
+html.qr-mode #wizConoce .ap-cta p{ color:var(--tinta-suave) !important; }
+html.qr-mode #wizConoce .ap-cta .ap-btn-main{ background:var(--rojo) !important; color:var(--tiza) !important; border:0 !important; box-shadow:none !important; }
+html.qr-mode #wizConoce .ap-cta .ap-btn-ghost{ background:transparent !important; color:var(--carbon) !important; border:2px solid var(--carbon) !important; box-shadow:none !important; }
+html.qr-mode #wizConoce .ap-cta::before,html.qr-mode #wizConoce .ap-cta::after{ display:none !important; }
+
+/* Tarjetas de servicios: tarjetas completas, una destacada en rojo */
+html.qr-mode #wizConoce .wiz-feat-card2{
+  background:#fff !important; border:2px solid var(--carbon) !important; border-radius:24px !important;
+  padding:18px !important; box-shadow:none !important; animation:none !important;
+}
+html.qr-mode #wizConoce .wiz-feat-hero{ background:var(--rojo) !important; border:0 !important; }
+html.qr-mode #wizConoce .wiz-feat-hero .t,html.qr-mode #wizConoce .wiz-feat-hero .d{ color:var(--tiza) !important; }
+html.qr-mode #wizConoce .wiz-feat-hero .ic{ background:var(--tiza) !important; box-shadow:none !important; }
+html.qr-mode #wizConoce .wiz-feat-dance{ background:var(--tiza) !important; border:2px solid var(--rojo) !important; }
+html.qr-mode #wizConoce .wiz-feat-dance .t{ color:var(--carbon) !important; }
+html.qr-mode #wizConoce .wiz-feat-dance .d{ color:var(--tinta-suave) !important; }
+html.qr-mode #wizConoce .wiz-feat-card2 .ic{ background:var(--rojo) !important; box-shadow:none !important; border-radius:50% !important; box-shadow:inset 0 0 0 2px var(--carbon) !important; }
+html.qr-mode #wizConoce .wiz-feat-card2 .ic i{ color:var(--tiza) !important; }
+html.qr-mode #wizConoce .wiz-feat-card2 .ic svg *{ stroke:var(--tiza) !important; }
+html.qr-mode #wizConoce .wiz-feat-card2 .ic svg [fill="#EFEAE1"],html.qr-mode #wizConoce .wiz-feat-card2 .ic svg [fill="#fff"]{ fill:var(--tiza) !important; }
+
+/* Aparición al hacer scroll (cada vez que la tarjeta entra en pantalla) */
+html.qr-mode .qr-rev{ opacity:0; transform:translateY(22px); transition:opacity .55s cubic-bezier(.2,.8,.2,1), transform .55s cubic-bezier(.2,.8,.2,1); }
+html.qr-mode .qr-rev.vis{ opacity:1; transform:none; }
+html.qr-mode .qr-rev.vis:nth-child(2n){ transition-delay:.06s; }
+
+/* Letras de los títulos: entran una por una al verse */
+html.qr-mode .qr-titulo-letras .qr-ltr{ display:inline-block; opacity:0; transform:translateY(65%); }
+html.qr-mode .qr-titulo-letras.vis .qr-ltr{ animation:qrLetra .62s cubic-bezier(.2,.8,.2,1) both; animation-delay:calc(var(--i) * 24ms); }
+@keyframes qrLetra{ from{ opacity:0; transform:translateY(65%); } to{ opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce){
+  html.qr-mode .qr-rev{ opacity:1; transform:none; transition:none; }
+  html.qr-mode .qr-titulo-letras .qr-ltr{ opacity:1; transform:none; }
+  html.qr-mode .qr-titulo-letras.vis .qr-ltr{ animation:none; }
+}
+html.qr-mode #wizConoce h2,html.qr-mode #wizPlanes h2,html.qr-mode #wizHorarios h2{ font-family:'Barlow Condensed',sans-serif !important; font-weight:900 !important; text-transform:uppercase; color:var(--carbon) !important; line-height:.92 !important; }

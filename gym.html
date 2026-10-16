@@ -664,8 +664,8 @@
     <div class="card">
       <h3><i class="fa-solid fa-door-open"></i> Control de ingreso</h3>
       <div class="ig-search">
-        <input id="buscarDni" placeholder="DNI o nombre del socio" oninput="buscarAutomatico()" autocomplete="off" enterkeyhint="search" onkeydown="if(event.key==='Enter'){ buscar(); }">
-        <button type="button" class="ig-search-btn" onclick="buscar()" aria-label="Buscar socio"><i class="fa-solid fa-arrow-right"></i></button>
+        <input id="buscarDni" inputmode="numeric" maxlength="8" placeholder="DNI del socio" oninput="buscarAutomatico()" autocomplete="off" enterkeyhint="go" onkeydown="if(event.key==='Enter'){ registrarDesdeBusqueda(); }">
+        <button type="button" class="ig-search-btn" onclick="registrarDesdeBusqueda()" aria-label="Registrar ingreso"><i class="fa-solid fa-arrow-right"></i></button>
       </div>
     </div>
     <div id="resultado"></div>
@@ -2164,38 +2164,66 @@ window.guardar = async function(){
   }
 };
 
-window.buscar = async function(){
-  let dni = document.getElementById("buscarDni").value;
-  const {data,error} = await supabaseClient.from("socios").select("*").eq("dni",dni).single();
-  let div = document.getElementById("resultado");
+// Búsqueda por DNI: el socio aparece solo cuando están los 8 dígitos.
+// La tarjeta muestra su condición, sin botones: el ingreso se marca con la
+// flecha (o Enter) del buscador, y solo si el socio está activo.
+const DNI_LARGO = 8;
+
+function socioPuedeIngresar(socio){
+  const c = scCuerpo(socio);
+  return !c.tieneBloqueoDeuda && c.estado === "ACTIVO";
+}
+
+async function traerSocioPorDni(dni){
+  const { data, error } = await supabaseClient.from("socios").select("*").eq("dni", dni).single();
+  return (error || !data) ? null : data;
+}
+
+function mostrarTarjetaBusqueda(socio){
+  const div = document.getElementById("resultado");
   if(!div) return;
-  if(error || !data){
-    div.innerHTML = "<div class='empty-state' style='margin-bottom:16px'><i class='fa-solid fa-user-slash'></i><b>Socio no encontrado</b><span>Revisa el DNI o el nombre e inténtalo de nuevo.</span></div>";
-    return;
-  }
-  mostrarSocio(data);
+  const c = scCuerpo(socio);
+  div.innerHTML = `
+  <article class="sc sc--${c.st} sc--ingreso">
+    ${c.html}
+    ${c.tieneDeuda ? "" : `<div class="sc-deuda no"><span><i class="fa-solid fa-circle-check"></i> Sin deuda</span><b>S/ 0</b></div>`}
+  </article>`;
+}
+
+function mostrarNoEncontradoBusqueda(){
+  const div = document.getElementById("resultado");
+  if(div) div.innerHTML = "<div class='empty-state' style='margin-bottom:16px'><i class='fa-solid fa-user-slash'></i><b>Socio no encontrado</b><span>Revisa el DNI e inténtalo de nuevo.</span></div>";
+}
+
+let cyLimpiarBusqueda = null;
+
+window.buscarAutomatico = async function(){
+  const input = document.getElementById("buscarDni");
+  const div = document.getElementById("resultado");
+  if(!input || !div) return;
+  if(cyLimpiarBusqueda){ clearTimeout(cyLimpiarBusqueda); cyLimpiarBusqueda = null; }
+  input.value = input.value.replace(/\D/g, "").slice(0, DNI_LARGO);
+  const dni = input.value;
+  if(dni.length < DNI_LARGO){ div.innerHTML = ""; return; }
+
+  const socio = (dataGlobal || []).find(s => String(s.dni) === dni) || await traerSocioPorDni(dni);
+  if(input.value !== dni) return; // el DNI cambió mientras se consultaba
+  if(!socio){ mostrarNoEncontradoBusqueda(); return; }
+  mostrarTarjetaBusqueda(socio);
 };
 
-window.buscarAutomatico = function(){
-  let v = document.getElementById("buscarDni").value.toLowerCase();
-  let div = document.getElementById("resultado");
-  if(!div) return;
-  
-  if(v.length <= 0){
-    div.innerHTML="";
-    return;
-  }
-  let filtrados = (dataGlobal || []).filter(s =>
-    (s.nombre || "").toLowerCase().includes(v) ||
-    (s.dni || "").includes(v)
-  );
-  if(filtrados.length <= 0){
-    div.innerHTML="<div class='empty-state' style='margin-bottom:16px'><i class='fa-solid fa-user-slash'></i><b>No encontrado</b><span>Revisa el DNI o el nombre e inténtalo de nuevo.</span></div>";
-    return;
-  }
-  let html = "";
-  filtrados.forEach(data=>{ html += generarCardSocio(data); });
-  div.innerHTML = html;
+window.registrarDesdeBusqueda = async function(){
+  const input = document.getElementById("buscarDni");
+  if(!input) return;
+  const dni = input.value.replace(/\D/g, "");
+  if(dni.length < DNI_LARGO) return;
+
+  const socio = (dataGlobal || []).find(s => String(s.dni) === dni) || await traerSocioPorDni(dni);
+  if(input.value !== dni) return;
+  if(!socio){ mostrarNoEncontradoBusqueda(); return; }
+  // Vencido, agotado o bloqueado: no se marca, solo queda su tarjeta con su condición
+  if(!socioPuedeIngresar(socio)){ mostrarTarjetaBusqueda(socio); return; }
+  await asistenciaNueva(socio.dni, socio.dias_restantes, socio);
 };
 
 function generarCardSocio(data){
@@ -2315,7 +2343,7 @@ window.asistenciaNueva = async function(dni, diasRestantesPasados, socioConocido
       "#f59e0b"
     );
     playSound("VENCIDO");
-    setTimeout(() => { mostrarSocio(socio); }, 2000);
+    setTimeout(() => { mostrarTarjetaBusqueda(socio); }, 2000);
     return false;
   }
 
@@ -2365,10 +2393,13 @@ window.asistenciaNueva = async function(dni, diasRestantesPasados, socioConocido
                : `<div class="sc-deuda no"><span><i class="fa-solid fa-circle-check"></i> Sin deuda</span><b>S/ 0</b></div>`}
     </article>`;
 
-    setTimeout(()=>{
+    // Si el recepcionista empieza a escribir el siguiente DNI antes de que
+    // termine esta pausa, buscarAutomatico() cancela la limpieza (no le borra lo escrito)
+    cyLimpiarBusqueda = setTimeout(()=>{
       const bDni = document.getElementById("buscarDni");
       if(bDni) bDni.value="";
       resDiv.innerHTML="";
+      cyLimpiarBusqueda = null;
     },2500);
   }
 

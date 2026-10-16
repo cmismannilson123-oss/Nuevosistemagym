@@ -4405,3 +4405,32 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
   #wizHorarios .hz-nota, #wizHorarios .hz-respira{ animation:none !important; }
 }
 
+
+/* ===== Muñequitos de "Conoce C&Y" (v104): ilustraciones animadas, solo transform y opacity ===== */
+#wizConoce .wiz-feat-card2 .ic{ display:flex; align-items:center; justify-content:center; padding:5px; }
+#wizConoce .wiz-feat-card2 .ic svg.ilu{ width:100%; height:100%; display:block; overflow:visible; }
+.ilu-brazo-maestro,.ilu-brazo-dar,.ilu-brazo-saludo,.ilu-barra,.ilu-apoyo,.ilu-cabeza-alumno,.ilu-objeto,.ilu-caminante,.ilu-pierna-a,.ilu-pierna-b,.ilu-ondas,.ilu-linea{ transform-box:view-box; }
+.ilu-capacitacion .ilu-brazo-maestro{ transform-origin:25px 25px; animation:ilu-senala 1.6s ease-in-out infinite alternate; }
+.ilu-capacitacion .ilu-cabeza-alumno{ transform-origin:46px 30px; animation:ilu-cabeceo 1.2s ease-in-out infinite alternate; }
+.ilu-pesas .ilu-barra,.ilu-pesas .ilu-apoyo{ animation:ilu-levanta 1.8s ease-in-out infinite alternate; }
+.ilu-manzana .ilu-brazo-dar{ transform-origin:22px 29px; animation:ilu-dar 2.4s ease-in-out infinite; }
+.ilu-manzana .ilu-objeto{ animation:ilu-entrega 2.4s ease-in-out infinite; }
+.ilu-pasillo .ilu-caminante{ animation:ilu-caminar .5s ease-in-out infinite alternate; }
+.ilu-pasillo .ilu-pierna-a{ animation:ilu-pierna .5s ease-in-out infinite alternate; }
+.ilu-pasillo .ilu-pierna-b{ animation:ilu-pierna .5s ease-in-out infinite alternate-reverse; }
+.ilu-pasillo .ilu-linea{ animation:ilu-pasillo 2.2s ease-in-out infinite; }
+.ilu-saludo .ilu-brazo-saludo{ transform-origin:33px 28px; animation:ilu-saludar .9s ease-in-out infinite alternate; }
+.ilu-saludo .ilu-ondas{ animation:ilu-ondas 1.2s ease-in-out infinite; }
+@keyframes ilu-senala{ from{ transform:rotate(-8deg); } to{ transform:rotate(7deg); } }
+@keyframes ilu-cabeceo{ from{ transform:translateY(0); } to{ transform:translateY(1.5px); } }
+@keyframes ilu-levanta{ from{ transform:translateY(0); } to{ transform:translateY(-5px); } }
+@keyframes ilu-dar{ 0%,100%{ transform:rotate(-5deg); } 50%{ transform:rotate(6deg); } }
+@keyframes ilu-entrega{ 0%{ transform:translate(0,0); opacity:0; } 15%{ opacity:1; } 70%{ transform:translate(9px,0); opacity:1; } 100%{ transform:translate(9px,0); opacity:0; } }
+@keyframes ilu-caminar{ from{ transform:translateY(0); } to{ transform:translateY(-1.5px); } }
+@keyframes ilu-pierna{ from{ transform:rotate(-16deg); } to{ transform:rotate(16deg); } }
+@keyframes ilu-pasillo{ 0%,100%{ opacity:.25; } 50%{ opacity:.7; } }
+@keyframes ilu-saludar{ from{ transform:rotate(-10deg); } to{ transform:rotate(16deg); } }
+@keyframes ilu-ondas{ 0%,100%{ opacity:.15; } 50%{ opacity:1; } }
+@media (prefers-reduced-motion: reduce){
+  .ilu *, .ilu{ animation:none !important; }
+}

@@ -1,6 +1,6 @@
 /* ============================================================
    TIENDA DEL GYM — punto de venta, fiados y deudas.
-   Solo para el panel del personal (no se carga en la pantalla del QR).
+   Solo para el panel del personal. La pantalla del QR no lo usa.
    Las reglas viven en la base de datos; aquí solo se muestran y se
    piden acciones. Fecha siempre en hora de Lima.
    ============================================================ */
@@ -141,7 +141,8 @@
     return v;
   }
   const ventaActiva = () => ui.ventas.find((v) => v.id === ui.activa) || ui.ventas[0];
-  const totalDe = (v) => v.carrito.reduce((s, l) => s + l.precio * l.cant, 0);
+  // Total en soles con dos decimales exactos (evita errores de coma flotante al comparar con S/ 10.99)
+  const totalDe = (v) => Math.round(v.carrito.reduce((s, l) => s + l.precio * l.cant, 0) * 100) / 100;
   const etiquetaVenta = (v, i) => (v.socio ? v.socio.nombre : "Cliente " + (i + 1));
 
   // Unidades que aún se pueden agregar de un producto (según stock y lo que ya está en el carrito)
@@ -256,8 +257,9 @@
     btn.disabled = !listo;
     btn.textContent = v.guardando ? "Registrando…" : v.metodo === "fiado" ? "Registrar fiado" : "Registrar venta";
     if (!v.confirmando) { cont.innerHTML = ""; return; }
+    const conFecha = v.metodo === "fiado" && v.fechaLimite && totalDe(v) > UMBRAL;
     const detalle = v.metodo === "fiado"
-      ? `Fiar <b>${soles(totalDe(v))}</b> a <b>${esc(v.socio.nombre)}</b>${v.fechaLimite
+      ? `Fiar <b>${soles(totalDe(v))}</b> a <b>${esc(v.socio.nombre)}</b>${conFecha
           ? `, con fecha límite el ${fechaCorta(v.fechaLimite)}`
           : totalDe(v) <= UMBRAL ? `, que bloquea desde ${fechaCorta(sumarDias(hoyLima(), 1))}` : ", sin fecha límite (no bloquea)"}.`
       : `Cobrar <b>${soles(totalDe(v))}</b> en ${v.metodo === "yape_plin" ? "Yape / Plin" : "efectivo"}.`;
@@ -288,6 +290,7 @@
 
   function agregar(id) {
     const v = ventaActiva();
+    if (v.guardando) return;
     const p = cat.productos.find((x) => x.id === id);
     if (!p || !p.activo || disponible(p, v) <= 0) return;
     const linea = v.carrito.find((l) => l.id === id);
@@ -299,6 +302,7 @@
 
   function cambiarCantidad(id, delta) {
     const v = ventaActiva();
+    if (v.guardando) return;
     const linea = v.carrito.find((l) => l.id === id);
     if (!linea) return;
     if (delta > 0) {
@@ -376,6 +380,9 @@
     v.metodo = "fiado";
     v.dni = dni;
     pintarTodo();
+    // Muestra la pestaña Tienda (el mismo botón de la barra) antes de preparar la venta
+    const botonTienda = document.querySelector(".tabs .tabbtn-centro");
+    if (botonTienda) botonTienda.click();
     await validarSocio(v, dni);
     q("tiendaRoot").scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -468,7 +475,7 @@
 
   // ---------- Gestión de productos y categorías ----------
 
-  const gest = { editandoId: null, confirmarBorrar: null, filtro: "Todas" };
+  const gest = { editandoId: null, confirmarBorrar: null, filtro: "Todas", guardando: false };
 
   TD.abrirGestion = async function () {
     const modal = q("modalProductos");
@@ -493,7 +500,8 @@
               <span class="td-switch"><input id="tdgControl" type="checkbox"><i></i> <em>Llevar cantidad disponible</em></span></label>
           </div>
           <label class="td-campo" id="tdgStockCampo" hidden><span>Stock disponible</span>
-            <input id="tdgStock" type="number" step="1" min="0" max="100000" inputmode="numeric" placeholder="0"></label>
+            <input id="tdgStock" type="number" step="1" min="0" max="100000" inputmode="numeric" placeholder="0">
+            <small id="tdgStockAyuda" class="td-ayuda-campo"></small></label>
           <div class="td-botones">
             <button type="button" class="td-btn td-btn--sec" data-g="cancelar-edicion" hidden>Cancelar edición</button>
             <button type="submit" class="td-btn td-btn--main" id="tdgGuardar">Guardar producto</button>
@@ -590,6 +598,11 @@
 
   function cargarFormulario(p) {
     gest.editandoId = p ? p.id : null;
+    const yaControlado = !!p && tieneControl(p);
+    q("tdgStock").readOnly = yaControlado;
+    q("tdgStockAyuda").textContent = yaControlado
+      ? "Para sumar unidades use «Reponer» en la lista de productos."
+      : "Cantidad disponible para vender. Se descuenta con cada venta.";
     q("tdgFormTitulo").textContent = p ? "Editar producto" : "Nuevo producto";
     q("tdgNombre").value = p ? p.nombre : "";
     q("tdgCat").value = p ? p.categoria : (cat.categorias[0] || "");
@@ -614,15 +627,20 @@
   async function onSubmitGestion(ev) {
     if (ev.target.id !== "tdgForm") return;
     ev.preventDefault();
+    if (gest.guardando) return;
     const nombre = q("tdgNombre").value.trim();
     const categoria = q("tdgCat").value;
     const precio = Number(q("tdgPrecio").value);
     const control = q("tdgControl").checked;
-    const stock = control ? Number(q("tdgStock").value) : null;
+    const stockCrudo = q("tdgStock").value.trim();
+    const stock = control ? Number(stockCrudo) : null;
+    if (control && stockCrudo === "") return mostrarToast("Escriba el stock disponible (0 si no hay)", "#ef4444");
     if (nombre.length < 2) return mostrarToast("Escriba el nombre del producto", "#ef4444");
     if (!categoria) return mostrarToast("Cree primero una categoría", "#ef4444");
     if (!(precio > 0 && precio < 10000)) return mostrarToast("El precio debe ser mayor a S/ 0", "#ef4444");
     if (control && (!Number.isInteger(stock) || stock < 0)) return mostrarToast("El stock debe ser un número entero, desde 0", "#ef4444");
+    gest.guardando = true;
+    q("tdgGuardar").disabled = true;
     try {
       const { error } = await sb().rpc("guardar_producto", {
         p_id: gest.editandoId, p_nombre: nombre, p_categoria: categoria, p_precio: precio, p_stock: stock,
@@ -630,11 +648,19 @@
       if (error) throw error;
       mostrarToast(gest.editandoId ? "✅ Producto actualizado" : "✅ Producto guardado", "#10b981");
       cargarFormulario(null);
+    } catch (e) {
+      mostrarToast("❌ " + errorGestion(e), "#ef4444");
+      return;
+    } finally {
+      gest.guardando = false;
+      q("tdgGuardar").disabled = false;
+    }
+    try {
       await cargarCatalogo();
       pintarGestion();
       pintarVenta();
     } catch (e) {
-      mostrarToast("❌ " + errorGestion(e), "#ef4444");
+      mostrarToast("❌ No se pudo actualizar la lista: " + mensajeError(e), "#ef4444");
     }
   }
 
@@ -729,10 +755,16 @@
     const root = q("tdDeudaRoot");
     if (!root || !root.dataset.dni) return;
     const dni = root.dataset.dni;
-    const [{ data: socio }, resumen] = await Promise.all([
-      sb().from("socios").select("dni, nombre, tipo_memb, deuda, fecha_deuda").eq("dni", dni).single(),
-      TD.resumenSocio(dni),
-    ]);
+    let socio, resumen;
+    try {
+      [{ data: socio }, resumen] = await Promise.all([
+        sb().from("socios").select("dni, nombre, tipo_memb, deuda, fecha_deuda").eq("dni", dni).single(),
+        TD.resumenSocio(dni),
+      ]);
+    } catch (e) {
+      mostrarToast("❌ " + mensajeError(e), "#ef4444");
+      return;
+    }
     if (socio) {
       const idx = (window.dataGlobal || []).findIndex((s) => String(s.dni) === String(dni));
       if (idx >= 0) Object.assign(window.dataGlobal[idx], socio);
@@ -816,8 +848,12 @@
     const root = q("tdDeudaRoot");
     const t = ev.target.closest("[data-accion]");
     if (!t || !root.contains(t)) return;
+    // Mientras un cobro se procesa, los demás toques se ignoran (evita cobrar dos veces)
+    if (root.dataset.ocupado) return;
     const accion = t.dataset.accion;
     const dni = root.dataset.dni;
+    root.dataset.ocupado = "1";
+    root.querySelectorAll("button").forEach((b) => { b.disabled = true; });
     try {
       if (accion === "cerrar-deuda") return TD.cerrarDeuda();
       if (accion === "abonar-mem" || accion === "cancelar-mem") {
@@ -827,7 +863,7 @@
         const { error } = await sb().rpc("abonar_deuda_membresia", { p_dni: dni, p_monto: monto });
         if (error) throw error;
         mostrarToast("✅ Membresía: pago registrado", "#10b981");
-        return recargarDeuda();
+        return await recargarDeuda();
       }
       if (accion === "agregar-tienda") {
         TD.cerrarDeuda();
@@ -844,7 +880,7 @@
         const { error } = await sb().rpc("registrar_pago_tienda", { p_venta_id: ventaId, p_monto: monto, p_metodo: metodo });
         if (error) throw error;
         mostrarToast("✅ Tienda: pago registrado", "#10b981");
-        return recargarDeuda();
+        return await recargarDeuda();
       }
       if (accion === "fecha-tienda" || accion === "quitar-fecha") {
         const fecha = accion === "quitar-fecha" ? null : fila.querySelector("[data-fecha]").value || null;
@@ -852,10 +888,13 @@
         const { error } = await sb().rpc("fijar_fecha_limite_tienda", { p_venta_id: ventaId, p_fecha: fecha });
         if (error) throw error;
         mostrarToast(fecha ? "✅ Fecha límite guardada" : "✅ Sin fecha límite", "#10b981");
-        return recargarDeuda();
+        return await recargarDeuda();
       }
     } catch (e) {
       mostrarToast("❌ " + mensajeError(e), "#ef4444");
+    } finally {
+      delete root.dataset.ocupado;
+      root.querySelectorAll("button").forEach((b) => { b.disabled = false; });
     }
   }
 
@@ -869,7 +908,7 @@
       const pestana = ev.target.closest("[data-pestana]");
       if (pestana) {
         q("tdDeudaRoot").dataset.tab = pestana.dataset.pestana;
-        return recargarDeuda();
+        return recargarDeuda().catch((e) => mostrarToast("❌ " + mensajeError(e), "#ef4444"));
       }
       accionDeuda(ev);
     });

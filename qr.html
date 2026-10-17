@@ -1191,6 +1191,9 @@ window.buscarQR = async function(esPrimeraVez){
 
   // Deuda de tienda que bloquea: no se ofrece marcar; se muestra la tarjeta de bloqueo
   if (socio.tienda_bloqueada) {
+    // Igual que un socio sin bloqueo: el celular queda recordado para la próxima vez
+    guardarTelefonoSeguro(telefono);
+    if (esPrimeraVez) guardarCredencialNavegador(telefono, dni);
     window.pendingQR = null;
     div.innerHTML = cyTarjetaBloqueoTienda(socio.nombre, socio.deudas_tienda);
     playSound("VENCIDO");

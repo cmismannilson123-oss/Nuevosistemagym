@@ -88,14 +88,24 @@
     </section>`;
   };
 
-  // ---------- Productos ----------
+  // ---------- Catálogo: categorías y productos ----------
 
-  async function cargarProductos() {
-    const { data, error } = await sb().from("productos")
-      .select("id, nombre, categoria, precio, activo").order("nombre");
-    if (error) throw error;
-    st.productos = data || [];
+  const cat = { categorias: [], productos: [] }; // todos, activos e inactivos
+
+  async function cargarCatalogo() {
+    const [c, p] = await Promise.all([
+      sb().from("categorias_producto").select("nombre").order("nombre"),
+      sb().from("productos").select("id, nombre, categoria, precio, stock, activo").order("nombre"),
+    ]);
+    if (c.error) throw c.error;
+    if (p.error) throw p.error;
+    cat.categorias = (c.data || []).map((x) => x.nombre);
+    cat.productos = p.data || [];
   }
+
+  const aLaVenta = () => cat.productos.filter((p) => p.activo);
+  const tieneControl = (p) => p.stock !== null && p.stock !== undefined;
+  const stockBajo = (p) => tieneControl(p) && p.stock <= 3;
 
   async function cargarVentasHoy() {
     const cont = q("tdHoy");
@@ -116,46 +126,82 @@
     }).join("");
   }
 
-  // ---------- Estado del punto de venta ----------
+  // ---------- Ventas en curso (una por cliente, para atender a varios a la vez) ----------
 
-  const st = {
-    productos: [],
-    carrito: [],          // { id, nombre, precio, cant }
-    categoria: "Todas",
-    metodo: "efectivo",
-    socio: null,          // { dni, nombre } validado
-    dni: "",
-    fechaLimite: "",
-    confirmando: false,
-    guardando: false,
-  };
+  const MAX_VENTAS = 8;
+  let contadorVenta = 0;
+  const ui = { ventas: [], activa: null, categoria: "Todas" };
 
-  const total = () => st.carrito.reduce((s, l) => s + l.precio * l.cant, 0);
+  function nuevaVenta() {
+    contadorVenta += 1;
+    const v = { id: "v" + contadorVenta, carrito: [], metodo: "efectivo", dni: "", socio: null,
+                fechaLimite: "", confirmando: false, guardando: false };
+    ui.ventas.push(v);
+    ui.activa = v.id;
+    return v;
+  }
+  const ventaActiva = () => ui.ventas.find((v) => v.id === ui.activa) || ui.ventas[0];
+  const totalDe = (v) => v.carrito.reduce((s, l) => s + l.precio * l.cant, 0);
+  const etiquetaVenta = (v, i) => (v.socio ? v.socio.nombre : "Cliente " + (i + 1));
+
+  // Unidades que aún se pueden agregar de un producto (según stock y lo que ya está en el carrito)
+  function disponible(p, v) {
+    if (!tieneControl(p)) return Infinity;
+    const enCarrito = v.carrito.filter((l) => l.id === p.id).reduce((s, l) => s + l.cant, 0);
+    return Math.max(0, p.stock - enCarrito);
+  }
+
+  function pintarVentas() {
+    const cont = q("tdVentas");
+    if (!cont) return;
+    cont.innerHTML = ui.ventas.map((v, i) => {
+      const activa = v.id === ui.activa;
+      const cerrable = v.carrito.length === 0 && ui.ventas.length > 1;
+      return `<div class="td-ticket${activa ? " activo" : ""}" role="tab" aria-selected="${activa}" data-venta="${esc(v.id)}">
+        <button type="button" class="td-ticket-main" data-ir="${esc(v.id)}">
+          <span>${esc(etiquetaVenta(v, i))}</span><b>${soles(totalDe(v))}</b>
+        </button>
+        ${cerrable ? `<button type="button" class="td-ticket-x" data-cerrar="${esc(v.id)}" aria-label="Cerrar esta venta">×</button>` : ""}
+      </div>`;
+    }).join("") + (ui.ventas.length < MAX_VENTAS
+      ? `<button type="button" class="td-ticket td-ticket--nuevo" data-nueva="1"><i class="fa-solid fa-plus"></i> Nueva venta</button>`
+      : "");
+  }
 
   function pintarCategorias() {
-    const cats = ["Todas", ...CATEGORIAS];
+    const cats = ["Todas", ...cat.categorias];
     q("tdCats").innerHTML = cats.map((c) =>
-      `<button type="button" class="td-cat${st.categoria === c ? " activa" : ""}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+      `<button type="button" class="td-cat${ui.categoria === c ? " activa" : ""}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
   }
 
   function pintarProductos() {
-    const lista = st.productos.filter((p) => p.activo && (st.categoria === "Todas" || p.categoria === st.categoria));
+    const v = ventaActiva();
+    const lista = aLaVenta().filter((p) => ui.categoria === "Todas" || p.categoria === ui.categoria);
     q("tdProductos").innerHTML = lista.length
-      ? lista.map((p) => `
-        <button type="button" class="td-prod" data-id="${esc(p.id)}">
+      ? lista.map((p) => {
+          const libre = disponible(p, v);
+          const agotado = libre <= 0;
+          const badge = !tieneControl(p) ? ""
+            : agotado ? `<em class="td-stock td-stock--cero">Sin stock</em>`
+            : `<em class="td-stock${stockBajo(p) ? " td-stock--bajo" : ""}">Quedan ${p.stock}</em>`;
+          return `
+        <button type="button" class="td-prod${agotado ? " agotado" : ""}" data-id="${esc(p.id)}" ${agotado ? "disabled" : ""}>
           <span class="td-prod-cat">${esc(p.categoria)}</span>
           <b>${esc(p.nombre)}</b>
           <strong>${soles(p.precio)}</strong>
-        </button>`).join("")
+          ${badge}
+        </button>`;
+        }).join("")
       : `<p class="td-vacio">No hay productos en esta categoría.</p>`;
   }
 
-  function pintarCarrito() {
+  function pintarVenta() {
+    const v = ventaActiva();
     const cont = q("tdCarrito");
-    if (!st.carrito.length) {
-      cont.innerHTML = `<p class="td-vacio">Toca un producto para agregarlo.</p>`;
+    if (!v.carrito.length) {
+      cont.innerHTML = `<p class="td-vacio">Toque un producto para agregarlo.</p>`;
     } else {
-      cont.innerHTML = st.carrito.map((l) => `
+      cont.innerHTML = v.carrito.map((l) => `
         <div class="td-linea">
           <div><b>${esc(l.nombre)}</b><small>${soles(l.precio)} c/u</small></div>
           <div class="td-cant">
@@ -166,54 +212,55 @@
           <strong>${soles(l.precio * l.cant)}</strong>
         </div>`).join("");
     }
-    q("tdTotal").textContent = soles(total());
+    q("tdTotal").textContent = soles(totalDe(v));
     document.querySelectorAll("#tiendaRoot [data-metodo]").forEach((b) =>
-      b.classList.toggle("activo", b.dataset.metodo === st.metodo));
-    pintarSocio();
-    pintarFiado();
-    pintarRegistrar();
+      b.classList.toggle("activo", b.dataset.metodo === v.metodo));
+    q("tdDni").value = v.dni;
+    pintarSocio(v);
+    pintarFiado(v);
+    pintarRegistrar(v);
+    pintarProductos();
+    pintarVentas();
   }
 
-  function pintarSocio() {
+  function pintarSocio(v) {
     const cont = q("tdSocio");
-    if (!dniValido(st.dni) && st.dni.length) {
+    if (v.dni.length && !dniValido(v.dni)) {
       cont.innerHTML = `<p class="td-ayuda">El DNI tiene 8 números.</p>`;
-    } else if (st.socio) {
-      cont.innerHTML = `<p class="td-socio-ok"><i class="fa-solid fa-circle-check"></i> ${esc(st.socio.nombre)}</p>`;
+    } else if (v.socio) {
+      cont.innerHTML = `<p class="td-socio-ok"><i class="fa-solid fa-circle-check"></i> ${esc(v.socio.nombre)}</p>`;
     } else {
       cont.innerHTML = "";
     }
   }
 
-  function pintarFiado() {
+  function pintarFiado(v) {
     const cont = q("tdFiado");
-    if (st.metodo !== "fiado") { cont.innerHTML = ""; return; }
-    const t = total();
-    const ayuda = !st.carrito.length
-      ? ""
+    if (v.metodo !== "fiado") { cont.innerHTML = ""; return; }
+    const t = totalDe(v);
+    const ayuda = !v.carrito.length ? ""
       : t <= UMBRAL
         ? `<p class="td-ayuda"><i class="fa-solid fa-circle-info"></i> Hasta S/ ${UMBRAL.toFixed(2)}: bloquea la entrada desde ${fechaCorta(sumarDias(hoyLima(), 1))}.</p>`
         : `<p class="td-ayuda"><i class="fa-solid fa-circle-info"></i> Más de S/ ${UMBRAL.toFixed(2)}: elija una fecha límite si quiere que bloquee la entrada. Sin fecha, no bloquea.</p>`;
     const fechaCampo = t > UMBRAL
       ? `<label class="td-campo"><span>Fecha límite (opcional)</span>
-           <input id="tdFechaLimite" type="date" min="${sumarDias(hoyLima(), 1)}" value="${esc(st.fechaLimite)}"></label>`
+           <input id="tdFechaLimite" type="date" min="${sumarDias(hoyLima(), 1)}" value="${esc(v.fechaLimite)}"></label>`
       : "";
     cont.innerHTML = fechaCampo + ayuda;
   }
 
-  function pintarRegistrar() {
+  function pintarRegistrar(v) {
     const cont = q("tdConfirmar");
     const btn = q("tdRegistrar");
-    const listo = st.carrito.length > 0 && !st.guardando &&
-      (st.metodo !== "fiado" || !!st.socio);
+    const listo = v.carrito.length > 0 && !v.guardando && (v.metodo !== "fiado" || !!v.socio);
     btn.disabled = !listo;
-    btn.textContent = st.metodo === "fiado" ? "Registrar fiado" : "Registrar venta";
-    if (!st.confirmando) { cont.innerHTML = ""; return; }
-    const detalle = st.metodo === "fiado"
-      ? `Fiar <b>${soles(total())}</b> a <b>${esc(st.socio.nombre)}</b>${st.fechaLimite
-          ? `, con fecha límite el ${fechaCorta(st.fechaLimite)}`
-          : total() <= UMBRAL ? `, que bloquea desde ${fechaCorta(sumarDias(hoyLima(), 1))}` : ", sin fecha límite (no bloquea)"}.`
-      : `Cobrar <b>${soles(total())}</b> en ${st.metodo === "yape_plin" ? "Yape / Plin" : "efectivo"}.`;
+    btn.textContent = v.guardando ? "Registrando…" : v.metodo === "fiado" ? "Registrar fiado" : "Registrar venta";
+    if (!v.confirmando) { cont.innerHTML = ""; return; }
+    const detalle = v.metodo === "fiado"
+      ? `Fiar <b>${soles(totalDe(v))}</b> a <b>${esc(v.socio.nombre)}</b>${v.fechaLimite
+          ? `, con fecha límite el ${fechaCorta(v.fechaLimite)}`
+          : totalDe(v) <= UMBRAL ? `, que bloquea desde ${fechaCorta(sumarDias(hoyLima(), 1))}` : ", sin fecha límite (no bloquea)"}.`
+      : `Cobrar <b>${soles(totalDe(v))}</b> en ${v.metodo === "yape_plin" ? "Yape / Plin" : "efectivo"}.`;
     cont.innerHTML = `<div class="td-confirmar" role="alertdialog" aria-label="Confirmar venta">
       <p>${detalle}</p>
       <div class="td-botones">
@@ -222,94 +269,79 @@
       </div></div>`;
   }
 
-  // Valida el DNI del socio (para fiar o para asociar la venta)
-  async function validarSocio(dni) {
-    st.socio = null;
-    if (!dniValido(dni)) { pintarCarrito(); return; }
+  function pintarTodo() { pintarCategorias(); pintarVenta(); }
+
+  // Valida el DNI del socio de una venta (para fiar o para asociarla)
+  async function validarSocio(v, dni) {
+    v.socio = null;
+    if (!dniValido(dni)) { pintarVenta(); return; }
     const { data, error } = await sb().from("socios").select("dni, nombre").eq("dni", dni).single();
-    if (st.dni !== dni) return; // cambió mientras consultaba
+    if (v.dni !== dni) return; // cambió mientras consultaba
     if (error || !data) {
       q("tdSocio").innerHTML = `<p class="td-error"><i class="fa-solid fa-circle-xmark"></i> No hay socio con ese DNI.</p>`;
-      pintarRegistrar();
+      pintarRegistrar(v);
       return;
     }
-    st.socio = { dni: data.dni, nombre: data.nombre };
-    pintarCarrito();
+    v.socio = { dni: data.dni, nombre: data.nombre };
+    pintarVenta();
   }
 
   function agregar(id) {
-    const p = st.productos.find((x) => x.id === id);
-    if (!p) return;
-    const linea = st.carrito.find((l) => l.id === id);
+    const v = ventaActiva();
+    const p = cat.productos.find((x) => x.id === id);
+    if (!p || !p.activo || disponible(p, v) <= 0) return;
+    const linea = v.carrito.find((l) => l.id === id);
     if (linea) linea.cant = Math.min(linea.cant + 1, 50);
-    else st.carrito.push({ id: p.id, nombre: p.nombre, precio: Number(p.precio), cant: 1 });
-    st.confirmando = false;
-    pintarCarrito();
+    else v.carrito.push({ id: p.id, nombre: p.nombre, precio: Number(p.precio), cant: 1 });
+    v.confirmando = false;
+    pintarVenta();
   }
 
   function cambiarCantidad(id, delta) {
-    const linea = st.carrito.find((l) => l.id === id);
+    const v = ventaActiva();
+    const linea = v.carrito.find((l) => l.id === id);
     if (!linea) return;
+    if (delta > 0) {
+      const p = cat.productos.find((x) => x.id === id);
+      if (!p || disponible(p, v) <= 0) return;
+    }
     linea.cant += delta;
-    if (linea.cant < 1) st.carrito = st.carrito.filter((l) => l.id !== id);
+    if (linea.cant < 1) v.carrito = v.carrito.filter((l) => l.id !== id);
     else linea.cant = Math.min(linea.cant, 50);
-    st.confirmando = false;
-    pintarCarrito();
+    v.confirmando = false;
+    pintarVenta();
   }
 
-  function limpiarVenta() {
-    st.carrito = [];
-    st.dni = "";
-    st.socio = null;
-    st.fechaLimite = "";
-    st.confirmando = false;
-    st.metodo = "efectivo";
-    q("tdDni").value = "";
-    pintarCarrito();
+  // Termina una venta: se quita de la lista y las demás siguen intactas
+  function terminarVenta(v) {
+    ui.ventas = ui.ventas.filter((x) => x.id !== v.id);
+    if (!ui.ventas.length) nuevaVenta();
+    ui.activa = ui.ventas[0].id;
+    pintarTodo();
   }
 
-  async function registrarVenta() {
-    if (st.guardando || !st.carrito.length) return;
-    if (st.metodo === "fiado" && !st.socio) return;
-    st.guardando = true;
-    pintarRegistrar();
+  async function registrarVenta(v) {
+    if (v.guardando || !v.carrito.length) return;
+    if (v.metodo === "fiado" && !v.socio) return;
+    v.guardando = true;
+    pintarRegistrar(v);
     try {
-      const items = st.carrito.map((l) => ({ producto_id: l.id, cantidad: l.cant }));
-      const dni = st.socio ? st.socio.dni : null;
-      const fecha = st.metodo === "fiado" && st.fechaLimite && total() > UMBRAL ? st.fechaLimite : null;
+      const items = v.carrito.map((l) => ({ producto_id: l.id, cantidad: l.cant }));
+      const dni = v.socio ? v.socio.dni : null;
+      const fecha = v.metodo === "fiado" && v.fechaLimite && totalDe(v) > UMBRAL ? v.fechaLimite : null;
       const { data, error } = await sb().rpc("registrar_venta", {
-        p_items: items, p_metodo: st.metodo, p_dni: dni, p_fecha_limite: fecha,
+        p_items: items, p_metodo: v.metodo, p_dni: dni, p_fecha_limite: fecha,
       });
       if (error) throw error;
-      const etiqueta = st.metodo === "fiado" ? "Fiado registrado" : "Venta registrada";
-      mostrarToast("✅ " + etiqueta + " · " + soles(data.total), "#10b981");
-      limpiarVenta();
+      mostrarToast("✅ " + (v.metodo === "fiado" ? "Fiado registrado" : "Venta registrada") + " · " + soles(data.total), "#10b981");
+      v.guardando = false;
+      terminarVenta(v);
+      cargarCatalogo().then(() => pintarProductos()).catch(() => {});
       cargarVentasHoy();
     } catch (e) {
       mostrarToast("❌ " + mensajeError(e), "#ef4444");
-    } finally {
-      st.guardando = false;
-      pintarRegistrar();
-    }
-  }
-
-  async function guardarProducto(ev) {
-    ev.preventDefault();
-    const nombre = q("tdPNombre").value.trim();
-    const precio = Number(q("tdPPrecio").value);
-    const categoria = q("tdPCat").value;
-    if (nombre.length < 2) return mostrarToast("Escriba el nombre del producto", "#ef4444");
-    if (!(precio > 0 && precio < 10000)) return mostrarToast("El precio debe ser mayor a S/ 0", "#ef4444");
-    try {
-      const { error } = await sb().from("productos").insert({ nombre, categoria, precio });
-      if (error) throw error;
-      mostrarToast("✅ Producto agregado", "#10b981");
-      q("tdFormProducto").reset();
-      await cargarProductos();
-      pintarCategorias();
-      pintarProductos();
-    } catch (e) {
-      mostrarToast("❌ " + mensajeError(e), "#ef4444");
+      v.guardando = false;
+      cargarCatalogo().then(() => pintarVenta()).catch(() => pintarRegistrar(v));
     }
   }
 
@@ -323,92 +355,90 @@
       root.addEventListener("click", onClick);
       root.addEventListener("input", onInput);
       root.addEventListener("change", onChange);
-      root.addEventListener("submit", onSubmit);
     }
+    if (!ui.ventas.length) nuevaVenta();
     try {
-      await cargarProductos();
+      await cargarCatalogo();
     } catch (e) {
       mostrarToast("❌ " + mensajeError(e), "#ef4444");
     }
-    pintarCategorias();
-    pintarProductos();
-    pintarCarrito();
+    pintarTodo();
     cargarVentasHoy();
   };
 
-  // Preselecciona un socio y el método fiar (desde el formulario de deuda)
+  // Abre una venta nueva con el socio ya elegido (desde el formulario de deuda)
   TD.iniciarFiado = async function (dni) {
     await TD.montar();
-    st.dni = dni;
-    st.metodo = "fiado";
-    q("tdDni").value = dni;
-    await validarSocio(dni);
+    let v = ventaActiva();
+    if (v.carrito.length || v.dni) v = nuevaVenta();
+    v.metodo = "fiado";
+    v.dni = dni;
+    pintarTodo();
+    await validarSocio(v, dni);
     q("tiendaRoot").scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   function onClick(ev) {
-    const t = ev.target.closest("button, [data-accion]");
+    const t = ev.target.closest("button");
     if (!t) return;
-    if (t.dataset.cat) { st.categoria = t.dataset.cat; pintarCategorias(); pintarProductos(); return; }
+    if (t.dataset.nueva) { if (ui.ventas.length < MAX_VENTAS) { nuevaVenta(); pintarTodo(); } return; }
+    if (t.dataset.cerrar) {
+      const v = ui.ventas.find((x) => x.id === t.dataset.cerrar);
+      if (v && !v.carrito.length && ui.ventas.length > 1) terminarVenta(v);
+      return;
+    }
+    if (t.dataset.ir) { ui.activa = t.dataset.ir; return pintarTodo(); }
+    if (t.dataset.cat) { ui.categoria = t.dataset.cat; return pintarTodo(); }
     if (t.dataset.id) return agregar(t.dataset.id);
     if (t.dataset.sumar) return cambiarCantidad(t.dataset.sumar, +1);
     if (t.dataset.restar) return cambiarCantidad(t.dataset.restar, -1);
     if (t.dataset.metodo) {
-      st.metodo = t.dataset.metodo;
-      st.confirmando = false;
-      if (st.metodo !== "fiado") st.fechaLimite = "";
-      return pintarCarrito();
+      const v = ventaActiva();
+      v.metodo = t.dataset.metodo;
+      v.confirmando = false;
+      if (v.metodo !== "fiado") v.fechaLimite = "";
+      return pintarVenta();
     }
-    if (t.dataset.accion === "limpiar") return limpiarVenta();
-    if (t.dataset.accion === "cancelar-confirmar") { st.confirmando = false; return pintarRegistrar(); }
-    if (t.dataset.accion === "confirmar") { st.confirmando = false; return registrarVenta(); }
-    if (t.id === "tdRegistrar") { st.confirmando = true; return pintarRegistrar(); }
+    if (t.dataset.accion === "gestionar") return TD.abrirGestion();
+    if (t.dataset.accion === "cancelar-confirmar") { const v = ventaActiva(); v.confirmando = false; return pintarRegistrar(v); }
+    if (t.dataset.accion === "confirmar") { const v = ventaActiva(); v.confirmando = false; return registrarVenta(v); }
+    if (t.id === "tdRegistrar") { const v = ventaActiva(); v.confirmando = true; return pintarRegistrar(v); }
   }
 
   function onInput(ev) {
     if (ev.target.id === "tdDni") {
-      const v = ev.target.value.replace(/\D/g, "").slice(0, 8);
-      ev.target.value = v;
-      st.dni = v;
-      st.confirmando = false;
-      if (dniValido(v)) validarSocio(v);
-      else { st.socio = null; pintarCarrito(); }
+      const v = ventaActiva();
+      const d = ev.target.value.replace(/\D/g, "").slice(0, 8);
+      ev.target.value = d;
+      v.dni = d;
+      v.confirmando = false;
+      if (dniValido(d)) validarSocio(v, d);
+      else { v.socio = null; pintarVenta(); }
     }
   }
 
   function onChange(ev) {
     if (ev.target.id === "tdFechaLimite") {
-      st.fechaLimite = ev.target.value || "";
-      pintarRegistrar();
+      ventaActiva().fechaLimite = ev.target.value || "";
+      pintarRegistrar(ventaActiva());
     }
-  }
-
-  function onSubmit(ev) {
-    if (ev.target.id === "tdFormProducto") guardarProducto(ev);
   }
 
   function plantilla() {
     return `
     <div class="td-wrap">
       <header class="td-head">
-        <h3><i class="fa-solid fa-bag-shopping"></i> Tienda</h3>
-        <p>Venta de suplementos y productos del gimnasio</p>
+        <div>
+          <h3><i class="fa-solid fa-bag-shopping"></i> Tienda</h3>
+          <p>Venta de suplementos y productos del gimnasio</p>
+        </div>
+        <button type="button" class="td-btn td-btn--sec td-gestionar" data-accion="gestionar"><i class="fa-solid fa-sliders"></i> Productos</button>
       </header>
+      <nav class="td-ventas" id="tdVentas" aria-label="Ventas en curso"></nav>
       <div class="td-grid">
         <section class="card td-catalogo" aria-label="Productos">
           <div class="td-cats" id="tdCats"></div>
           <div class="td-productos" id="tdProductos"></div>
-          <details class="td-nuevo">
-            <summary><i class="fa-solid fa-plus"></i> Agregar producto</summary>
-            <form id="tdFormProducto" class="td-form">
-              <label class="td-campo"><span>Nombre</span><input id="tdPNombre" maxlength="80" placeholder="Ej. Proteína 1 kg" required></label>
-              <label class="td-campo"><span>Categoría</span>
-                <select id="tdPCat">${CATEGORIAS.map((c) => `<option>${c}</option>`).join("")}</select></label>
-              <label class="td-campo"><span>Precio (S/)</span>
-                <input id="tdPPrecio" type="number" step="0.01" min="0.01" max="9999" inputmode="decimal" placeholder="0.00" required></label>
-              <button class="td-btn td-btn--sec" type="submit">Guardar producto</button>
-            </form>
-          </details>
         </section>
         <section class="card td-venta" aria-label="Venta actual">
           <h4>Venta</h4>
@@ -432,6 +462,234 @@
         <div id="tdHoy"></div>
       </section>
     </div>`;
+  }
+
+  // ---------- Gestión de productos y categorías ----------
+
+  const gest = { editandoId: null, confirmarBorrar: null, filtro: "Todas" };
+
+  TD.abrirGestion = async function () {
+    const modal = q("modalProductos");
+    if (!modal) return;
+    modal.hidden = false;
+    if (!modal.dataset.listo) {
+      modal.dataset.listo = "1";
+      modal.innerHTML = `<div class="td-modal" role="dialog" aria-modal="true" aria-labelledby="tdgTitulo">
+        <header class="td-deuda-head">
+          <div><h3 id="tdgTitulo">Productos y categorías</h3><p>Lo que se vende en la tienda</p></div>
+          <button type="button" class="td-cerrar" data-g="cerrar" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+        </header>
+        <form id="tdgForm" class="td-form td-gform" novalidate>
+          <h4 id="tdgFormTitulo">Nuevo producto</h4>
+          <div class="td-fila-2">
+            <label class="td-campo"><span>Nombre</span><input id="tdgNombre" maxlength="80" placeholder="Ej. Proteína 1 kg" autocomplete="off"></label>
+            <label class="td-campo"><span>Categoría</span><select id="tdgCat"></select></label>
+          </div>
+          <div class="td-fila-2">
+            <label class="td-campo"><span>Precio (S/)</span><input id="tdgPrecio" type="number" step="0.01" min="0.01" max="9999" inputmode="decimal" placeholder="0.00"></label>
+            <label class="td-campo td-check"><span>Control de stock</span>
+              <span class="td-switch"><input id="tdgControl" type="checkbox"><i></i> <em>Llevar cantidad disponible</em></span></label>
+          </div>
+          <label class="td-campo" id="tdgStockCampo" hidden><span>Stock disponible</span>
+            <input id="tdgStock" type="number" step="1" min="0" max="100000" inputmode="numeric" placeholder="0"></label>
+          <div class="td-botones">
+            <button type="button" class="td-btn td-btn--sec" data-g="cancelar-edicion" hidden>Cancelar edición</button>
+            <button type="submit" class="td-btn td-btn--main" id="tdgGuardar">Guardar producto</button>
+          </div>
+        </form>
+        <section class="td-gseccion" aria-labelledby="tdgCatTitulo">
+          <h4 id="tdgCatTitulo">Categorías</h4>
+          <div class="td-fila-acciones">
+            <input id="tdgNuevaCat" maxlength="40" placeholder="Nueva categoría" autocomplete="off" aria-label="Nombre de la nueva categoría">
+            <button type="button" class="td-btn td-btn--sec" data-g="crear-cat">Agregar</button>
+          </div>
+          <div id="tdgCategorias" class="td-glista"></div>
+        </section>
+        <section class="td-gseccion" aria-labelledby="tdgProdTitulo">
+          <div class="td-gseccion-cab">
+            <h4 id="tdgProdTitulo">Productos</h4>
+            <select id="tdgFiltro" aria-label="Filtrar por categoría"></select>
+          </div>
+          <div id="tdgProductos" class="td-glista"></div>
+        </section>
+      </div>`;
+      modal.addEventListener("click", onClickGestion);
+      modal.addEventListener("submit", onSubmitGestion);
+      modal.addEventListener("change", (ev) => {
+        if (ev.target.id === "tdgControl") toggleStockCampo();
+        if (ev.target.id === "tdgFiltro") { gest.filtro = ev.target.value; pintarGestion(); }
+      });
+      document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && !modal.hidden) TD.cerrarGestion(); });
+    }
+    try { await cargarCatalogo(); } catch (e) { mostrarToast("❌ " + mensajeError(e), "#ef4444"); }
+    pintarGestion();
+    q("tdgNombre").focus();
+  };
+
+  TD.cerrarGestion = function () {
+    const modal = q("modalProductos");
+    if (modal) modal.hidden = true;
+  };
+
+  function toggleStockCampo() {
+    const on = q("tdgControl").checked;
+    q("tdgStockCampo").hidden = !on;
+  }
+
+  function llenarSelects() {
+    const opciones = cat.categorias.map((c) => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
+    q("tdgCat").innerHTML = opciones;
+    q("tdgFiltro").innerHTML = `<option value="Todas">Todas las categorías</option>` +
+      cat.categorias.map((c) => `<option value="${esc(c)}"${c === gest.filtro ? " selected" : ""}>${esc(c)}</option>`).join("");
+  }
+
+  function pintarGestion() {
+    if (!q("tdgForm")) return;
+    llenarSelects();
+    const conteo = (c) => cat.productos.filter((p) => p.categoria === c);
+    q("tdgCategorias").innerHTML = cat.categorias.length ? cat.categorias.map((c) => {
+      const lista = conteo(c);
+      const activos = lista.filter((p) => p.activo).length;
+      const bloqueada = activos > 0;
+      const pendiente = gest.confirmarBorrar === c;
+      return `<div class="td-glinea">
+        <div><b>${esc(c)}</b><small>${activos} a la venta${lista.length - activos ? ` · ${lista.length - activos} desactivado(s)` : ""}</small></div>
+        ${c === "Otros" ? `<span class="td-chip-fijo">Fija</span>` : `
+        <button type="button" class="td-btn td-btn--sec td-btn-chico${pendiente ? " td-peligro" : ""}" data-g="borrar-cat" data-cat="${esc(c)}"
+          ${bloqueada ? `disabled title="Tiene ${activos} producto(s) a la venta. Muévalos antes de eliminarla"` : ""}>
+          ${pendiente ? "Confirmar" : "Eliminar"}</button>`}
+      </div>`;
+    }).join("") : `<p class="td-vacio">No hay categorías.</p>`;
+
+    const lista = cat.productos.filter((p) => gest.filtro === "Todas" || p.categoria === gest.filtro);
+    q("tdgProductos").innerHTML = lista.length ? lista.map((p) => {
+      const stock = tieneControl(p) ? `${p.stock} en stock` : "Sin control de stock";
+      return `<article class="td-gprod${p.activo ? "" : " inactivo"}">
+        <div class="td-gprod-info">
+          <b>${esc(p.nombre)}${p.activo ? "" : ` <em class="td-chip-off">Desactivado</em>`}</b>
+          <small>${esc(p.categoria)} · ${soles(p.precio)} · ${esc(stock)}</small>
+        </div>
+        <div class="td-gprod-acc">
+          <button type="button" class="td-btn td-btn--sec td-btn-chico" data-g="editar" data-id="${esc(p.id)}">Editar</button>
+          ${tieneControl(p) && p.activo ? `
+          <span class="td-reponer">
+            <input type="number" min="1" max="100000" step="1" inputmode="numeric" placeholder="+ uds" data-reponer-input="${esc(p.id)}" aria-label="Unidades a reponer">
+            <button type="button" class="td-btn td-btn--sec td-btn-chico" data-g="reponer" data-id="${esc(p.id)}">Reponer</button>
+          </span>` : ""}
+          <button type="button" class="td-btn td-btn--sec td-btn-chico" data-g="activar" data-id="${esc(p.id)}" data-activo="${p.activo}">${p.activo ? "Desactivar" : "Activar"}</button>
+        </div>
+      </article>`;
+    }).join("") : `<p class="td-vacio">Todavía no hay productos en esta categoría.</p>`;
+  }
+
+  function cargarFormulario(p) {
+    gest.editandoId = p ? p.id : null;
+    q("tdgFormTitulo").textContent = p ? "Editar producto" : "Nuevo producto";
+    q("tdgNombre").value = p ? p.nombre : "";
+    q("tdgCat").value = p ? p.categoria : (cat.categorias[0] || "");
+    q("tdgPrecio").value = p ? Number(p.precio).toFixed(2) : "";
+    q("tdgControl").checked = p ? tieneControl(p) : false;
+    q("tdgStock").value = p && tieneControl(p) ? p.stock : "";
+    q("tdgGuardar").textContent = p ? "Guardar cambios" : "Guardar producto";
+    q("tdgForm").querySelector('[data-g="cancelar-edicion"]').hidden = !p;
+    toggleStockCampo();
+    q("tdgNombre").focus();
+  }
+
+  // Muestra un error de gestión; si la función aún no existe en la base, lo explica
+  function errorGestion(e) {
+    const m = mensajeError(e);
+    if (/function .* does not exist|Could not find the function|schema cache/i.test(m)) {
+      return "Esta función todavía no está instalada en la base de datos. Avise al administrador.";
+    }
+    return m;
+  }
+
+  async function onSubmitGestion(ev) {
+    if (ev.target.id !== "tdgForm") return;
+    ev.preventDefault();
+    const nombre = q("tdgNombre").value.trim();
+    const categoria = q("tdgCat").value;
+    const precio = Number(q("tdgPrecio").value);
+    const control = q("tdgControl").checked;
+    const stock = control ? Number(q("tdgStock").value) : null;
+    if (nombre.length < 2) return mostrarToast("Escriba el nombre del producto", "#ef4444");
+    if (!categoria) return mostrarToast("Cree primero una categoría", "#ef4444");
+    if (!(precio > 0 && precio < 10000)) return mostrarToast("El precio debe ser mayor a S/ 0", "#ef4444");
+    if (control && (!Number.isInteger(stock) || stock < 0)) return mostrarToast("El stock debe ser un número entero, desde 0", "#ef4444");
+    try {
+      const { error } = await sb().rpc("guardar_producto", {
+        p_id: gest.editandoId, p_nombre: nombre, p_categoria: categoria, p_precio: precio, p_stock: stock,
+      });
+      if (error) throw error;
+      mostrarToast(gest.editandoId ? "✅ Producto actualizado" : "✅ Producto guardado", "#10b981");
+      cargarFormulario(null);
+      await cargarCatalogo();
+      pintarGestion();
+      pintarVenta();
+    } catch (e) {
+      mostrarToast("❌ " + errorGestion(e), "#ef4444");
+    }
+  }
+
+  async function onClickGestion(ev) {
+    const modal = q("modalProductos");
+    if (ev.target === modal) return TD.cerrarGestion();
+    const t = ev.target.closest("[data-g]");
+    if (!t) return;
+    const accion = t.dataset.g;
+    try {
+      if (accion === "cerrar") return TD.cerrarGestion();
+      if (accion === "cancelar-edicion") return cargarFormulario(null);
+      if (accion === "editar") return cargarFormulario(cat.productos.find((p) => p.id === t.dataset.id));
+      if (accion === "crear-cat") {
+        const input = q("tdgNuevaCat");
+        const nombre = input.value.trim();
+        if (nombre.length < 2) return mostrarToast("Escriba el nombre de la categoría", "#ef4444");
+        const { error } = await sb().rpc("crear_categoria", { p_nombre: nombre });
+        if (error) throw error;
+        input.value = "";
+        mostrarToast("✅ Categoría creada", "#10b981");
+        await cargarCatalogo();
+        return pintarGestion();
+      }
+      if (accion === "borrar-cat") {
+        const nombre = t.dataset.cat;
+        if (gest.confirmarBorrar !== nombre) {
+          gest.confirmarBorrar = nombre;
+          pintarGestion();
+          setTimeout(() => { if (gest.confirmarBorrar === nombre) { gest.confirmarBorrar = null; pintarGestion(); } }, 4000);
+          return;
+        }
+        gest.confirmarBorrar = null;
+        const { error } = await sb().rpc("eliminar_categoria", { p_nombre: nombre });
+        if (error) throw error;
+        mostrarToast("✅ Categoría eliminada", "#10b981");
+        await cargarCatalogo();
+        return pintarGestion();
+      }
+      if (accion === "activar") {
+        const { error } = await sb().rpc("activar_producto", { p_id: t.dataset.id, p_activo: t.dataset.activo !== "true" });
+        if (error) throw error;
+        mostrarToast("✅ Producto actualizado", "#10b981");
+        await cargarCatalogo();
+        pintarGestion();
+        return pintarVenta();
+      }
+      if (accion === "reponer") {
+        const input = modal.querySelector(`[data-reponer-input="${t.dataset.id}"]`);
+        const cantidad = Number(input && input.value);
+        if (!Number.isInteger(cantidad) || cantidad < 1) return mostrarToast("Escriba cuántas unidades se reponen", "#ef4444");
+        const { error } = await sb().rpc("reponer_stock", { p_id: t.dataset.id, p_cantidad: cantidad });
+        if (error) throw error;
+        mostrarToast("✅ Stock repuesto", "#10b981");
+        await cargarCatalogo();
+        pintarGestion();
+        return pintarVenta();
+      }
+    } catch (e) {
+      mostrarToast("❌ " + errorGestion(e), "#ef4444");
+    }
   }
 
   // ---------- Formulario de deuda del socio (botón "Deuda") ----------

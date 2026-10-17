@@ -153,3 +153,71 @@
   .td-confirmar, .td-modal{ animation:none; }
   .td-btn, .td-prod, .td-cat, .td-metodos button{ transition:none; }
 }
+
+/* ---------- Ventas en curso (una por cliente) ---------- */
+.td-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+.td-gestionar{ min-height:42px; padding:10px 14px; font-size:14px; width:auto; }
+.td-ventas{ display:flex; gap:8px; overflow-x:auto; padding:2px 2px 6px; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+.td-ventas::-webkit-scrollbar{ display:none; }
+.td-ticket{
+  display:inline-flex; align-items:center; flex:0 0 auto; min-height:46px; border-radius:14px;
+  border:1px solid rgba(148,163,184,.28); background:rgba(15,23,42,.6); color:#e2e8f0;
+  transition:border-color .2s, background .2s;
+}
+.td-ticket.activo{ border-color:#22d3a0; background:rgba(34,211,160,.12); box-shadow:0 0 0 3px rgba(34,211,160,.12); }
+.td-ticket-main{
+  display:flex; align-items:center; gap:10px; height:46px; padding:0 12px; background:transparent; border:0;
+  color:inherit; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap;
+}
+.td-ticket-main b{ color:#6ee7b7; font-variant-numeric:tabular-nums; }
+.td-ticket-x{ width:34px; height:46px; border:0; background:transparent; color:#94a3b8; font-size:20px; cursor:pointer; }
+.td-ticket--nuevo{ gap:8px; padding:0 14px; height:46px; border-style:dashed; color:#6ee7b7; background:transparent; font-size:14px; font-weight:700; cursor:pointer; }
+
+/* ---------- Stock ---------- */
+.td-stock{
+  display:inline-block; margin-top:4px; font-style:normal; font-size:11px; font-weight:700;
+  color:#6ee7b7; background:rgba(34,211,160,.12); padding:2px 8px; border-radius:999px;
+}
+.td-stock--bajo{ color:#fcd34d; background:rgba(245,158,11,.14); }
+.td-stock--cero{ color:#fca5a5; background:rgba(239,68,68,.14); }
+.td-prod.agotado{ opacity:.45; cursor:not-allowed; }
+.td-prod.agotado:hover{ border-color:rgba(148,163,184,.18); }
+
+/* ---------- Gestión de productos ---------- */
+.td-gform{ margin-top:0; }
+.td-gform h4{ margin:0 0 4px; font-size:15px; font-weight:800; color:#f1f5f9; }
+.td-fila-2{ display:grid; grid-template-columns:1fr; gap:10px; }
+@media (min-width: 560px){ .td-fila-2{ grid-template-columns:1fr 1fr; } }
+.td-switch{ display:inline-flex; align-items:center; gap:10px; min-height:44px; color:#cbd5e1; font-size:14px; }
+.td-switch input{ width:auto !important; min-height:auto !important; margin:0; }
+.td-gseccion{ margin-top:18px; padding-top:14px; border-top:1px solid rgba(148,163,184,.15); }
+.td-gseccion h4{ margin:0 0 10px; font-size:14px; font-weight:800; color:#e2e8f0; }
+.td-gseccion-cab{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+.td-gseccion-cab h4{ margin:0; }
+.td-gseccion-cab select{
+  background:rgba(2,6,23,.6); border:1px solid rgba(148,163,184,.25); color:#f1f5f9;
+  border-radius:11px; padding:9px 12px; font-size:14px; min-height:42px; width:auto; min-width:200px;
+}
+.td-glista{ display:grid; gap:8px; }
+.td-glinea{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; background:rgba(2,6,23,.4); }
+.td-glinea b{ color:#f1f5f9; font-size:14px; }
+.td-glinea small, .td-gprod-info small{ display:block; color:#94a3b8; font-size:12px; margin-top:2px; }
+.td-chip-fijo, .td-chip-off{
+  font-size:11px; font-style:normal; font-weight:700; color:#94a3b8; border:1px solid rgba(148,163,184,.3);
+  border-radius:999px; padding:2px 8px; white-space:nowrap;
+}
+.td-chip-off{ margin-left:6px; color:#fca5a5; border-color:rgba(248,113,113,.4); }
+.td-btn-chico{ min-height:38px !important; padding:8px 12px !important; font-size:13px !important; width:auto !important; margin-top:0 !important; }
+.td-peligro{ color:#fecaca !important; border-color:rgba(248,113,113,.5) !important; background:rgba(239,68,68,.15) !important; }
+button:disabled.td-btn-chico{ opacity:.4; cursor:not-allowed; }
+.td-gprod{ display:grid; gap:10px; padding:12px; border-radius:14px; background:rgba(2,6,23,.45); border:1px solid rgba(148,163,184,.15); }
+.td-gprod.inactivo{ opacity:.6; }
+.td-gprod-info b{ color:#f1f5f9; font-size:14px; }
+.td-gprod-acc{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.td-reponer{ display:inline-flex; gap:6px; align-items:center; }
+.td-reponer input{ width:96px !important; min-height:38px !important; padding:6px 10px !important; font-size:14px !important; }
+#modalProductos .td-modal{ max-width:680px; }
+
+/* Los elementos con el atributo hidden deben ocultarse aunque tengan display propio */
+.td-wrap [hidden], #modalProductos [hidden], #modalDeuda [hidden]{ display:none !important; }
+.td-ventas .td-ticket--nuevo{ width:auto; flex:0 0 auto; }

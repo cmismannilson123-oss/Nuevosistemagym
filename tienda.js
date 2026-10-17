@@ -323,6 +323,8 @@
   async function registrarVenta(v) {
     if (v.guardando || !v.carrito.length) return;
     if (v.metodo === "fiado" && !v.socio) return;
+    // Un DNI escrito que aún no se valida no debe perderse en silencio
+    if (dniValido(v.dni) && !v.socio) return mostrarToast("Revise el DNI del socio antes de registrar", "#ef4444");
     v.guardando = true;
     pintarRegistrar(v);
     try {
@@ -536,9 +538,13 @@
     q("tdgStockCampo").hidden = !on;
   }
 
+  // Al volver a dibujar las listas se conserva lo que el usuario ya eligió en el formulario
   function llenarSelects() {
+    const selCat = q("tdgCat");
+    const elegida = selCat.value;
     const opciones = cat.categorias.map((c) => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
-    q("tdgCat").innerHTML = opciones;
+    selCat.innerHTML = opciones;
+    if (cat.categorias.includes(elegida)) selCat.value = elegida;
     q("tdgFiltro").innerHTML = `<option value="Todas">Todas las categorías</option>` +
       cat.categorias.map((c) => `<option value="${esc(c)}"${c === gest.filtro ? " selected" : ""}>${esc(c)}</option>`).join("");
   }

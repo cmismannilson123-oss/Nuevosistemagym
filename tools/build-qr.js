@@ -116,7 +116,7 @@ function leerBloquesScript(html) {
 // Elementos que solo usa el panel del personal: no van en la pantalla del socio
 const PANEL_SOLO = [
   'id="topbarPrincipal"', 'id="topbarSpacer"', 'class="tabs"', 'class="dashboard"',
-  'id="tab1"', 'id="tab2"', 'id="tab3"', 'id="tab4"', 'id="tab5"',
+  'id="tab1"', 'id="tab2"', 'id="tab3"', 'id="tab5"',
   'id="modalRenovar"', 'id="modalEditarSocio"', 'id="modalCuaderno"', 'id="cyAvisos"',
   'id="modalPreciosInvite"', 'id="voucher"', 'id="loading-screen"',
   'id="tab6"', 'id="modalDeuda"', 'id="modalProductos"',

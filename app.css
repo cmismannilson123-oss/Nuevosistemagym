@@ -1332,7 +1332,7 @@ input:focus, select:focus, textarea:focus{
   z-index: 500;
   box-shadow: 0 -6px 24px rgba(0,0,0,0.45);
 }
-.tabbtn, .tabbtn.active, .tabbtn-qr{
+.tabbtn, .tabbtn.active, .tabbtn-centro{
   flex: 1 1 0 !important;
   min-width: 0 !important;
   max-width: none !important;
@@ -1379,20 +1379,20 @@ input:focus, select:focus, textarea:focus{
   background: none !important;
   color: var(--emerald) !important;
 }
-.tabbtn-qr{
+.tabbtn-centro{
   background: linear-gradient(160deg, var(--emerald), #059669) !important;
   color: #fff !important;
   box-shadow: 0 0 14px rgba(16,185,129,0.4) !important;
 }
-.tabbtn-qr i, .tabbtn-qr span{ color:#fff !important; }
-.tabbtn-qr.active, .tabbtn-qr:hover{
+.tabbtn-centro i, .tabbtn-centro span{ color:#fff !important; }
+.tabbtn-centro.active, .tabbtn-centro:hover{
   box-shadow: 0 0 22px rgba(16,185,129,0.6) !important;
 }
 .tabbtn:hover{
   transform: none !important;
   box-shadow: none !important;
 }
-.tabbtn-qr:hover{
+.tabbtn-centro:hover{
   box-shadow: 0 0 22px rgba(16,185,129,0.6) !important;
 }
 
@@ -2188,15 +2188,15 @@ html, body{
 }
 @keyframes cyNavPop{ 0%{ transform:translateY(3px) scale(.82); } 60%{ transform:translateY(-2px) scale(1.1); } 100%{ transform:none; } }
 @keyframes cyNavBar{ from{ transform:scaleX(0); opacity:0; } to{ transform:scaleX(1); opacity:1; } }
-.tabs .tabbtn-qr{
+.tabs .tabbtn-centro{
   background:linear-gradient(160deg,#17c590,#0a7f58) !important; color:#03140d !important;
   border-radius:18px !important; box-shadow:0 8px 20px -8px rgba(16,185,129,.8), inset 0 1px 0 rgba(255,255,255,.3) !important;
 }
-.tabs .tabbtn-qr i, .tabs .tabbtn-qr span{ color:#03140d !important; }
-.tabs .tabbtn-qr i{ background:transparent !important; }
-.tabs .tabbtn-qr.active i{ background:rgba(0,0,0,.14) !important; }
-.tabs .tabbtn-qr.active::before{ display:none; }
-.tabs .tabbtn-qr::after{
+.tabs .tabbtn-centro i, .tabs .tabbtn-centro span{ color:#03140d !important; }
+.tabs .tabbtn-centro i{ background:transparent !important; }
+.tabs .tabbtn-centro.active i{ background:rgba(0,0,0,.14) !important; }
+.tabs .tabbtn-centro.active::before{ display:none; }
+.tabs .tabbtn-centro::after{
   content:""; position:absolute; inset:0; border-radius:18px; border:2px solid rgba(52,211,153,.65); opacity:0;
   animation:cyQrPulse 3.4s ease-out 1.5s infinite; pointer-events:none;
 }
@@ -2215,7 +2215,7 @@ html, body{
 @keyframes cyPanelIn{ from{ opacity:0; translate:0 8px; } to{ opacity:1; translate:0 0; } }
 
 @media (prefers-reduced-motion: reduce){
-  .tabs .tabbtn-qr::after, .tabs .tabbtn.active i, .tabs .tabbtn.active::before, .panel.active, .res-card, .res-bar i{ animation:none !important; }
+  .tabs .tabbtn-centro::after, .tabs .tabbtn.active i, .tabs .tabbtn.active::before, .panel.active, .res-card, .res-bar i{ animation:none !important; }
 }
 
 /* ==========================================================================
@@ -2257,16 +2257,16 @@ html, body{
 
 /* Navegación inferior: QR como acción central elevada */
 .tabs{ overflow:visible !important; align-items:center !important; }
-.tabs .tabbtn-qr{
+.tabs .tabbtn-centro{
   order:0; flex:0 0 64px !important; width:64px !important; height:64px; margin-top:-30px !important; padding:0 !important;
   border-radius:50% !important; border:5px solid #07100d !important;
   background:linear-gradient(160deg,#1fd6a0,#0a8a60) !important;
   box-shadow:0 12px 26px -8px rgba(16,185,129,.85), 0 0 0 1px rgba(52,211,153,.35) !important;
 }
-.tabs .tabbtn-qr span{ display:none !important; }
-.tabs .tabbtn-qr i{ width:auto !important; height:auto !important; font-size:23px !important; color:#03140d !important; }
-.tabs .tabbtn-qr::after{ border-radius:50%; }
-.tabs .tabbtn-qr.active{ box-shadow:0 14px 30px -8px rgba(16,185,129,1), 0 0 0 2px rgba(52,211,153,.7) !important; }
+.tabs .tabbtn-centro span{ display:none !important; }
+.tabs .tabbtn-centro i{ width:auto !important; height:auto !important; font-size:23px !important; color:#03140d !important; }
+.tabs .tabbtn-centro::after{ border-radius:50%; }
+.tabs .tabbtn-centro.active{ box-shadow:0 14px 30px -8px rgba(16,185,129,1), 0 0 0 2px rgba(52,211,153,.7) !important; }
 
 /* Avisos emergentes con el mismo lenguaje */
 .cy-toast{

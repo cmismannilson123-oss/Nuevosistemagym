@@ -656,10 +656,9 @@
   <div class="tabs">
     <button class="tabbtn active" onclick="showTab(1,event)"><i class="fa-solid fa-door-open"></i><span>Ingreso</span></button>
     <button class="tabbtn" onclick="showTab(2,event)"><i class="fa-solid fa-user-plus"></i><span>Registro</span></button>
-    <button class="tabbtn tabbtn-qr" onclick="showTab(4,event)" aria-label="Código QR de ingreso"><i class="fa-solid fa-qrcode"></i><span>QR</span></button>
+    <button class="tabbtn tabbtn-centro" onclick="showTab(6,event)" aria-label="Tienda"><i class="fa-solid fa-bag-shopping"></i><span>Tienda</span></button>
     <button class="tabbtn" onclick="showTab(3,event)"><i class="fa-solid fa-users"></i><span>Lista</span></button>
     <button class="tabbtn" onclick="showTab(5,event)"><i class="fa-solid fa-paper-plane"></i><span>Invitar</span></button>
-    <button class="tabbtn" onclick="showTab(6,event)"><i class="fa-solid fa-bag-shopping"></i><span>Tienda</span></button>
   </div>
 
   <div id="tab1" class="panel active">
@@ -759,15 +758,6 @@
     <div id="lista" class="socios-grid"></div>
   </div>
 
-  <div id="tab4" class="panel">
-    <div class="card" style="text-align:center;">
-      <h3 style="justify-content:center"><i class="fa-solid fa-qrcode"></i> QR de ingreso</h3>
-      <p style="color:#94a3b8; margin-bottom:20px;">Escanea el código QR desde tu celular para registrar asistencia automáticamente</p>
-      <div class="qr-box">
-        <div id="gymQR"></div>
-      </div>
-    </div>
-  </div>
   <!-- PANEL DE INVITACIONES Y PROMOCIONES (TAB 5) -->
   <div id="tab6" class="panel"><div id="tiendaRoot"></div></div>
   <div id="tab5" class="panel">
@@ -787,6 +777,14 @@
       <button class="btn-whatsapp" onclick="enviarInvitacionWhatsApp()" style="background: #25d366; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;">
         <i class="fa-brands fa-whatsapp"></i> Enviar Información Completa por WhatsApp
       </button>
+    </div>
+
+    <div class="card cy-qr-ingreso" style="text-align:center;">
+      <h3 style="justify-content:center"><i class="fa-solid fa-qrcode"></i> QR de ingreso</h3>
+      <p style="color:#94a3b8; margin-bottom:20px;">Escanea el código QR desde tu celular para registrar asistencia automáticamente</p>
+      <div class="qr-box">
+        <div id="gymQR"></div>
+      </div>
     </div>
     </div>
 
@@ -1267,7 +1265,7 @@ async function inicializarFlujoQRInterno(){
     const tabs = document.querySelector(".tabs");
     if(tabs) tabs.style.display = "none";
 
-    const panels = ["tab1", "tab2", "tab3", "tab4"];
+    const panels = ["tab1", "tab2", "tab3", "tab5", "tab6"];
     panels.forEach(p => {
       const el = document.getElementById(p);
       if(el) el.style.display = "none";
@@ -5470,7 +5468,7 @@ window.cyConfirmarIngreso = function(nombre){
     var espacio = 24;
     if (nav && getComputedStyle(nav).display !== 'none') {
       var vh = window.innerHeight, r = nav.getBoundingClientRect(), mayor = vh - r.top;
-      var qr = nav.querySelector('.tabbtn-qr');
+      var qr = nav.querySelector('.tabbtn-centro');
       if (qr) { var rq = qr.getBoundingClientRect(); mayor = Math.max(mayor, vh - rq.top); }
       espacio = Math.ceil(mayor) + 22;
     } else {

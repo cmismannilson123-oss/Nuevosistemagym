@@ -1031,6 +1031,31 @@ function mostrarToast(mensaje,color="#10b981"){
   setTimeout(()=>{ toast.remove(); },3000);
 }
 
+function cyTarjetaBloqueoTienda(nombre, deudas){
+  const MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+  const fecha = (iso) => { if(!iso) return "—"; const [, m, d] = String(iso).split("-").map(Number); return d + " " + MESES[m - 1]; };
+  const lista = Array.isArray(deudas) ? deudas : [];
+  const total = lista.reduce((s, d) => s + (Number(d.saldo) || 0), 0);
+  const filas = lista.map((d) => `
+    <li class="tb-fila">
+      <div>
+        <b>${escaparHTML(d.articulos || "Productos de tienda")}</b>
+        <small>Compra del ${escaparHTML(fecha(d.fecha))} · bloqueado desde el ${escaparHTML(fecha(d.vence))}</small>
+      </div>
+      <strong>S/ ${(Number(d.saldo) || 0).toFixed(2)}</strong>
+    </li>`).join("");
+  return `
+  <article class="tb-card" role="alert" aria-live="assertive">
+    <div class="tb-icono" aria-hidden="true"><i class="fa-solid fa-lock"></i></div>
+    <p class="tb-kicker">Ingreso bloqueado</p>
+    <h2 class="tb-titulo">Deuda de producto fiado</h2>
+    <p class="tb-nombre">${escaparHTML(nombre || "Socio")}</p>
+    <div class="tb-total"><span>Debe en total</span><b>S/ ${total.toFixed(2)}</b></div>
+    <ul class="tb-lista">${filas}</ul>
+    <p class="tb-pie"><i class="fa-solid fa-store" aria-hidden="true"></i> Acérquese a recepción para pagar su deuda y activar su ingreso.</p>
+  </article>`;
+}
+
 function mostrarTarjetaEstado(titulo, mensaje, color="#ef4444"){
   const div = document.getElementById("qrResult");
   if(!div) return;
@@ -1161,6 +1186,14 @@ window.buscarQR = async function(esPrimeraVez){
     } else {
       mostrarFormularioSocioQR("No encontramos un socio con ese celular ni con ese DNI. Si ya te inscribiste, acércate a recepción.", { tipo: "error", titulo: "Número no registrado. ", tel: telefono, dni: dni, foco: "tel" });
     }
+    return;
+  }
+
+  // Deuda de tienda que bloquea: no se ofrece marcar; se muestra la tarjeta de bloqueo
+  if (socio.tienda_bloqueada) {
+    window.pendingQR = null;
+    div.innerHTML = cyTarjetaBloqueoTienda(socio.nombre, socio.deudas_tienda);
+    playSound("VENCIDO");
     return;
   }
 
@@ -1322,6 +1355,11 @@ window.confirmarAsistenciaQR = async function () {
           cyAvisarIntento();
           mostrarTarjetaEstado("🚫 ACCESO BLOQUEADO", `<b>${escaparHTML(resultado.nombre)}</b><br><br>💰 Deuda pendiente: <b>S/ ${escaparHTML(resultado.deuda)}</b><br><br>Regularice su pago para habilitar su acceso.`, "#ef4444");
           break;
+        case "BLOQUEADO_TIENDA": {
+          const dv = document.getElementById("qrResult");
+          if (dv) dv.innerHTML = cyTarjetaBloqueoTienda(resultado.nombre, resultado.deudas);
+          break;
+        }
         case "BLOQUEADO":
           mostrarTarjetaEstado("🚫 DEMASIADOS INTENTOS", "Espera 15 minutos o acércate a recepción.", "#ef4444");
           break;

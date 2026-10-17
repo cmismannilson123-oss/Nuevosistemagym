@@ -1551,6 +1551,33 @@ function mostrarToast(mensaje,color="#10b981"){
   setTimeout(()=>{ toast.remove(); },3000);
 }
 
+// Tarjeta de ingreso bloqueado por deuda de productos (tienda).
+// Reemplaza la pantalla de marcar asistencia: el socio ve cuánto debe y por qué.
+function cyTarjetaBloqueoTienda(nombre, deudas){
+  const MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
+  const fecha = (iso) => { if(!iso) return "—"; const [, m, d] = String(iso).split("-").map(Number); return d + " " + MESES[m - 1]; };
+  const lista = Array.isArray(deudas) ? deudas : [];
+  const total = lista.reduce((s, d) => s + (Number(d.saldo) || 0), 0);
+  const filas = lista.map((d) => `
+    <li class="tb-fila">
+      <div>
+        <b>${escaparHTML(d.articulos || "Productos de tienda")}</b>
+        <small>Compra del ${escaparHTML(fecha(d.fecha))} · bloqueado desde el ${escaparHTML(fecha(d.vence))}</small>
+      </div>
+      <strong>S/ ${(Number(d.saldo) || 0).toFixed(2)}</strong>
+    </li>`).join("");
+  return `
+  <article class="tb-card" role="alert" aria-live="assertive">
+    <div class="tb-icono" aria-hidden="true"><i class="fa-solid fa-lock"></i></div>
+    <p class="tb-kicker">Ingreso bloqueado</p>
+    <h2 class="tb-titulo">Deuda de producto fiado</h2>
+    <p class="tb-nombre">${escaparHTML(nombre || "Socio")}</p>
+    <div class="tb-total"><span>Debe en total</span><b>S/ ${total.toFixed(2)}</b></div>
+    <ul class="tb-lista">${filas}</ul>
+    <p class="tb-pie"><i class="fa-solid fa-store" aria-hidden="true"></i> Acérquese a recepción para pagar su deuda y activar su ingreso.</p>
+  </article>`;
+}
+
 function mostrarTarjetaEstado(titulo, mensaje, color="#ef4444"){
   const div = document.getElementById("qrResult");
   if(!div) return;
@@ -3129,6 +3156,14 @@ window.buscarQR = async function(esPrimeraVez){
     return;
   }
 
+  // Deuda de tienda que bloquea: no se ofrece marcar; se muestra la tarjeta de bloqueo
+  if (socio.tienda_bloqueada) {
+    window.pendingQR = null;
+    div.innerHTML = cyTarjetaBloqueoTienda(socio.nombre, socio.deudas_tienda);
+    playSound("VENCIDO");
+    return;
+  }
+
   socio.dni = dni;
   window.cyCupones = socio.cupones || {};
   window.cyFinSocio = socio.fecha_fin;
@@ -3286,6 +3321,11 @@ window.confirmarAsistenciaQR = async function () {
           cyAvisarIntento();
           mostrarTarjetaEstado("🚫 ACCESO BLOQUEADO", `<b>${escaparHTML(resultado.nombre)}</b><br><br>💰 Deuda pendiente: <b>S/ ${escaparHTML(resultado.deuda)}</b><br><br>Regularice su pago para habilitar su acceso.`, "#ef4444");
           break;
+        case "BLOQUEADO_TIENDA": {
+          const dv = document.getElementById("qrResult");
+          if (dv) dv.innerHTML = cyTarjetaBloqueoTienda(resultado.nombre, resultado.deudas);
+          break;
+        }
         case "BLOQUEADO":
           mostrarTarjetaEstado("🚫 DEMASIADOS INTENTOS", "Espera 15 minutos o acércate a recepción.", "#ef4444");
           break;
@@ -3756,7 +3796,8 @@ window.enviarInvitacionWhatsApp = function() {
     ins: { t:'Inscripciones', u:'Inscripción',   i:'fa-user-plus' },
     ren: { t:'Renovaciones',  u:'Renovación',    i:'fa-rotate-right' },
     ade: { t:'Adelantos',     u:'Adelanto',      i:'fa-forward' },
-    deu: { t:'Deudas cobradas', u:'Cobro de deuda', i:'fa-hand-holding-dollar' }
+    deu: { t:'Deudas cobradas', u:'Cobro de deuda', i:'fa-hand-holding-dollar' },
+    tie: { t:'Tienda',        u:'Venta de tienda', i:'fa-bag-shopping' }
   };
   const CACHE_LS = 'cy_cuaderno_v1';
   const cache = new Map();           // 'YYYY-MM' -> { filas, ts }
@@ -3773,8 +3814,17 @@ window.enviarInvitacionWhatsApp = function() {
   const sinTildes = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   const esc = (s) => escaparHTML(s == null ? '' : String(s));
 
+  // Conceptos de tienda empiezan con "Tienda" (ventas, pagos de fiados)
+  const esTienda = (concepto) => /^tienda\b/.test(sinTildes(concepto));
+  // Lo que se muestra como descripción: los productos, sin el prefijo del concepto
+  const descripcionTienda = (concepto) => String(concepto || '')
+    .replace(/^tienda\s*[·:]\s*/i, '')
+    .replace(/^(venta|pago de fiado|fiado pagado|canceló fiado)\s*:\s*/i, '')
+    .trim() || 'Productos';
+
   function tipoDe(concepto){
     const c = sinTildes(concepto);
+    if (esTienda(concepto)) return 'tie';
     if (c.includes('inscrip')) return 'ins';
     if (c.includes('adelanto')) return 'ade';
     if (c.includes('cancelo') || c.includes('abono') || c.includes('deuda')) return 'deu';
@@ -3787,15 +3837,23 @@ window.enviarInvitacionWhatsApp = function() {
     const m = plan.match(/\s*\(Inicia:\s*(\d{1,2})\/(\d{1,2})\/(\d{4})\)\s*$/i);
     if (m) { plan = plan.slice(0, m.index).trim(); inicia = `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`; }
     const l = lima(r.fecha || r.fecha_movimiento);
+    const tienda = esTienda(r.concepto);
+    const c = sinTildes(r.concepto);
+    const dni = String(r.dni || '');
+    let cobro = null;
+    if (tienda) cobro = c.includes('fiado pagado') || c.includes('cancelo fiado') ? 'Fiado pagado'
+                      : c.includes('pago de fiado') || c.includes('abono') ? 'Pago de fiado' : 'Venta';
+    else if (c.includes('abono')) cobro = 'Abono a deuda';
+    if (tienda) plan = descripcionTienda(r.concepto);
     return {
       dia: l.toISOString().slice(0, 10),
       hora: l.toISOString().slice(11, 16),
       ts: new Date(r.fecha || r.fecha_movimiento).getTime(),
-      dni: String(r.dni || ''),
-      nombre: String(r.nombre || '').trim() || 'Socio',
+      dni,
+      nombre: String(r.nombre || '').trim() || (tienda && !dni ? 'Cliente de tienda' : 'Socio'),
       plan: plan || 'Membresía',
       tipo: tipoDe(r.concepto),
-      cobro: sinTildes(r.concepto).includes('abono') ? 'Abono a deuda' : null,
+      cobro,
       monto: parseFloat(r.monto != null ? r.monto : r.monto_ingreso) || 0,
       deuda: parseFloat(r.deuda != null ? r.deuda : r.deuda_visual) || 0,
       inicia, pendiente: !!pendiente
@@ -3867,7 +3925,7 @@ window.enviarInvitacionWhatsApp = function() {
   }
 
   function pintarResumen(filas){
-    const tot = { ins:[0,0], ren:[0,0], ade:[0,0], deu:[0,0] };
+    const tot = { ins:[0,0], ren:[0,0], ade:[0,0], deu:[0,0], tie:[0,0] };
     let total = 0, hoy = 0; const h = hoyLima();
     filas.forEach(f => { total += f.monto; tot[f.tipo][0] += f.monto; tot[f.tipo][1]++; if (f.dia === h) hoy += f.monto; });
     const esActual = st.mes === mesActual();

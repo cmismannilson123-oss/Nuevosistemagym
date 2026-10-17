@@ -119,6 +119,7 @@ const PANEL_SOLO = [
   'id="tab1"', 'id="tab2"', 'id="tab3"', 'id="tab4"', 'id="tab5"',
   'id="modalRenovar"', 'id="modalEditarSocio"', 'id="modalCuaderno"', 'id="cyAvisos"',
   'id="modalPreciosInvite"', 'id="voucher"', 'id="loading-screen"',
+  'id="tab6"', 'id="modalDeuda"',
 ];
 
 // Quita un elemento completo (con todo lo que tiene dentro) a partir de un atributo
@@ -255,6 +256,8 @@ function construir() {
   cabecera = cabecera.replace(/<script>\s*if \(window\.location\.search\.includes\("qr=1"\)\)[\s\S]*?<\/script>/,
     '<script>document.documentElement.classList.add("qr-mode");</script>\n  <link rel="manifest" href="manifest-qr.json">');
   cabecera = cabecera.replace(/<script[^>]*src="[^"]*(html2canvas|qrcode)[^"]*"[^>]*><\/script>\n?/g, '');
+  // Hoja de estilos solo del panel de tienda: no se usa en la pantalla del socio
+  cabecera = cabecera.replace(/<link rel="stylesheet" href="tienda\.css">\n?/g, '');
   // Metas y título que gym.html repite: se dejan la primera vez
   for (const meta of [/<meta charset="UTF-8">\n?/, /<meta name="viewport"[^>]*>\n?/, /<title>[^<]*<\/title>\n?/]) {
     let visto = false;

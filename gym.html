@@ -44,6 +44,7 @@
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" onload="window.cyQrListo && window.cyQrListo()"></script>
 
 <link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="tienda.css">
 </head>
 
 <body>
@@ -658,6 +659,7 @@
     <button class="tabbtn tabbtn-qr" onclick="showTab(4,event)" aria-label="Código QR de ingreso"><i class="fa-solid fa-qrcode"></i><span>QR</span></button>
     <button class="tabbtn" onclick="showTab(3,event)"><i class="fa-solid fa-users"></i><span>Lista</span></button>
     <button class="tabbtn" onclick="showTab(5,event)"><i class="fa-solid fa-paper-plane"></i><span>Invitar</span></button>
+    <button class="tabbtn" onclick="showTab(6,event)"><i class="fa-solid fa-bag-shopping"></i><span>Tienda</span></button>
   </div>
 
   <div id="tab1" class="panel active">
@@ -767,6 +769,7 @@
     </div>
   </div>
   <!-- PANEL DE INVITACIONES Y PROMOCIONES (TAB 5) -->
+  <div id="tab6" class="panel"><div id="tiendaRoot"></div></div>
   <div id="tab5" class="panel">
     <div class="seg" role="tablist" aria-label="Invitar o Premios">
       <button type="button" id="segEnviar" class="seg-b on" role="tab" aria-selected="true" onclick="cyInvTab('enviar')"><i class="fa-solid fa-paper-plane"></i> Invitar</button>
@@ -839,6 +842,11 @@
 </div>
 
 
+<div id="modalDeuda" class="td-modal-fondo" hidden>
+  <div class="td-modal" role="dialog" aria-modal="true" aria-labelledby="tdDeudaTitulo">
+    <div id="tdDeudaRoot"></div>
+  </div>
+</div>
 <div id="modalRenovar" class="modal-backdrop" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,.85);z-index:99999;justify-content:center;align-items:center;">
   <div class="card modal-panel" style="width:95%;max-width:420px;margin-bottom:0;background:#0e1a17;border:1.5px solid rgba(16, 185, 129, 0.45);animation: modalPanelPop .35s cubic-bezier(0.175, 0.885, 0.32, 1.275);">
     <h2 style="text-align:center;margin-top:0;font-weight:800;color:#fff;"><i class="fa-solid fa-rotate" style="color:#10b981;"></i> Renovar membresía</h2>
@@ -2174,6 +2182,11 @@ function socioPuedeIngresar(socio){
   return !c.tieneBloqueoDeuda && c.estado === "ACTIVO";
 }
 
+// Si no se puede leer la deuda de tienda, no se marca (falla cerrado)
+async function resumenTiendaSocio(dni){
+  try { return await TD.resumenSocio(dni); } catch(e) { return null; }
+}
+
 // La flecha del buscador muestra lo que va a pasar: escribe el DNI (deshabilitada),
 // marcar ingreso (check), o no puede ingresar (apagada)
 function estadoBotonIngreso(estado){
@@ -2196,15 +2209,25 @@ async function traerSocioPorDni(dni){
   return (error || !data) ? null : data;
 }
 
-function mostrarTarjetaBusqueda(socio){
+async function mostrarTarjetaBusqueda(socio){
   const div = document.getElementById("resultado");
   if(!div) return;
-  estadoBotonIngreso(socioPuedeIngresar(socio) ? "listo" : "no");
+  const resumen = await resumenTiendaSocio(socio.dni);
+  // Si el DNI cambió mientras se consultaba, no se pinta una tarjeta vieja
+  const bDni = document.getElementById("buscarDni");
+  if(bDni && bDni.value !== String(socio.dni)) return;
+  const puede = !!resumen && !resumen.bloquea && socioPuedeIngresar(socio);
+  estadoBotonIngreso(puede ? "listo" : "no");
   const c = scCuerpo(socio);
+  const aviso = !resumen
+    ? `<p class="td-error"><i class="fa-solid fa-circle-exclamation"></i> No se pudo verificar la deuda de tienda. Intente de nuevo.</p>`
+    : "";
   div.innerHTML = `
   <article class="sc sc--${c.st} sc--ingreso">
     ${c.html}
-    ${c.tieneDeuda ? "" : `<div class="sc-deuda no"><span><i class="fa-solid fa-circle-check"></i> Sin deuda</span><b>S/ 0</b></div>`}
+    ${c.tieneDeuda ? "" : `<div class="sc-deuda no"><span><i class="fa-solid fa-circle-check"></i> Sin deuda de membresía</span><b>S/ 0</b></div>`}
+    ${TD.htmlSeccionSocio(resumen)}
+    ${aviso}
   </article>`;
 }
 
@@ -2228,7 +2251,7 @@ window.buscarAutomatico = async function(){
   const socio = (dataGlobal || []).find(s => String(s.dni) === dni) || await traerSocioPorDni(dni);
   if(input.value !== dni) return; // el DNI cambió mientras se consultaba
   if(!socio){ mostrarNoEncontradoBusqueda(); return; }
-  mostrarTarjetaBusqueda(socio);
+  await mostrarTarjetaBusqueda(socio);
 };
 
 window.registrarDesdeBusqueda = async function(){
@@ -2240,8 +2263,9 @@ window.registrarDesdeBusqueda = async function(){
   const socio = (dataGlobal || []).find(s => String(s.dni) === dni) || await traerSocioPorDni(dni);
   if(input.value !== dni) return;
   if(!socio){ mostrarNoEncontradoBusqueda(); return; }
-  // Vencido, agotado o bloqueado: no se marca, solo queda su tarjeta con su condición
-  if(!socioPuedeIngresar(socio)){ mostrarTarjetaBusqueda(socio); return; }
+  // Vencido, agotado o bloqueado (membresía o tienda): no se marca, solo queda su tarjeta
+  const resumen = await resumenTiendaSocio(socio.dni);
+  if(!resumen || resumen.bloquea || !socioPuedeIngresar(socio)){ await mostrarTarjetaBusqueda(socio); return; }
   await asistenciaNueva(socio.dni, socio.dias_restantes, socio);
 };
 
@@ -2343,6 +2367,11 @@ window.asistenciaNueva = async function(dni, diasRestantesPasados, socioConocido
   const resInsert = await supabaseClient.from("historial_asistencia").insert([{
     nombre: socio.nombre, dni: socio.dni, hora, fecha: fechaHoy, metodo: metodoFinal
   }]);
+  if (resInsert.error && (resInsert.error.code === "P0001" || /BLOQUEADO_TIENDA/.test(resInsert.error.message || ""))) {
+    mostrarToast("🚫 Deuda de tienda pendiente: no se registró la asistencia", "#ef4444");
+    await mostrarTarjetaBusqueda(socio);
+    return false;
+  }
   if (!resInsert.error) {
     await supabaseClient.from("socios").update({ dias_restantes: nuevosDias }).eq("dni", dni);
   }
@@ -2808,40 +2837,8 @@ window.enviarAvisoVencimiento = async function(dni){
 };
 
 let _editandoDeuda = false;
-window.editarDeuda = async function(dni){
-  if (_editandoDeuda) return;
-  const socio = (dataGlobal || []).find(s => String(s.dni) === String(dni));
-  const antes = parseFloat(socio && socio.deuda) || 0;
-  let n = prompt("Nueva deuda (S/)" + (antes > 0 ? "  — actual: " + antes : ""), antes > 0 ? String(antes) : "");
-  if (n === null) return;
-  n = String(n).trim().replace(",", ".").replace(/^s\/\s*/i, "");
-  const nueva = n === "" ? 0 : (/^\d+(\.\d+)?$/.test(n) ? parseFloat(n) : NaN);
-  if (isNaN(nueva) || nueva < 0) { mostrarToast("Escribe solo el monto, por ejemplo 20", "#f59e0b"); return; }
-
-  const datosActualizar = { deuda: String(nueva), fecha_deuda: nueva > 0 ? (antes > 0 && socio.fecha_deuda ? socio.fecha_deuda : fechaHoyISO()) : null };
-  _editandoDeuda = true;
-  let error = null;
-  try { ({ error } = await supabaseClient.from("socios").update(datosActualizar).eq("dni", dni)); } catch (e) { error = e; }
-  _editandoDeuda = false;
-  if (error) {
-    console.error("No se pudo guardar la deuda:", error);
-    mostrarToast("❌ No se guardó. Revisa el internet e inténtalo de nuevo", "#ef4444");
-    return;
-  }
-
-  // Cuaderno de caja: lo que bajó la deuda es dinero cobrado hoy
-  if (socio && nueva !== antes) {
-    cyCajaGuardar({
-      dni: socio.dni || dni,
-      nombre: socio.nombre || '',
-      tipo_memb: socio.tipo_memb || 'Membresía',
-      concepto: nueva < antes ? (nueva === 0 ? "🎉 Canceló deuda pendiente" : "📉 Abono parcial a deuda") : "⚠️ Se le asignó nueva deuda",
-      monto_ingreso: nueva < antes ? antes - nueva : 0,
-      deuda_visual: nueva
-    });
-  }
-  mostrarToast(nueva < antes ? (nueva === 0 ? "✅ Deuda cancelada" : "✅ Abono registrado") : "✅ Deuda actualizada", "#10b981");
-  await render();
+window.editarDeuda = function(dni){
+  if (window.TD) return TD.abrirDeuda(dni);
 };
 
 window.eliminar = async function(dni){
@@ -2864,10 +2861,11 @@ function showTab(n,event){
     
     const dash = document.querySelector(".dashboard");
     if(dash) {
-    dash.style.display = (n===1 || n===2 || n===4 || n===5) ? "none" : "grid";
+    dash.style.display = (n===1 || n===2 || n===4 || n===5 || n===6) ? "none" : "grid";
 
     }
     if(n===3) render();
+    if(n===6 && window.TD) TD.montar();
     if(n===2 && window.cyCargarProspectos) { try{ cyCargarProspectos(); }catch(e){} }
 }
 
@@ -5928,5 +5926,6 @@ document.addEventListener("click", function(e){
   setTimeout(function(){ b.classList.remove("is-loading"); }, 6000);
 }, true);
 </script>
+<script src="tienda.js"></script>
 </body>
 </html>

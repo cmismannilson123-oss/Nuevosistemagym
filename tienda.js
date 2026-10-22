@@ -801,13 +801,14 @@
     return `
       <div class="td-saldo"><span>Debe por membresía</span><b>${soles(deuda)}</b>
         ${socio.fecha_deuda ? `<small>Desde el ${fechaCorta(socio.fecha_deuda)}</small>` : ""}</div>
-      <p class="td-ayuda">La deuda de membresía solo se puede abonar o cancelar. Para agregar deuda, inscriba al socio o use la tienda.</p>
-      <div class="td-accion">
-        <label class="td-campo"><span>Monto a abonar (S/)</span>
+      <p class="td-ayuda">La deuda de membresía solo se puede cobrar. Para agregar deuda, inscriba al socio o use la tienda.</p>
+      <div class="td-cobro">
+        <p class="td-cobro-titulo">Cobrar deuda de membresía</p>
+        <label class="td-campo"><span>Monto a cobrar ahora (S/)</span>
           <input id="tdMontoMem" type="number" step="0.01" min="0.01" max="${deuda}" value="${deuda}" inputmode="decimal"></label>
         <div class="td-botones">
-          <button type="button" class="td-btn td-btn--sec" data-accion="abonar-mem">Abonar</button>
-          <button type="button" class="td-btn td-btn--main" data-accion="cancelar-mem" data-deuda="${deuda}">Cancelar deuda (${soles(deuda)})</button>
+          <button type="button" class="td-btn td-btn--sec" data-accion="abonar-mem">Cobrar este monto</button>
+          <button type="button" class="td-btn td-btn--main" data-accion="cancelar-mem" data-deuda="${deuda}">Cobrar todo · ${soles(deuda)}</button>
         </div>
       </div>`;
   }
@@ -818,27 +819,38 @@
       return `<p class="td-vacio">No tiene deudas de tienda.</p>${agregar}`;
     }
     const filas = resumen.fiados.map((f) => `
-      <article class="td-deuda-item${f.bloquea ? " td-fila--bloquea" : ""}" data-venta="${esc(f.id)}">
+      <article class="td-deuda-item${f.bloquea ? " td-deuda-item--bloquea" : ""}" data-venta="${esc(f.id)}">
         <header>
-          <div><b>${esc(f.articulos)}</b><small>${fechaCorta(f.fecha)} · ${esc(textoVencimiento(f))}</small></div>
+          <div>
+            <b>${esc(f.articulos)}</b>
+            <small>Compra del ${fechaCorta(f.fecha)}</small>
+            <span class="td-vence${f.bloquea ? " td-vence--bloquea" : ""}">${esc(textoVencimiento(f))}</span>
+          </div>
           <strong>${soles(f.saldo)}</strong>
         </header>
-        <div class="td-accion">
+        <div class="td-cobro">
+          <p class="td-cobro-titulo">Cobrar</p>
           <div class="td-fila-acciones">
-            <input type="number" step="0.01" min="0.01" max="${f.saldo}" value="${f.saldo}" inputmode="decimal" data-monto aria-label="Monto a abonar">
-            <select data-metodo-pago aria-label="Forma de pago"><option value="efectivo">Efectivo</option><option value="yape_plin">Yape / Plin</option></select>
+            <label class="td-campo"><span>Monto (S/)</span>
+              <input type="number" step="0.01" min="0.01" max="${f.saldo}" value="${f.saldo}" inputmode="decimal" data-monto></label>
+            <label class="td-campo"><span>Forma de pago</span>
+              <select data-metodo-pago><option value="efectivo">Efectivo</option><option value="yape_plin">Yape / Plin</option></select></label>
           </div>
           <div class="td-botones">
-            <button type="button" class="td-btn td-btn--sec" data-accion="abonar-tienda">Abonar</button>
-            <button type="button" class="td-btn td-btn--main" data-accion="cancelar-tienda">Cancelar saldo</button>
+            <button type="button" class="td-btn td-btn--sec" data-accion="abonar-tienda">Cobrar este monto</button>
+            <button type="button" class="td-btn td-btn--main" data-accion="cancelar-tienda">Cobrar todo · ${soles(f.saldo)}</button>
           </div>
-          ${f.total > UMBRAL ? `
-          <div class="td-fila-acciones">
-            <input type="date" min="${sumarDias(hoyLima(), 1)}" value="${esc(f.vence || "")}" data-fecha aria-label="Fecha límite">
-            <button type="button" class="td-btn td-btn--sec" data-accion="fecha-tienda">Guardar fecha</button>
-            ${f.vence ? `<button type="button" class="td-btn td-btn--sec" data-accion="quitar-fecha">Sin fecha</button>` : ""}
-          </div>` : `<p class="td-ayuda">Deudas de hasta S/ ${UMBRAL.toFixed(2)} vencen al día siguiente y no admiten otra fecha.</p>`}
         </div>
+        ${f.total > UMBRAL ? `
+        <div class="td-fecha">
+          <p class="td-cobro-titulo">Fecha límite de pago</p>
+          <label class="td-campo"><span>Fecha en la que debe pagar</span>
+            <input type="date" min="${sumarDias(hoyLima(), 1)}" value="${esc(f.vence || "")}" data-fecha></label>
+          <div class="td-botones">
+            <button type="button" class="td-btn td-btn--sec" data-accion="fecha-tienda">Guardar fecha</button>
+            ${f.vence ? `<button type="button" class="td-btn td-btn--sec" data-accion="quitar-fecha">Quitar fecha límite</button>` : ""}
+          </div>
+        </div>` : `<p class="td-fecha-ayuda">Deudas de hasta S/ ${UMBRAL.toFixed(2)} vencen al día siguiente y no admiten otra fecha límite.</p>`}
       </article>`).join("");
     return `${filas}${agregar}`;
   }

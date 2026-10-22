@@ -4475,4 +4475,12 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 
 /* Solo el administrador ve estos controles; a recepción no se le muestran */
 html:not([data-rol="admin"]) [data-solo-admin]{ display:none !important; }
-.btn-ajustes{ margin-right:8px; }
+
+/* Encabezado: el administrador tiene Ajustes (y cierra sesión desde ahí);
+   recepción ve campana y cerrar sesión. Los tres botones usan el mismo tamaño. */
+html[data-rol="admin"] #btnCerrarSesion{ display:none !important; }
+.topbar .tb-acc{ gap:8px !important; }
+.topbar .tb-acc .btn-cerrar-sesion{ width:40px !important; height:40px !important; font-size:15px; display:grid; place-items:center; padding:0 !important; }
+.topbar .titulo-wrap{ flex:1 1 auto; overflow:hidden; }
+.topbar .tb-marca h2{ font-size:clamp(19px,5.6vw,25px) !important; white-space:nowrap; }
+.tb-marca small{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }

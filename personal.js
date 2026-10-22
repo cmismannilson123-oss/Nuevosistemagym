@@ -48,14 +48,14 @@
 
   function formClave(userId) {
     return `
-      <form class="td-form td-form-clave" data-form="clave" data-user="${esc(userId)}" autocomplete="off">
-        <label class="td-campo"><span>Nueva contraseña (mínimo ${MIN_CLAVE} caracteres)</span>
+      <form class="aj-form" data-form="clave" data-user="${esc(userId)}" autocomplete="off">
+        <label class="aj-campo"><span>Nueva contraseña (mínimo ${MIN_CLAVE} caracteres)</span>
           <input name="clave" type="password" autocomplete="new-password" minlength="${MIN_CLAVE}" maxlength="72" required></label>
-        <label class="td-campo"><span>Repetir la contraseña</span>
+        <label class="aj-campo"><span>Repetir la contraseña</span>
           <input name="clave2" type="password" autocomplete="new-password" minlength="${MIN_CLAVE}" maxlength="72" required></label>
-        <div class="td-botones">
-          <button type="button" class="td-btn td-btn--sec" data-accion="cancelar-clave">Cancelar</button>
-          <button type="submit" class="td-btn td-btn--main">Guardar contraseña</button>
+        <div class="aj-fila">
+          <button type="button" class="aj-btn aj-btn--salir" data-accion="cancelar-clave">Cancelar</button>
+          <button type="submit" class="aj-btn aj-btn--clave">Guardar contraseña</button>
         </div>
       </form>`;
   }
@@ -70,18 +70,25 @@
       const esAdmin = c.rol === "admin";
       const etiqueta = esAdmin ? "Administrador" : "Recepción";
       const pendiente = st.confirmar === c.user_id;
+      const inicial = esc(((c.nombre || c.email || "?").trim().charAt(0) || "?").toUpperCase());
       const acciones = esAdmin
-        ? `<p class="td-ayuda">Esta es tu cuenta de administrador.</p>`
-        : `<div class="td-botones">
-             <button type="button" class="td-btn td-btn--sec" data-accion="cambiar-clave" data-user="${esc(c.user_id)}">Cambiar contraseña</button>
-             <button type="button" class="td-btn td-btn--main${pendiente ? " td-peligro" : ""}" data-accion="cerrar-sesiones" data-user="${esc(c.user_id)}">
-               ${pendiente ? "Confirmar: cerrar sus sesiones" : "Cerrar sesión en sus dispositivos"}</button>
+        ? `<p class="aj-nota"><i class="fa-solid fa-circle-check"></i> Esta es tu cuenta. Desde aquí administras al personal.</p>`
+        : `<div class="aj-acciones">
+             <button type="button" class="aj-btn aj-btn--clave" data-accion="cambiar-clave" data-user="${esc(c.user_id)}">
+               <i class="fa-solid fa-key"></i> Cambiar contraseña</button>
+             <button type="button" class="aj-btn ${pendiente ? "aj-btn--confirmar" : "aj-btn--peligro"}" data-accion="cerrar-sesiones" data-user="${esc(c.user_id)}">
+               <i class="fa-solid ${pendiente ? "fa-triangle-exclamation" : "fa-power-off"}"></i>
+               ${pendiente ? "Toque otra vez para confirmar" : "Cerrar sesión en sus dispositivos"}</button>
            </div>
            ${st.claveDe === c.user_id ? formClave(c.user_id) : ""}`;
-      return `<article class="td-gprod">
-        <div class="td-gprod-info">
-          <b>${esc(c.nombre || c.email)}</b>
-          <small>${esc(c.email)} · ${etiqueta} · desde ${esc(fechaCorta(c.creado))}</small>
+      return `<article class="aj-cuenta">
+        <div class="aj-cuenta-top">
+          <span class="aj-avatar${esAdmin ? "" : " aj-avatar--recep"}">${inicial}</span>
+          <div class="aj-datos">
+            <b>${esc(c.nombre || c.email)}</b>
+            <small>${esc(c.email)}</small>
+            <span class="aj-chip ${esAdmin ? "aj-chip--admin" : "aj-chip--recep"}">${etiqueta}</span>
+          </div>
         </div>
         ${acciones}
       </article>`;

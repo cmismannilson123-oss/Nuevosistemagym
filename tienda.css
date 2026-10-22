@@ -221,3 +221,62 @@ button:disabled.td-btn-chico{ opacity:.4; cursor:not-allowed; }
 /* Los elementos con el atributo hidden deben ocultarse aunque tengan display propio */
 .td-wrap [hidden], #modalProductos [hidden], #modalDeuda [hidden]{ display:none !important; }
 .td-ventas .td-ticket--nuevo{ width:auto; flex:0 0 auto; }
+
+/* ---------- Ajustes del administrador (violeta: se distingue de la tienda y de las deudas) ---------- */
+.aj-modal{ background:linear-gradient(180deg,#140f2a 0%,#0b1220 58%); border-color:rgba(167,139,250,.35); }
+.aj-head{ display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+.aj-head > div{ flex:1; min-width:0; }
+.aj-head h3{ margin:0; font-size:19px; font-weight:800; color:#f5f3ff; }
+.aj-head p{ margin:3px 0 0; color:#a8a3c9; font-size:13px; }
+.aj-icono{ width:42px; height:42px; flex:none; border-radius:14px; display:grid; place-items:center; font-size:17px; color:#c4b5fd; background:rgba(167,139,250,.16); border:1px solid rgba(167,139,250,.38); }
+.aj-lista{ display:grid; gap:12px; }
+.aj-cuenta{ display:grid; gap:12px; padding:14px; border-radius:16px; background:rgba(15,10,35,.62); border:1px solid rgba(167,139,250,.2); }
+.aj-cuenta-top{ display:flex; align-items:center; gap:12px; min-width:0; }
+.aj-avatar{ width:46px; height:46px; flex:none; border-radius:50%; display:grid; place-items:center; font-size:18px; font-weight:800; color:#1e1b4b; background:linear-gradient(180deg,#ddd6fe,#a78bfa); }
+.aj-avatar--recep{ background:linear-gradient(180deg,#bae6fd,#38bdf8); }
+.aj-datos{ flex:1; min-width:0; display:grid; gap:3px; }
+.aj-datos b{ font-size:15px; color:#f1f5f9; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.aj-datos small{ color:#94a3b8; font-size:12.5px; overflow-wrap:anywhere; }
+.aj-chip{ justify-self:start; display:inline-flex; align-items:center; margin-top:3px; padding:3px 10px; border-radius:999px; font-size:11.5px; font-weight:800; letter-spacing:.2px; }
+.aj-chip--admin{ color:#6ee7b7; background:rgba(52,211,153,.14); border:1px solid rgba(52,211,153,.42); }
+.aj-chip--recep{ color:#7dd3fc; background:rgba(56,189,248,.14); border:1px solid rgba(56,189,248,.42); }
+.aj-acciones{ display:grid; gap:8px; }
+.aj-btn{
+  width:100%; min-height:48px; padding:12px 14px; border-radius:13px; border:1px solid transparent;
+  font-family:inherit; font-size:14.5px; font-weight:800; line-height:1.25; text-align:center; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:10px; transition:transform .15s, background .2s, border-color .2s;
+}
+.aj-btn:active{ transform:scale(.98); }
+.aj-btn:disabled{ opacity:.45; cursor:not-allowed; }
+.aj-btn--clave{ color:#fde68a; background:rgba(251,191,36,.1); border-color:rgba(251,191,36,.42); }
+.aj-btn--peligro{ color:#fca5a5; background:rgba(248,113,113,.08); border-color:rgba(248,113,113,.48); }
+.aj-btn--confirmar{ color:#fff; background:#dc2626; border-color:#f87171; box-shadow:0 10px 22px -14px rgba(220,38,38,.9); }
+.aj-btn--salir{ color:#e2e8f0; background:rgba(148,163,184,.12); border-color:rgba(148,163,184,.3); }
+.aj-nota{ margin:0; display:flex; align-items:center; gap:8px; color:#a8a3c9; font-size:13px; line-height:1.4; }
+.aj-nota i{ color:#6ee7b7; }
+.aj-form{ display:grid; gap:10px; padding-top:12px; border-top:1px dashed rgba(251,191,36,.34); }
+.aj-campo{ display:grid; gap:6px; }
+.aj-campo span{ font-size:12.5px; font-weight:600; color:#cbd5e1; }
+.aj-campo input{
+  width:100%; min-height:44px; box-sizing:border-box; padding:10px 12px; font-size:15px; color:#f1f5f9;
+  background:rgba(2,6,23,.6); border:1px solid rgba(167,139,250,.3); border-radius:11px;
+}
+.aj-campo input:focus{ outline:none; border-color:#a78bfa; box-shadow:0 0 0 3px rgba(167,139,250,.2); }
+.aj-fila{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.aj-pie{ margin-top:16px; padding-top:14px; border-top:1px solid rgba(148,163,184,.16); }
+.aj-pie .aj-btn{ width:100%; }
+
+/* ---------- Cobro de deudas (ámbar) — bloques claros: cobrar / fecha límite ---------- */
+.td-cobro{ display:grid; gap:10px; padding:12px; border-radius:13px; background:rgba(2,6,23,.5); border:1px solid rgba(245,158,11,.25); }
+.td-cobro-titulo{ margin:0; font-size:11.5px; font-weight:800; letter-spacing:.7px; text-transform:uppercase; color:#fcd34d; }
+.td-cobro .td-fila-acciones{ grid-template-columns:1fr 1fr; }
+.td-cobro .td-botones .td-btn{ min-height:50px; font-size:14.5px; }
+.td-cobro .td-btn--main{ margin-top:0; }
+.td-fecha{ display:grid; gap:10px; padding:12px; border-radius:13px; background:rgba(2,6,23,.35); border:1px dashed rgba(148,163,184,.3); }
+.td-fecha .td-botones{ grid-template-columns:1fr 1fr; }
+.td-fecha-ayuda{ margin:0; color:#94a3b8; font-size:12.5px; line-height:1.4; }
+.td-vence{ justify-self:start; display:inline-flex; align-items:center; gap:6px; margin-top:4px; padding:3px 9px; border-radius:999px; font-size:11.5px; font-weight:700; color:#fde68a; background:rgba(245,158,11,.12); border:1px solid rgba(245,158,11,.35); }
+.td-vence--bloquea{ color:#fecaca; background:rgba(248,113,113,.12); border-color:rgba(248,113,113,.45); }
+.td-deuda-item header > div{ min-width:0; }
+.td-deuda-item header b{ overflow-wrap:anywhere; }
+.td-deuda-item--bloquea{ border-color:rgba(248,113,113,.45); }

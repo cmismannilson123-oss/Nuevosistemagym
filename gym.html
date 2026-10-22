@@ -70,7 +70,7 @@
     <span class="tb-logo"><span class="logo-cy"></span></span>
     <div class="tb-marca">
       <h2>C&amp;Y <span class="accent">FITNESS</span> GYM</h2>
-      <small>Panel de recepción</small>
+      <small id="tbRol">Panel de recepción</small>
     </div>
   </div>
   <div class="tb-acc">
@@ -842,12 +842,16 @@
 
 
 <div id="modalAjustes" class="td-modal-fondo" hidden>
-  <div class="td-modal" role="dialog" aria-modal="true" aria-labelledby="cyAjustesTitulo">
-    <header class="td-deuda-head">
-      <div><h3 id="cyAjustesTitulo">Ajustes</h3><p>Cuentas del personal</p></div>
+  <div class="td-modal aj-modal" role="dialog" aria-modal="true" aria-labelledby="cyAjustesTitulo">
+    <header class="aj-head">
+      <span class="aj-icono"><i class="fa-solid fa-gear"></i></span>
+      <div><h3 id="cyAjustesTitulo">Ajustes</h3><p>Cuentas del personal y seguridad</p></div>
       <button type="button" class="td-cerrar" onclick="cyCerrarAjustes()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
     </header>
-    <div id="cyPersonal" class="td-glista"></div>
+    <div id="cyPersonal" class="aj-lista"></div>
+    <footer class="aj-pie">
+      <button type="button" class="aj-btn aj-btn--salir" onclick="cerrarSesionStaff()"><i class="fa-solid fa-right-from-bracket"></i> Cerrar mi sesión</button>
+    </footer>
   </div>
 </div>
 <div id="modalProductos" class="td-modal-fondo" hidden></div>
@@ -1215,6 +1219,8 @@ window.cyFijarRol = async function () {
     if (data === "admin") rol = "admin";
   } catch (e) { /* se queda en recepción */ }
   document.documentElement.dataset.rol = rol;
+  const tbRol = document.getElementById("tbRol");
+  if (tbRol) tbRol.textContent = rol === "admin" ? "Panel del administrador" : "Panel de recepción";
 };
 
 window.cerrarSesionStaff = async function() {
@@ -2684,7 +2690,7 @@ function mostrarLista(data){
     let urlWsp = telfLimpio ? `https://wa.me/${telfLimpio}?text=${msjWsp}` : '#';
 
     const accionPrincipal = estado === "ACTIVO"
-      ? `<button class="sc-btn sc-btn--deuda" onclick="editarDeuda(${jsAttr(s.dni)})" title="Gestionar deuda"><i class="fa-solid fa-money-bill-wave ic-deuda"></i><span>Deuda</span></button>`
+      ? `<button class="sc-btn sc-btn--deuda" onclick="editarDeuda(${jsAttr(s.dni)})" title="Ver y cobrar la deuda"><i class="fa-solid fa-hand-holding-dollar ic-deuda"></i><span>Deuda</span></button>`
       : `<button class="sc-btn sc-btn--renovar" onclick="renovar(${jsAttr(s.dni)})" title="Renovar membresía"><i class="fa-solid fa-rotate"></i><span>Renovar</span></button>`;
 
     html += `

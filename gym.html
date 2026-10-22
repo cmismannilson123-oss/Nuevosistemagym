@@ -75,6 +75,7 @@
   </div>
   <div class="tb-acc">
     <button type="button" id="btnAvisos" class="tb-avisos" onclick="cyAbrirAvisos()" title="App y notificaciones" aria-label="App y notificaciones"><i class="fa-solid fa-bell"></i><span class="tb-punto" hidden></span></button>
+    <button type="button" id="btnAjustes" class="btn-cerrar-sesion btn-ajustes" data-solo-admin onclick="cyAbrirAjustes()" title="Ajustes" aria-label="Ajustes"><i class="fa-solid fa-gear"></i></button>
     <button type="button" id="btnCerrarSesion" class="btn-cerrar-sesion" onclick="cerrarSesionStaff()" title="Cerrar sesión" aria-label="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
   </div>
 </div>
@@ -840,6 +841,15 @@
 </div>
 
 
+<div id="modalAjustes" class="td-modal-fondo" hidden>
+  <div class="td-modal" role="dialog" aria-modal="true" aria-labelledby="cyAjustesTitulo">
+    <header class="td-deuda-head">
+      <div><h3 id="cyAjustesTitulo">Ajustes</h3><p>Cuentas del personal</p></div>
+      <button type="button" class="td-cerrar" onclick="cyCerrarAjustes()" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
+    </header>
+    <div id="cyPersonal" class="td-glista"></div>
+  </div>
+</div>
 <div id="modalProductos" class="td-modal-fondo" hidden></div>
 <div id="modalDeuda" class="td-modal-fondo" hidden>
   <div class="td-modal" role="dialog" aria-modal="true" aria-labelledby="tdDeudaTitulo">
@@ -1155,7 +1165,7 @@ async function verificarAccesoSistema() {
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (session) {
     const { data: esStaff } = await supabaseClient.rpc("es_staff");
-    if (esStaff === true) { mostrarDashboard(); return; }
+    if (esStaff === true) { await cyFijarRol(); mostrarDashboard(); return; }
     await supabaseClient.auth.signOut();
     if (errorMsg) errorMsg.textContent = "❌ Este usuario no tiene permiso para usar el sistema.";
   }
@@ -1196,6 +1206,16 @@ async function verificarAccesoSistema() {
     location.reload();
   });
 }
+
+// Rol de la cuenta: 'admin' o 'recepcion'. Si no se puede leer, queda 'recepcion' (lo más restrictivo).
+window.cyFijarRol = async function () {
+  let rol = "recepcion";
+  try {
+    const { data } = await supabaseClient.rpc("mi_rol");
+    if (data === "admin") rol = "admin";
+  } catch (e) { /* se queda en recepción */ }
+  document.documentElement.dataset.rol = rol;
+};
 
 window.cerrarSesionStaff = async function() {
   if (!confirm("¿Cerrar sesión en este dispositivo?")) return;
@@ -2674,8 +2694,8 @@ function mostrarLista(data){
         ${accionPrincipal}
         <button class="sc-btn sc-btn--adel" onclick="adelantarMembresia(${jsAttr(s.dni)})" title="Adelantar membresía"><i class="fa-solid fa-forward ic-adel"></i><span>Adelantar</span></button>
         <button class="sc-btn sc-btn--wsp" onclick="${telfLimpio ? `window.open(${jsAttr(urlWsp)}, '_blank')` : "mostrarToast('⚠️ Socio sin número válido', '#f59e0b')"}" title="Abrir WhatsApp"><i class="fa-brands fa-whatsapp ic-wsp"></i><span>WhatsApp</span></button>
-        <button class="sc-btn sc-btn--edit" onclick="abrirModalEditarSocio(${jsAttr(s.dni)})" title="Editar datos del socio"><i class="fa-solid fa-pen-to-square ic-edit"></i><span>Editar</span></button>
-        <button class="sc-btn sc-btn--peligro" onclick="eliminar(${jsAttr(s.dni)})" title="Eliminar socio"><i class="fa-solid fa-trash-can"></i><span>Eliminar</span></button>
+        <button class="sc-btn sc-btn--edit" data-solo-admin onclick="abrirModalEditarSocio(${jsAttr(s.dni)})" title="Editar datos del socio"><i class="fa-solid fa-pen-to-square ic-edit"></i><span>Editar</span></button>
+        <button class="sc-btn sc-btn--peligro" data-solo-admin onclick="eliminar(${jsAttr(s.dni)})" title="Eliminar socio"><i class="fa-solid fa-trash-can"></i><span>Eliminar</span></button>
       </footer>
     </article>`;
   });
@@ -3810,6 +3830,8 @@ window.enviarInvitacionWhatsApp = function() {
   const lima = (t) => new Date(new Date(t).getTime() - 5 * 3600e3);
   const hoyLima = () => lima(Date.now()).toISOString().slice(0, 10);
   const mesActual = () => hoyLima().slice(0, 7);
+  // Recepción solo ve el día de hoy; el administrador ve el historial completo
+  const cuadernoAdmin = () => document.documentElement.dataset.rol === 'admin';
   const sumarMes = (m, n) => { const [y, mm] = m.split('-').map(Number); const d = new Date(Date.UTC(y, mm - 1 + n, 1)); return d.toISOString().slice(0, 7); };
   const finDeMes = (m) => { const [y, mm] = m.split('-').map(Number); return new Date(Date.UTC(y, mm, 0)).toISOString().slice(0, 10); };
   const soles = (n) => 'S/ ' + (Math.round((+n || 0) * 100) / 100).toLocaleString('es-PE', { maximumFractionDigits: 2 });
@@ -3987,8 +4009,8 @@ window.enviarInvitacionWhatsApp = function() {
     if (!el) return;
     const mes = st.mes;
     el.mes.textContent = MESES[+mes.slice(5) - 1].replace(/^./, c => c.toUpperCase()) + ' ' + mes.slice(0, 4);
-    el.next.disabled = mes >= mesActual();
-    el.prev.disabled = mes <= sumarMes(mesActual(), -36);
+    el.next.disabled = mes >= mesActual() || !cuadernoAdmin();
+    el.prev.disabled = mes <= sumarMes(mesActual(), -36) || !cuadernoAdmin();
     const c = cache.get(mes);
     const todas = filasDelMes(mes);
     if (!c && !todas.length) { el.resumen.innerHTML = ''; return; }
@@ -4065,7 +4087,7 @@ window.enviarInvitacionWhatsApp = function() {
 
   function irMes(mes){
     if (mes > mesActual()) return;
-    st.mes = mes;
+    st.mes = cuadernoAdmin() ? mes : mesActual();
     el.cuerpo.scrollTop = 0;
     cargar(mes, false);
     // Precarga el mes anterior para que pasar de mes sea instantáneo
@@ -5988,5 +6010,6 @@ document.addEventListener("click", function(e){
 }, true);
 </script>
 <script src="tienda.js"></script>
+<script src="personal.js"></script>
 </body>
 </html>

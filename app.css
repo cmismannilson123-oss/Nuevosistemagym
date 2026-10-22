@@ -4472,3 +4472,7 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 .tb-pie i{ color:#fbbf24; margin-top:3px; }
 @keyframes tbEntra{ from{ opacity:0; transform:translateY(14px) scale(.98); } to{ opacity:1; transform:none; } }
 @media (prefers-reduced-motion: reduce){ .tb-card{ animation:none; } }
+
+/* Solo el administrador ve estos controles; a recepción no se le muestran */
+html:not([data-rol="admin"]) [data-solo-admin]{ display:none !important; }
+.btn-ajustes{ margin-right:8px; }

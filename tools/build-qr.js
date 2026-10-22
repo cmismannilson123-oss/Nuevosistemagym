@@ -119,7 +119,7 @@ const PANEL_SOLO = [
   'id="tab1"', 'id="tab2"', 'id="tab3"', 'id="tab5"',
   'id="modalRenovar"', 'id="modalEditarSocio"', 'id="modalCuaderno"', 'id="cyAvisos"',
   'id="modalPreciosInvite"', 'id="voucher"', 'id="loading-screen"',
-  'id="tab6"', 'id="modalDeuda"', 'id="modalProductos"',
+  'id="tab6"', 'id="modalDeuda"', 'id="modalProductos"', 'id="modalAjustes"', 'id="btnAjustes"',
 ];
 
 // Quita un elemento completo (con todo lo que tiene dentro) a partir de un atributo

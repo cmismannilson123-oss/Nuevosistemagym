@@ -488,7 +488,7 @@
           <div><h3 id="tdgTitulo">Productos y categorías</h3><p>Lo que se vende en la tienda</p></div>
           <button type="button" class="td-cerrar" data-g="cerrar" aria-label="Cerrar"><i class="fa-solid fa-xmark"></i></button>
         </header>
-        <form id="tdgForm" class="td-form td-gform" novalidate>
+        <form id="tdgForm" class="td-form td-gform" novalidate data-solo-admin>
           <h4 id="tdgFormTitulo">Nuevo producto</h4>
           <div class="td-fila-2">
             <label class="td-campo"><span>Nombre</span><input id="tdgNombre" maxlength="80" placeholder="Ej. Proteína 1 kg" autocomplete="off"></label>
@@ -507,7 +507,7 @@
             <button type="submit" class="td-btn td-btn--main" id="tdgGuardar">Guardar producto</button>
           </div>
         </form>
-        <section class="td-gseccion" aria-labelledby="tdgCatTitulo">
+        <section class="td-gseccion" aria-labelledby="tdgCatTitulo" data-solo-admin>
           <h4 id="tdgCatTitulo">Categorías</h4>
           <div class="td-fila-acciones">
             <input id="tdgNuevaCat" maxlength="40" placeholder="Nueva categoría" autocomplete="off" aria-label="Nombre de la nueva categoría">
@@ -569,7 +569,7 @@
       return `<div class="td-glinea">
         <div><b>${esc(c)}</b><small>${activos} a la venta${lista.length - activos ? ` · ${lista.length - activos} desactivado(s)` : ""}</small></div>
         ${c === "Otros" ? `<span class="td-chip-fijo">Fija</span>` : `
-        <button type="button" class="td-btn td-btn--sec td-btn-chico${pendiente ? " td-peligro" : ""}" data-g="borrar-cat" data-cat="${esc(c)}"
+        <button type="button" class="td-btn td-btn--sec td-btn-chico${pendiente ? " td-peligro" : ""}" data-solo-admin data-g="borrar-cat" data-cat="${esc(c)}"
           ${bloqueada ? `disabled title="Tiene ${activos} producto(s) a la venta. Muévalos antes de eliminarla"` : ""}>
           ${pendiente ? "Confirmar" : "Eliminar"}</button>`}
       </div>`;
@@ -584,13 +584,13 @@
           <small>${esc(p.categoria)} · ${soles(p.precio)} · ${esc(stock)}</small>
         </div>
         <div class="td-gprod-acc">
-          <button type="button" class="td-btn td-btn--sec td-btn-chico" data-g="editar" data-id="${esc(p.id)}">Editar</button>
+          <button type="button" class="td-btn td-btn--sec td-btn-chico" data-solo-admin data-g="editar" data-id="${esc(p.id)}">Editar</button>
           ${tieneControl(p) && p.activo ? `
           <span class="td-reponer">
             <input type="number" min="1" max="100000" step="1" inputmode="numeric" placeholder="+ uds" data-reponer-input="${esc(p.id)}" aria-label="Unidades a reponer">
             <button type="button" class="td-btn td-btn--sec td-btn-chico" data-g="reponer" data-id="${esc(p.id)}">Reponer</button>
           </span>` : ""}
-          <button type="button" class="td-btn td-btn--sec td-btn-chico" data-g="activar" data-id="${esc(p.id)}" data-activo="${p.activo}">${p.activo ? "Desactivar" : "Activar"}</button>
+          <button type="button" class="td-btn td-btn--sec td-btn-chico" data-solo-admin data-g="activar" data-id="${esc(p.id)}" data-activo="${p.activo}">${p.activo ? "Desactivar" : "Activar"}</button>
         </div>
       </article>`;
     }).join("") : `<p class="td-vacio">Todavía no hay productos en esta categoría.</p>`;

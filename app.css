@@ -4484,3 +4484,79 @@ html[data-rol="admin"] #btnCerrarSesion{ display:none !important; }
 .topbar .titulo-wrap{ flex:1 1 auto; overflow:hidden; }
 .topbar .tb-marca h2{ font-size:clamp(19px,5.6vw,25px) !important; white-space:nowrap; }
 .tb-marca small{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* ==========================================================================
+   Flujo QR público — formularios de ingreso de socio e inscripción.
+   Tipografía: Inter para el texto, Barlow Condensed para los títulos.
+   ========================================================================== */
+#loginFormGym, #inscOverlay{ font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; -webkit-font-smoothing:antialiased; }
+
+.qr-login{ margin-top:6px; text-align:left; animation:qrLoginIn .32s cubic-bezier(.2,.8,.2,1); }
+@keyframes qrLoginIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
+.qr-login-top{ display:flex; align-items:center; gap:12px; margin:0 0 14px; }
+.qr-login .wiz-title{ font-family:var(--cy-display); font-size:14px; letter-spacing:.9px; }
+
+.qr-login-card, .insc-card{
+  padding:22px 18px 20px; border-radius:22px;
+  background:linear-gradient(180deg,rgba(12,26,22,.92),rgba(7,14,12,.94));
+  border:1px solid rgba(52,211,153,.16);
+  box-shadow:0 24px 44px -26px #000, inset 0 1px 0 rgba(255,255,255,.04);
+}
+.qr-login-card h3, .insc-card h3{
+  margin:0 0 6px; font-family:var(--cy-display); font-weight:700; font-size:28px; line-height:1.05;
+  letter-spacing:.5px; text-transform:uppercase; color:#f8fafc;
+}
+.qr-login-sub{ margin:0 0 18px; font-size:14px; line-height:1.5; color:#9fb3ac; }
+
+.qr-campo{ display:block; margin:0 0 14px; }
+.qr-campo > span:first-child{
+  display:block; margin:0 2px 7px; font-size:12px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; color:#8fa59d;
+}
+.qr-entrada{ position:relative; display:block; }
+.qr-entrada > i{
+  position:absolute; left:16px; top:50%; transform:translateY(-50%); font-size:15px; color:#34d399; pointer-events:none;
+}
+.qr-entrada input{
+  display:block; width:100%; height:54px; margin:0; box-sizing:border-box; padding:0 16px 0 44px;
+  border-radius:14px; border:1.5px solid rgba(255,255,255,.12); background:#050d0b; color:#f1f5f9;
+  font-family:inherit; font-size:16px; letter-spacing:.2px; transition:border-color .2s, box-shadow .2s;
+}
+.qr-entrada input::placeholder{ color:#4f6159; }
+.qr-entrada input:focus{ outline:none; border-color:#34d399; box-shadow:0 0 0 3px rgba(52,211,153,.2); }
+#loginFormGym input.qr-campo-mal, .insc-card input.qr-campo-mal{ border-color:#f87171 !important; box-shadow:0 0 0 3px rgba(248,113,113,.18) !important; }
+
+.qr-login-nota{ margin:-2px 2px 16px; font-size:12.5px; line-height:1.4; color:#7f938b; text-align:left; }
+.qr-login-nota.qr-aviso{ margin:0 0 16px; }
+
+.qr-buscar, .insc-send{
+  width:100%; min-height:56px; margin:0; border:0; border-radius:16px;
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  font-family:inherit; font-size:16px; font-weight:700; letter-spacing:.2px; color:#fff; cursor:pointer;
+  transition:transform .15s, opacity .2s;
+}
+.qr-buscar{ background:linear-gradient(135deg,#10b981,#059669); box-shadow:0 14px 28px -14px rgba(16,185,129,.9); }
+.insc-send{ margin-top:10px; background:linear-gradient(135deg,#f59e0b,#ea580c); box-shadow:0 14px 28px -14px rgba(234,88,12,.85); }
+.qr-buscar:active, .insc-send:active{ transform:scale(.98); }
+.insc-send:disabled{ opacity:.7; cursor:progress; }
+
+.qr-login-privado, .insc-nota{
+  display:flex; align-items:center; justify-content:center; gap:8px; margin:14px 0 0; text-align:center;
+  font-size:12px; line-height:1.4; color:#7f938b;
+}
+.qr-login-privado i, .insc-nota i{ color:#34d399; }
+
+/* Inscripción */
+.insc-eyebrow{
+  display:inline-block; margin:0 0 10px; padding:4px 10px; border-radius:999px;
+  font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#6ee7b7;
+  background:rgba(52,211,153,.1); border:1px solid rgba(52,211,153,.3);
+}
+.insc-card p{ font-family:inherit; }
+.insc-card p b{ color:#fde68a; font-weight:700; }
+.insc-ico{ color:#34d399; font-size:22px; vertical-align:middle; margin-left:4px; }
+.insc-ico-sm{ color:#f59e0b; font-size:14px; margin-left:2px; }
+.insc-card .qr-entrada input{ height:54px; }
+.insc-error{ min-height:20px; margin:12px 2px 0; font-size:13.5px; font-weight:600; color:#fca5a5; }
+.insc-wrap .wiz-topbar{ margin-bottom:6px; }
+
+

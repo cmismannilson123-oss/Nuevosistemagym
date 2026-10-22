@@ -21,7 +21,7 @@
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 <link rel="dns-prefetch" href="https://ntfy.sh">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js"></script>
 
@@ -188,30 +188,28 @@
         <span class="pt-time" id="ptTime"></span>
       </button>
 
-      <form id="loginFormGym" onsubmit="procesarIngresoSocio(event)" style="display:none;" autocomplete="off">
-        <input 
-          type="tel" 
-          id="qrPhone" 
-          name="telefonoSocio" 
-          autocomplete="off" 
-          placeholder="Tu número de celular" 
-          required
-          style="width:100%;padding:15px 16px;border-radius:50px;border:1.5px solid rgba(16,185,129,.4);background:rgba(6,20,18,.6);color:#fff;font-size:15px;margin-bottom:12px;box-sizing:border-box;text-align:center;"
-        >
-        <input 
-          type="tel" 
-          id="qrDni" 
-          name="dniSocio" 
-          inputmode="numeric"
-          autocomplete="off" 
-          placeholder="Tu DNI" 
-          required
-          style="width:100%;padding:15px 16px;border-radius:50px;border:1.5px solid rgba(16,185,129,.4);background:rgba(6,20,18,.6);color:#fff;font-size:15px;margin-bottom:12px;box-sizing:border-box;text-align:center;"
-        >
-        <p id="qrFormAviso" style="color:#94a3b8;font-size:13px;margin:0 0 12px;text-align:center;">Solo la primera vez en este celular.</p>
-        <button type="submit" class="qr-btn-principal">
-          <span class="icono-circulo">🔍</span> Buscar <span class="flecha">→</span>
-        </button>
+      <form id="loginFormGym" class="qr-login" onsubmit="procesarIngresoSocio(event)" style="display:none;" autocomplete="off">
+        <div class="qr-login-top">
+          <button type="button" class="wiz-back" onclick="cyVolverOpcionesQR()" aria-label="Volver">←</button>
+          <span class="wiz-title">Ingreso de socio</span>
+        </div>
+        <div class="qr-login-card">
+          <h3>Marca tu asistencia</h3>
+          <p class="qr-login-sub">Ingresa tu celular y tu DNI para continuar.</p>
+          <label class="qr-campo" for="qrPhone">
+            <span>Número de celular</span>
+            <span class="qr-entrada"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
+              <input type="tel" id="qrPhone" name="telefonoSocio" autocomplete="off" placeholder="Ej: 927885791" required></span>
+          </label>
+          <label class="qr-campo" for="qrDni">
+            <span>DNI</span>
+            <span class="qr-entrada"><i class="fa-solid fa-id-card" aria-hidden="true"></i>
+              <input type="tel" id="qrDni" name="dniSocio" inputmode="numeric" autocomplete="off" placeholder="Tu DNI" required></span>
+          </label>
+          <p id="qrFormAviso" class="qr-login-nota">Solo la primera vez en este celular.</p>
+          <button type="submit" class="qr-buscar"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><span>Buscar socio</span></button>
+        </div>
+        <p class="qr-login-privado"><i class="fa-solid fa-lock" aria-hidden="true"></i>Tus datos solo se usan para registrar tu asistencia.</p>
       </form>
 
       <!-- Guarda el número como si fuera un inicio de sesión, SOLO para que en iPhone
@@ -525,18 +523,22 @@
       <span class="wiz-title" id="inscTitulo">Quiero inscribirme</span>
     </div>
     <div class="insc-card">
-      <h3>¡Únete a la comunidad C&amp;Y! 💪</h3>
-      <p>Déjanos tus datos y reserva tu lugar. Al terminar te espera un <b>premio sorpresa</b> 🎁</p>
+      <span class="insc-eyebrow">Inscripción</span>
+      <h3>¡Únete a la comunidad C&amp;Y! <i class="fa-solid fa-dumbbell insc-ico" aria-hidden="true"></i></h3>
+      <p>Déjanos tus datos y reserva tu lugar. Al terminar te espera un <b>premio sorpresa</b> <i class="fa-solid fa-gift insc-ico-sm" aria-hidden="true"></i></p>
       <div id="inscPromo" class="insc-promo" style="display:none;"></div>
       <form id="inscForm" onsubmit="cyEnviarPrereg(event)" autocomplete="off" novalidate>
-        <label for="inscDni">DNI</label>
-        <input id="inscDni" type="text" inputmode="numeric" maxlength="12" placeholder="Tu DNI" autocomplete="off">
-        <label for="inscNombre">Nombre completo</label>
-        <input id="inscNombre" type="text" maxlength="80" placeholder="Nombres y apellidos" autocomplete="off">
-        <label for="inscWsp">WhatsApp</label>
-        <input id="inscWsp" type="tel" inputmode="tel" maxlength="16" placeholder="Ej: 927885791" autocomplete="off">
+        <label class="qr-campo" for="inscDni"><span>DNI</span>
+          <span class="qr-entrada"><i class="fa-solid fa-id-card" aria-hidden="true"></i>
+            <input id="inscDni" type="text" inputmode="numeric" maxlength="12" placeholder="Tu DNI" autocomplete="off"></span></label>
+        <label class="qr-campo" for="inscNombre"><span>Nombre completo</span>
+          <span class="qr-entrada"><i class="fa-solid fa-user" aria-hidden="true"></i>
+            <input id="inscNombre" type="text" maxlength="80" placeholder="Nombres y apellidos" autocomplete="off"></span></label>
+        <label class="qr-campo" for="inscWsp"><span>WhatsApp</span>
+          <span class="qr-entrada"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+            <input id="inscWsp" type="tel" inputmode="tel" maxlength="16" placeholder="Ej: 927885791" autocomplete="off"></span></label>
         <div id="inscError" class="insc-error" role="alert"></div>
-        <button type="submit" id="inscEnviar" class="insc-send"><i class="fa-solid fa-paper-plane"></i> <span>Enviar y ver mi premio</span></button>
+        <button type="submit" id="inscEnviar" class="insc-send"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> <span>Enviar y ver mi premio</span></button>
       </form>
       <div class="insc-nota"><i class="fa-solid fa-lock"></i> Tus datos solo los usa el gimnasio para atenderte.</div>
     </div>
@@ -707,6 +709,13 @@ function borrarTelefonoSeguro() {
   try { localStorage.removeItem("telefonoGym"); } catch (e) {}
   try { sessionStorage.removeItem("telefonoGym"); } catch (e) {}
 }
+
+window.cyVolverOpcionesQR = function () {
+  const form = document.getElementById("loginFormGym");
+  if (form) form.style.display = "none";
+  const opciones = document.getElementById("qrOpcionesInicio");
+  if (opciones) opciones.style.display = "flex";
+};
 
 function mostrarFormularioSocioQR(mensaje, op) {
   op = op || {};
@@ -1547,12 +1556,11 @@ function tarjetaPlanHTML(p, i){
          <span class="pp-ahora"><span class="pp-moneda">S/</span><span class="pp-num" data-v="${p.precio}">${p.precio}</span></span>
          ${p.periodo ? `<span class="pp-per">${p.periodo}</span>` : ""}
        </div>`;
-  const beneficios = p.renov ? `
+  const beneficios = p.invitado ? `
       <div class="pp-extra">
-        <div class="pp-extra-t">Beneficios de renovación</div>
+        <div class="pp-extra-t">Beneficio por invitado</div>
         <ul class="pp-lista">
           <li><i class="fa-solid fa-user-plus"></i><span>Si tu invitado se inscribe, recibes <b>+3 días</b> adicionales en tu membresía.</span></li>
-          <li><i class="fa-solid fa-gift"></i><span>Tu invitado obtiene <b>10% de descuento</b> de bienvenida.</span></li>
         </ul>
       </div>` : "";
   const masDe4 = p.incluye.length > 4;

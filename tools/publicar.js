@@ -32,7 +32,7 @@ function paso(nombre, fn) {
 
 const git = (...args) => execFileSync("git", args, { cwd: RAIZ, encoding: "utf8" });
 const archivosPublicables = () =>
-  git("ls-files").split("\n").filter(Boolean)
+  git("ls-files", "--cached", "--others", "--exclude-standard").split("\n").filter(Boolean)
     .filter((f) => !/^(\.claude\/|\.github\/|supabase\/|tools\/|dist\/|README\.md|\.gitignore)/.test(f));
 
 const swTexto = () => fs.readFileSync(path.join(RAIZ, "sw.js"), "utf8");

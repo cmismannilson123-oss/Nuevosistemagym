@@ -30,7 +30,7 @@
 // vieja y toma la nueva automáticamente.
 // ============================================================
 
-const CACHE_NAME = 'cy-fitness-gym-v121';
+const CACHE_NAME = 'cy-fitness-gym-v122';
 
 // Dominios externos de los que es seguro guardar copia (son archivos estáticos:
 // librerías, íconos, fuentes, fotos — nunca datos de socios). Cualquier petición
@@ -56,6 +56,10 @@ const ARCHIVOS_APP = [
   './tienda.css',
   './tienda.js',
   './personal.js',
+  './js/qr/pantalla-inicial.js',
+  './js/qr/inscripcion.js',
+  './js/qr/planes-scroll.js',
+  './js/qr/cupones-socio.js',
   './images/logo-cy.png',
   './images/icon-192.png',
   './images/badge-96.png',

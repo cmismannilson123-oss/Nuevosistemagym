@@ -104,11 +104,19 @@ function analizarSentencia(st, texto) {
 
 function leerBloquesScript(html) {
   const bloques = [];
-  const re = /<script\b([^>]*)>([\s\S]*?)<\/script>/g;
+  // Bloques inline y archivos locales (<script src="js/...">). Las librerías
+  // externas (http/https, CDN) se quedan en la cabecera y no se analizan.
+  const re = /<script\b([^>]*\bsrc="([^"]+)"[^>]*)><\/script>|<script\b([^>]*)>([\s\S]*?)<\/script>/g;
   let m;
   while ((m = re.exec(html))) {
-    if (/\bsrc\s*=/.test(m[1])) continue;               // librerías externas: se quedan en la cabecera
-    bloques.push({ attrs: m[1], contenido: m[2], inicio: m.index, fin: m.index + m[0].length });
+    if (m[2] !== undefined) {
+      if (/^https?:|^\/\//.test(m[2])) continue;     // librería externa
+      const contenido = fs.readFileSync(path.join(RAIZ, m[2]), 'utf8');
+      bloques.push({ attrs: m[1], contenido, inicio: m.index, fin: m.index + m[0].length, archivo: m[2] });
+      continue;
+    }
+    if (/\bsrc\s*=/.test(m[3])) continue;
+    bloques.push({ attrs: m[3], contenido: m[4], inicio: m.index, fin: m.index + m[0].length });
   }
   return bloques;
 }

@@ -275,7 +275,7 @@ function construir() {
   // 8) Cuerpo: el marcado de gym.html sin el panel ni sus scripts (el JS va al final)
   let resto = html.slice(html.indexOf('<body'), html.lastIndexOf('</body>'));
   PANEL_SOLO.forEach(a => { resto = quitarElemento(resto, a); });
-  resto = resto.replace(/<script\b([^>]*)>[\s\S]*?<\/script>/g, (m, attrs) => (/\bsrc\s*=/.test(attrs) ? '' : ''));
+  resto = resto.replace(/<script\b([^>]*)>[\s\S]*?<\/script>\n?/g, '');
   const finCuerpo = html.slice(html.lastIndexOf('</body>'));
 
   let salida = cabecera + '\n\n' + resto + finCuerpo;

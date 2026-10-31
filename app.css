@@ -481,8 +481,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, .tabbtn:focus-v
 .wiz-topbar{ display:flex; align-items:center; gap:12px; margin-bottom:18px; }
 .wiz-back{ width:38px; height:38px; min-width:38px; border-radius:50%; background:#dc2626; border:none; color:#fff; display:flex; align-items:center; justify-content:center; font-size:19px; font-weight:900; cursor:pointer; box-shadow:0 0 14px rgba(220,38,38,.65), 0 4px 10px rgba(0,0,0,.35); }
 .wiz-title{ color:#34d399; font-weight:800; font-size:12.5px; letter-spacing:.6px; text-transform:uppercase; }
-.wiz-h1{ font-size:20px; font-weight:900; color:#fff; text-align:left; line-height:1.3; margin:2px 0 8px; }
-.wiz-h1 .accent{ color:#34d399; }
 .wiz-p{ color:#94a3b8; font-size:13px; text-align:left; margin:0 0 18px; line-height:1.5; }
 
 .wiz-grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px; }
@@ -490,27 +488,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, .tabbtn:focus-v
 .wiz-feat-card .ic{ width:38px; height:38px; border-radius:50%; background:rgba(16,185,129,.15); display:flex; align-items:center; justify-content:center; margin:0 auto 8px; font-size:17px; }
 .wiz-feat-card .t{ font-weight:800; font-size:11px; color:#fff; margin-bottom:3px; letter-spacing:.2px; }
 .wiz-feat-card .d{ font-size:10.5px; color:#94a3b8; line-height:1.3; }
-
-.wiz-quote{ background:rgba(255,255,255,.03); border-left:3px solid #34d399; border-radius:10px; padding:14px 16px; font-size:13px; color:#e2e8f0; font-style:italic; margin:6px 0 20px; text-align:center; }
-
-.wiz-info-card{ background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:16px 18px; margin-bottom:14px; text-align:left; }
-.wiz-info-card .lbl{ display:flex; align-items:center; gap:8px; color:#34d399; font-weight:800; font-size:12.5px; margin-bottom:10px; letter-spacing:.3px; }
-.wiz-info-row{ margin-bottom:10px; }
-.wiz-info-row:last-child{ margin-bottom:0; }
-.wiz-info-row .d1{ color:#fff; font-weight:700; font-size:13px; }
-.wiz-info-row .d2{ color:#94a3b8; font-size:11.5px; margin:2px 0; }
-.wiz-info-row .d3{ color:#34d399; font-weight:800; font-size:13px; }
-
-.wiz-banner{
-  border-radius:16px; margin-bottom:16px; padding:30px 16px; text-align:center;
-  background:
-    linear-gradient(160deg, rgba(6,15,12,.55), rgba(4,8,7,.85)),
-    url('https://images.unsplash.com/photo-1744551154623-4b5336e95c28?q=80&w=900&auto=format&fit=crop') center/cover no-repeat;
-  border:1px solid rgba(16,185,129,.35);
-}
-.wiz-banner .bi{ font-size:30px; margin-bottom:8px; }
-.wiz-banner .bt{ color:#fff; font-weight:800; font-size:13px; }
-.wiz-banner .bd{ color:#94a3b8; font-size:11.5px; margin-top:2px; }
 
 .wiz-plan-list{ display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
 
@@ -598,37 +575,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, .tabbtn:focus-v
 @media (min-width:760px){
   #wizConoce .wiz-feat-hero,#wizConoce .wiz-feat-dance{ grid-column:span 2; }
 }
-.wiz-horario-split{ display:grid; grid-template-columns:1fr 1fr; gap:0; }
-.wiz-horario-col{ text-align:center; padding:4px 8px; }
-.wiz-horario-col:first-child{ border-right:1px solid rgba(148,163,184,.2); }
-.wiz-horario-ico{ width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; margin:0 auto 8px; border:1.5px solid rgba(52,211,153,.4); }
-.wiz-horario-ico.luna{ border-color:rgba(96,165,250,.5); }
-.wiz-horario-ico.baile{ border-color:rgba(232,121,249,.5); width:38px; height:38px; font-size:17px; flex-shrink:0; }
-.wiz-horario-pill{ display:inline-block; margin-top:8px; padding:5px 12px; border-radius:20px; border:1.5px solid rgba(52,211,153,.4); color:#34d399; font-weight:800; font-size:10.5px; }
-.wiz-horario-pill.baile{ border-color:rgba(232,121,249,.5); color:#e879f9; }
-.wiz-baile-card{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
-.wiz-baile-row{ display:flex; align-items:center; gap:12px; }
-.wiz-baile-banner{
-  background:
-    linear-gradient(135deg, rgba(88,28,135,.55), rgba(112,26,117,.6)),
-    url('https://images.unsplash.com/photo-1524594152303-9fd13543fe6e?q=80&w=600&auto=format&fit=crop') center/cover no-repeat;
-  border:1px solid rgba(232,121,249,.35); border-radius:12px; padding:14px; min-width:90px; min-height:70px;
-  font-family:'Brush Script MT', cursive; font-style:italic; color:#fff; text-shadow:0 2px 6px rgba(0,0,0,.6);
-  text-align:center; font-size:16px; line-height:1.1; white-space:nowrap; display:flex; align-items:center; justify-content:center;
-}
-.wiz-ubicacion-row{ display:flex; align-items:center; justify-content:space-between; gap:14px; }
-.wiz-mini-mapa{ width:64px; height:64px; min-width:64px; border-radius:12px; background:
-  linear-gradient(rgba(52,211,153,.08) 1px, transparent 1px) 0 0/16px 16px,
-  linear-gradient(90deg, rgba(52,211,153,.08) 1px, transparent 1px) 0 0/16px 16px,
-  rgba(52,211,153,.06);
-  border:1px solid rgba(52,211,153,.3); display:flex; align-items:center; justify-content:center; }
-.wiz-mini-mapa .pin{ font-size:22px; }
 
 /* ---- Horarios divididos Mañana/Tarde + tarjeta de Baile & Step ---- */
 .wiz-wsp-divider{ width:1px; align-self:stretch; background:rgba(255,255,255,.35); margin:0 2px; }
-
-
-.wiz-secondary-btn{ width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:14px 18px; border-radius:50px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.15); color:#fff; font-weight:700; font-size:13px; margin-bottom:10px; cursor:pointer; }
 
 .wiz-whatsapp-btn{ width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:16px 20px; border-radius:50px; background:#25d366; border:none; color:#fff; font-weight:800; font-size:14px; cursor:pointer; box-shadow:0 8px 22px rgba(37,211,102,.35); margin-top:4px; }
 
@@ -1269,8 +1218,6 @@ input:focus, select:focus, textarea:focus{
 /* Servicios: una pieza protagonista + grilla de apoyo + cierre con baile */
 .wiz-grid2{ gap:10px !important; }
 
-.wiz-quote{ font-family:var(--cy-display); font-size:22px; line-height:1.1; font-weight:600; border-radius:var(--cy-r-md); }
-
 /* Planes: protagonista + filas que se expanden */
 .wiz-plan-list{ gap:10px !important; }
 .plan{
@@ -1333,11 +1280,10 @@ input:focus, select:focus, textarea:focus{
 .open-chip .dot{ width:10px; height:10px; border-radius:50%; background:#34d399; flex:none; box-shadow:0 0 0 4px rgba(52,211,153,.2); }
 .open-chip.cerrado{ background:rgba(148,163,184,.1); border-color:rgba(148,163,184,.3); color:#cbd5e1; }
 .open-chip.cerrado .dot{ background:#94a3b8; box-shadow:0 0 0 4px rgba(148,163,184,.15); }
-.wiz-horario-col.ahora .wiz-horario-pill{ background:rgba(16,185,129,.2); border-color:#34d399; color:#d1fae5; }
 
 /* Botones de la experiencia pública */
-.wiz-secondary-btn,.wiz-whatsapp-btn,.catalogo-promo-btn{ transition:transform .15s ease-out; -webkit-tap-highlight-color:transparent; }
-.wiz-secondary-btn:active,.wiz-whatsapp-btn:active,.catalogo-promo-btn:active{ transform:scale(.985); }
+.wiz-whatsapp-btn,.catalogo-promo-btn{ transition:transform .15s ease-out; -webkit-tap-highlight-color:transparent; }
+.wiz-whatsapp-btn:active,.catalogo-promo-btn:active{ transform:scale(.985); }
 .wiz-whatsapp-btn{ position:sticky; bottom:calc(14px + env(safe-area-inset-bottom,0px)); z-index:3; }
 
 @media (min-width:760px){
@@ -2534,28 +2480,20 @@ html.qr-mode .container{ padding-bottom:calc(24px + env(safe-area-inset-bottom,0
 .ap-ok .ap-rv.ap-in{ opacity:1; translate:0 0; scale:1; }
 
 /* Horarios y planes: tarjetas con el mismo lenguaje */
-#wizHorarios .wiz-info-card, #wizPlanes .plan{ border-radius:26px !important; }
-#wizHorarios .wiz-info-card{ background:linear-gradient(165deg,rgba(255,255,255,.065),rgba(255,255,255,.015)) !important; border:1px solid rgba(255,255,255,.09) !important; box-shadow:0 24px 40px -28px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,255,255,.06); padding:20px !important; }
-#wizHorarios .wiz-horario-pill{ font-size:11px; padding:6px 11px; white-space:nowrap; }
-#wizHorarios .wiz-banner{ border-radius:26px; }
+#wizPlanes .plan{ border-radius:26px !important; }
 #wizHorarios .wiz-whatsapp-btn, #wizPlanes .wiz-whatsapp-btn{ border-radius:999px; }
 
 @media (prefers-reduced-motion: reduce){
   .ap-aurora i,.ap-hero-photo,.ap-cue::after,.ap-eq i,.ap-btn-main::after,#wizConoce .wiz-feat-hero .ic{ animation:none !important; }
   .ap-eyebrow,.ap-h1,.ap-sub,.ap-cue,.ap-large h2{ animation:none !important; }
   .ap-eq i{ transform:scaleY(.6); }
-  .ap-hero-copy,.ap-hero-img{ transform:none !important; opacity:1 !important; }#wizHorarios .wiz-horario-split{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); }#wizHorarios .wiz-horario-col{ min-width:0; padding:4px 6px; }#wizHorarios .wiz-horario-pill{ white-space:normal; max-width:100%; text-align:center; line-height:1.25; font-size:10.5px; padding:6px 10px; }
+  .ap-hero-copy,.ap-hero-img{ transform:none !important; opacity:1 !important; }
 }
 
 /* ===== v50: fluidez, estabilidad y orden ===== */
 
 /* -- Horarios y ubicación: nada se sale de su lugar (aunque el celular tenga letra grande) -- */
-#wizHorarios .wiz-info-card{ padding:18px 16px !important; min-width:0; }
 #wizHorarios .d1,#wizHorarios .d2{ overflow-wrap:break-word; }
-.wiz-baile-card,.wiz-baile-row,.wiz-baile-row > div{ min-width:0; }
-.wiz-baile-banner{ flex-shrink:0; min-width:78px; }
-.wiz-ubicacion-row > div:first-child{ min-width:0; flex:1; overflow-wrap:break-word; }
-.wiz-mini-mapa{ flex-shrink:0; }
 
 /* -- Planes: sin inclinación 3D; presionar = un leve hundimiento, nada de temblor -- */
 .plan,.wiz-feat-card2{ transform:none !important; }

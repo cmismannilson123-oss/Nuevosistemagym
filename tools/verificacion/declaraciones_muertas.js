@@ -38,11 +38,15 @@ const PROPS = JSON.parse(fs.readFileSync(path.join(__dirname, 'props_sc.json'), 
   await page.evaluate(() => { const b = [...document.querySelectorAll('.tabs button')].find(x => /Lista/i.test(x.textContent)); if (b) b.click(); });
   await page.waitForTimeout(900);
   await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' });
+  // Pantalla de planes del socio (con sus cupones) para que también se mida
+  await page.evaluate(() => { try { window.mostrarBienvenidaPublicaQR(); window.wizIr('wizPlanes'); } catch (e) {} });
+  await page.waitForTimeout(500);
   const res = await page.evaluate(({ PROPS }) => {
     // Elementos de las tarjetas (y sus pseudoelementos) y propiedades a comparar
-    const tarjetas = [...document.querySelectorAll('article.sc')];
+    // Elementos del panel (tarjetas) y de las pantallas del QR (planes, bienvenida, inscripción)
+    const raices = [...document.querySelectorAll('article.sc'), ...document.querySelectorAll('#wizOverlay, #loginFormGym, #inscOverlay, #qrCardPrimeraVez')];
     const elementos = [];
-    tarjetas.forEach(t => { elementos.push(t); t.querySelectorAll('*').forEach(e => elementos.push(e)); });
+    raices.forEach(t => { elementos.push(t); t.querySelectorAll('*').forEach(e => elementos.push(e)); });
     const firma = () => {
       const out = [];
       elementos.forEach(el => {

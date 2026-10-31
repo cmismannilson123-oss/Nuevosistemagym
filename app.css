@@ -1167,10 +1167,10 @@ input:focus, select:focus, textarea:focus{
 /* Portada con parallax suave */
 
 /* Servicios: una pieza protagonista + grilla de apoyo + cierre con baile */
-.wiz-grid2{ gap:10px !important; }
+.wiz-grid2{ gap:10px; }
 
 /* Planes: protagonista + filas que se expanden */
-.wiz-plan-list{ gap:10px !important; }
+.wiz-plan-list{ gap:10px; }
 .plan::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--pc); }
 .plan-head:focus-visible{ outline:2px solid var(--pc); outline-offset:-2px; }
 .plan--hero::before{ display:none; }

@@ -929,6 +929,9 @@ async function sincronizarDatosSilencioso() {
       // en vez de eso, volvemos a verificar el estado real del socio, por si el
       // navegador reutilizó una pestaña vieja con la pantalla de "Bienvenido" de
       // una asistencia anterior.
+      // Si ya se verificó hace menos de 10 s (al abrir la página, el navegador
+      // dispara 'focus' y 'visibilitychange' casi juntos), no se repite la consulta.
+      if (Date.now() - (window._ultimaVerificacionQR || 0) < 10000) return;
       inicializarFlujoQR();
       return;
     }
@@ -1149,6 +1152,7 @@ window.buscarQR = async function(esPrimeraVez){
 
   // La vista pública no puede leer la tabla de socios: el servidor devuelve
   // solo los datos mínimos del socio si el teléfono Y el DNI coinciden.
+  window._ultimaVerificacionQR = Date.now();
   const { data: resp, error } = await cyRpcSeguro("verificar_socio_qr", { p_telefono: telefono, p_dni: dni });
   const socio = resp && resp.ok ? resp : (resp && resp.bloqueado ? resp : null);
   let div = document.getElementById("qrResult");

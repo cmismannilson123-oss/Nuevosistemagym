@@ -140,6 +140,9 @@ async function sincronizarDatosSilencioso() {
       // en vez de eso, volvemos a verificar el estado real del socio, por si el
       // navegador reutilizó una pestaña vieja con la pantalla de "Bienvenido" de
       // una asistencia anterior.
+      // Si ya se verificó hace menos de 10 s (al abrir la página, el navegador
+      // dispara 'focus' y 'visibilitychange' casi juntos), no se repite la consulta.
+      if (Date.now() - (window._ultimaVerificacionQR || 0) < 10000) return;
       inicializarFlujoQR();
       return;
     }

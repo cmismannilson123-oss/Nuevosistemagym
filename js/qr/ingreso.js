@@ -82,6 +82,7 @@ window.buscarQR = async function(esPrimeraVez){
 
   // La vista pública no puede leer la tabla de socios: el servidor devuelve
   // solo los datos mínimos del socio si el teléfono Y el DNI coinciden.
+  window._ultimaVerificacionQR = Date.now();
   const { data: resp, error } = await cyRpcSeguro("verificar_socio_qr", { p_telefono: telefono, p_dni: dni });
   const socio = resp && resp.ok ? resp : (resp && resp.bloqueado ? resp : null);
   let div = document.getElementById("qrResult");

@@ -539,7 +539,19 @@ button:focus-visible, input:focus-visible, select:focus-visible, .tabbtn:focus-v
 /* ---- Horarios divididos Mañana/Tarde + tarjeta de Baile & Step ---- */
 .wiz-wsp-divider{ width:1px; align-self:stretch; background:rgba(255,255,255,.35); margin:0 2px; }
 
-.wiz-whatsapp-btn{ width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:16px 20px; border-radius:50px; background:#25d366; border:none; color:#fff; font-weight:800; font-size:14px; cursor:pointer; box-shadow:0 8px 22px rgba(37,211,102,.35); margin-top:4px; }
+/* Botón "Quiero más información" de horarios y planes */
+
+.wiz-whatsapp-btn { width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:16px 20px; background:#25d366; border:none; color:#fff; font-weight:800; font-size:14px; cursor:pointer; box-shadow:0 8px 22px rgba(37,211,102,.35); bottom:calc(14px + env(safe-area-inset-bottom,0px)); z-index:3; border-radius: 999px; margin-top: 18px; position: static; transition:transform .15s ease-out; -webkit-tap-highlight-color:transparent;
+}
+
+.wiz-whatsapp-btn:active { transform:scale(.985);
+}
+
+#wizHorarios .wiz-whatsapp-btn { position:relative; isolation:isolate; animation:hz-subir .55s .4s cubic-bezier(.2,.8,.2,1) both;
+}
+
+#wizHorarios .wiz-whatsapp-btn::before { content:""; position:absolute; inset:0; border-radius:inherit; background:#25d366; z-index:-1; animation:hz-halo 2.8s 1.2s ease-out infinite; pointer-events:none;
+}
 
 
 .qr-info-grid{
@@ -1179,9 +1191,7 @@ input:focus, select:focus, textarea:focus{
 .open-chip.cerrado .dot{ background:#94a3b8; box-shadow:0 0 0 4px rgba(148,163,184,.15); }
 
 /* Botones de la experiencia pública */
-.wiz-whatsapp-btn{ transition:transform .15s ease-out; -webkit-tap-highlight-color:transparent; }
-.wiz-whatsapp-btn:active,.catalogo-promo-btn:active{ transform:scale(.985); }
-.wiz-whatsapp-btn{ position:sticky; bottom:calc(14px + env(safe-area-inset-bottom,0px)); z-index:3; }
+.catalogo-promo-btn:active{ transform:scale(.985); }
 
 @media (min-width:760px){
   .wiz-overlay .wiz-screen{ max-width:760px; }
@@ -2376,7 +2386,6 @@ html.qr-mode .container{ padding-bottom:calc(24px + env(safe-area-inset-bottom,0
 .ap-ok .ap-rv.ap-in{ opacity:1; translate:0 0; scale:1; }
 
 /* Horarios y planes: tarjetas con el mismo lenguaje */
-#wizHorarios .wiz-whatsapp-btn, #wizPlanes .wiz-whatsapp-btn{ border-radius:999px; }
 
 @media (prefers-reduced-motion: reduce){
   .ap-aurora i,.ap-hero-photo,.ap-cue::after,.ap-eq i,.ap-btn-main::after,#wizConoce .wiz-feat-hero .ic{ animation:none !important; }
@@ -3836,7 +3845,6 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 .pp-flecha{ margin-left:auto; }
 
 /* La pantalla de planes no tapa las tarjetas con el botón flotante: queda al final */
-#wizPlanes .wiz-whatsapp-btn{ position:static; margin-top:18px; }
 
 @media (prefers-reduced-motion: reduce){
   .js-anim .pp-card.is-in .pp-antes::after{ animation:none; transform:scaleX(1); }
@@ -3899,8 +3907,6 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 #wizHorarios .hz-card:nth-of-type(3){ animation-delay:.16s; }
 #wizHorarios .hz-card:nth-of-type(4){ animation-delay:.24s; }
 #wizHorarios .hz-servicios{ animation-delay:.32s; }
-#wizHorarios .wiz-whatsapp-btn{ position:relative; isolation:isolate; animation:hz-subir .55s .4s cubic-bezier(.2,.8,.2,1) both; margin-top:18px; }
-#wizHorarios .wiz-whatsapp-btn::before{ content:""; position:absolute; inset:0; border-radius:inherit; background:#25d366; z-index:-1; animation:hz-halo 2.8s 1.2s ease-out infinite; pointer-events:none; }
 #wizHorarios .hz-turno{ animation:hz-subir .5s cubic-bezier(.2,.8,.2,1) both; position:relative; }
 #wizHorarios .hz-turno:nth-child(2){ animation-delay:.08s; }
 

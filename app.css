@@ -559,10 +559,45 @@ button:focus-visible, input:focus-visible, select:focus-visible, .tabbtn:focus-v
 /* ---- Tarjetas de planes con color por plan + lista "INCLUYE" (estilo referencia) ---- */
 
 /* ---- Tarjetas de "Conoce" con borde rojo (estilo referencia) ---- */
-.wiz-feat-card2{ background:rgba(255,255,255,.03); border:1.5px solid rgba(220,38,38,.55); border-left:4px solid #dc2626; border-radius:14px; padding:14px; }
-.wiz-feat-card2 .ic{ width:40px; height:40px; border-radius:50%; background:#dc2626; color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; margin-bottom:10px; box-shadow:0 4px 12px rgba(220,38,38,.4); }
-.wiz-feat-card2 .t{ font-weight:800; font-size:11px; color:#fff; margin-bottom:4px; line-height:1.25; }
-.wiz-feat-card2 .d{ font-size:10.5px; color:#94a3b8; line-height:1.35; }
+/* Tarjetas de "Conoce el gym" (#wizConoce): valores finales, una regla por parte; el color sale de --a. */
+#wizConoce .wiz-feat-card2{
+  position:relative; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-end;
+  min-width:0; min-height:158px; padding:18px;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:26px;
+  background:radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--a) 28%, transparent), transparent 62%), linear-gradient(165deg,#0f1822,#0a1017);
+  box-shadow:0 26px 44px -28px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,255,255,.07);
+}
+#wizConoce .wiz-feat-card2::after{
+  content:""; position:absolute; right:-40px; bottom:-40px; width:140px; height:140px; border-radius:50%;
+  border:1px solid color-mix(in srgb, var(--a) 30%, transparent); pointer-events:none;
+}
+#wizConoce .wiz-feat-card2 .ic{
+  display:flex; align-items:center; justify-content:center; padding:5px;
+  width:46px; height:46px; min-width:46px; margin:0 0 auto;
+  border-radius:15px; font-size:19px; color:#06100d;
+  background:linear-gradient(145deg, color-mix(in srgb, var(--a) 70%, #fff), var(--a));
+  box-shadow:0 10px 24px -6px var(--a);
+}
+#wizConoce .wiz-feat-card2 .ic svg.ilu{ width:100%; height:100%; display:block; overflow:visible; }
+#wizConoce .wiz-feat-card2 .t{
+  font-family:var(--cy-display); font-size:clamp(14px,4.4vw,19px); font-weight:800; letter-spacing:0;
+  line-height:1.08; color:#fff; margin:14px 0 5px; overflow-wrap:break-word;
+}
+#wizConoce .wiz-feat-card2 .d{ font-size:12px; line-height:1.35; color:#9fb0c2; }
+#wizConoce .wiz-feat-hero{
+  grid-column:1/-1; align-items:center; gap:14px;
+  min-height:236px; padding:22px;
+  background:radial-gradient(110% 100% at 0% 0%, color-mix(in srgb, var(--a) 40%, transparent), transparent 66%), linear-gradient(165deg,#170d10,#0a1017);
+}
+#wizConoce .wiz-feat-hero .ic{ width:68px; height:68px; min-width:68px; border-radius:22px; font-size:28px; animation:apPulse 3.2s ease-in-out infinite; }
+#wizConoce .wiz-feat-hero .t{ font-size:32px; margin-top:18px; }
+#wizConoce .wiz-feat-hero .d{ font-size:14px; }
+#wizConoce .wiz-feat-dance{ grid-column:1/-1; align-items:center; gap:14px; min-height:132px; justify-content:flex-end; }
+#wizConoce .wiz-feat-dance .t{ font-size:24px; }
+@media (min-width:760px){
+  #wizConoce .wiz-feat-hero,#wizConoce .wiz-feat-dance{ grid-column:span 2; }
+}
 .wiz-horario-split{ display:grid; grid-template-columns:1fr 1fr; gap:0; }
 .wiz-horario-col{ text-align:center; padding:4px 8px; }
 .wiz-horario-col:first-child{ border-right:1px solid rgba(148,163,184,.2); }
@@ -1233,29 +1268,6 @@ input:focus, select:focus, textarea:focus{
 
 /* Servicios: una pieza protagonista + grilla de apoyo + cierre con baile */
 .wiz-grid2{ gap:10px !important; }
-.wiz-feat-card2{
-  border:1px solid rgba(255,255,255,.08) !important;
-  border-left:3px solid #dc2626 !important;
-  border-radius:var(--cy-r-md) !important;
-  background:rgba(255,255,255,.035) !important;
-  transform:perspective(700px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(var(--s,1));
-  transition:transform .18s ease-out;
-}
-.wiz-feat-card2 .ic{ border-radius:12px !important; box-shadow:none !important; }
-.wiz-feat-card2 .t{ font-family:var(--cy-display); font-size:16px !important; font-weight:700; letter-spacing:.3px; }
-.wiz-feat-card2 .d{ font-size:11.5px !important; }
-.wiz-feat-hero{
-  grid-column:1/-1; display:flex; align-items:center; gap:14px; padding:18px !important;
-  background:linear-gradient(135deg,rgba(220,38,38,.24),rgba(220,38,38,.04)) !important;
-}
-.wiz-feat-hero .ic{ width:56px !important; height:56px !important; min-width:56px; font-size:24px !important; margin:0 !important; }
-.wiz-feat-hero .t{ font-size:21px !important; }
-.wiz-feat-dance{
-  grid-column:1/-1; border-left-color:#e879f9 !important;
-  background:linear-gradient(135deg,rgba(232,121,249,.16),rgba(232,121,249,.03)) !important;
-  display:flex; align-items:center; gap:14px;
-}
-.wiz-feat-dance .ic{ background:#c026d3 !important; margin:0 !important; }
 
 .wiz-quote{ font-family:var(--cy-display); font-size:22px; line-height:1.1; font-weight:600; border-radius:var(--cy-r-md); }
 
@@ -1331,7 +1343,6 @@ input:focus, select:focus, textarea:focus{
 @media (min-width:760px){
   .wiz-overlay .wiz-screen{ max-width:760px; }
   .wiz-grid2{ grid-template-columns:repeat(4,1fr) !important; }
-  .wiz-feat-hero,.wiz-feat-dance{ grid-column:span 2; }
   #wizPlanes .wiz-plan-list{ display:grid; grid-template-columns:1fr 1fr; align-items:start; }#wizPlanes .plan--hero{ grid-column:1/-1; }
 }
 
@@ -2492,25 +2503,7 @@ html.qr-mode .container{ padding-bottom:calc(24px + env(safe-area-inset-bottom,0
 
 /* Bento: servicios como piezas con luz propia */
 #wizConoce .wiz-grid2{ gap:12px !important; }
-#wizConoce .wiz-feat-card2{ position:relative; overflow:hidden; min-height:158px; display:flex !important; flex-direction:column; justify-content:flex-end; padding:18px !important;
-  border:1px solid rgba(255,255,255,.09) !important; border-left:1px solid rgba(255,255,255,.09) !important; border-radius:26px !important;
-  background:linear-gradient(165deg,#0f1822,#0a1017) !important;
-  background:radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--a) 28%, transparent), transparent 62%), linear-gradient(165deg,#0f1822,#0a1017) !important;
-  box-shadow:0 26px 44px -28px rgba(0,0,0,.95), inset 0 1px 0 rgba(255,255,255,.07); }
-#wizConoce .wiz-feat-card2::after{ content:""; position:absolute; right:-40px; bottom:-40px; width:140px; height:140px; border-radius:50%; border:1px solid color-mix(in srgb, var(--a) 30%, transparent); pointer-events:none; }
-#wizConoce .wiz-feat-card2 .ic{ width:46px !important; height:46px !important; min-width:46px; margin:0 0 auto !important; border-radius:15px !important; font-size:19px !important; color:#06100d !important;
-  background:var(--a) !important; background:linear-gradient(145deg, color-mix(in srgb, var(--a) 70%, #fff), var(--a)) !important; box-shadow:0 10px 24px -6px var(--a) !important; }
-#wizConoce .wiz-feat-card2{ min-width:0; }
-#wizConoce .wiz-feat-card2 .t{ font-family:var(--cy-display); font-size:clamp(14px,4.4vw,19px) !important; line-height:1.08; font-weight:800; letter-spacing:0; color:#fff; margin:14px 0 5px; overflow-wrap:break-word; }
-#wizConoce .wiz-feat-card2 .d{ font-size:12px !important; line-height:1.35; color:#9fb0c2; }
-#wizConoce .wiz-feat-hero{ min-height:236px; padding:22px !important; background:linear-gradient(165deg,#1a0f12,#0a1017) !important;
-  background:radial-gradient(110% 100% at 0% 0%, color-mix(in srgb, var(--a) 40%, transparent), transparent 66%), linear-gradient(165deg,#170d10,#0a1017) !important; }
-#wizConoce .wiz-feat-hero .ic{ width:68px !important; height:68px !important; min-width:68px; border-radius:22px !important; font-size:28px !important; animation:apPulse 3.2s ease-in-out infinite; }
-#wizConoce .wiz-feat-hero .t{ font-size:32px !important; margin-top:18px; }
-#wizConoce .wiz-feat-hero .d{ font-size:14px !important; }
 @keyframes apPulse{ 0%,100%{ box-shadow:0 10px 24px -6px var(--a), 0 0 0 0 color-mix(in srgb, var(--a) 55%, transparent); } 60%{ box-shadow:0 10px 24px -6px var(--a), 0 0 0 14px transparent; } }
-#wizConoce .wiz-feat-dance{ min-height:132px; justify-content:flex-end; }
-#wizConoce .wiz-feat-dance .t{ font-size:24px !important; }
 .ap-eq{ position:absolute; right:20px; top:20px; display:flex; align-items:flex-end; gap:4px; height:34px; }
 .ap-eq i{ width:5px; height:100%; border-radius:3px; background:linear-gradient(180deg,#f0abfc,#c026d3); transform-origin:50% 100%; animation:apEq 1s ease-in-out infinite; }
 .ap-eq i:nth-child(2){ animation-delay:-.25s; animation-duration:.8s; } .ap-eq i:nth-child(3){ animation-delay:-.5s; animation-duration:1.15s; }
@@ -4158,8 +4151,6 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 
 
 /* ===== Muñequitos de "Conoce C&Y" (v104): ilustraciones animadas, solo transform y opacity ===== */
-#wizConoce .wiz-feat-card2 .ic{ display:flex; align-items:center; justify-content:center; padding:5px; }
-#wizConoce .wiz-feat-card2 .ic svg.ilu{ width:100%; height:100%; display:block; overflow:visible; }
 .ilu-brazo-maestro,.ilu-brazo-dar,.ilu-brazo-saludo,.ilu-barra,.ilu-apoyo,.ilu-cabeza-alumno,.ilu-objeto,.ilu-caminante,.ilu-pierna-a,.ilu-pierna-b,.ilu-ondas,.ilu-linea{ transform-box:view-box; }
 .ilu-capacitacion .ilu-brazo-maestro{ transform-origin:25px 25px; animation:ilu-senala 1.6s ease-in-out infinite alternate; }
 .ilu-capacitacion .ilu-cabeza-alumno{ transform-origin:46px 30px; animation:ilu-cabeceo 1.2s ease-in-out infinite alternate; }

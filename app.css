@@ -1466,59 +1466,145 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{ box-shadow:0 0 
 .qr-hero-fullbleed .qr-hero-content > div:last-child{ animation:cyFadeIn .4s ease-out 1.65s backwards; }
 
 /* Las dos opciones */
-.cy-tile{
-  position:relative; isolation:isolate; overflow:hidden; width:100%; min-height:88px; margin:0 !important;
-  display:flex; align-items:center; gap:14px; padding:12px 16px 12px 12px !important;
-  border-radius:22px !important; text-align:left; color:#fff; cursor:pointer;
-  border:1px solid rgba(255,255,255,.18) !important;
-  transition:transform .16s ease-out, box-shadow .16s ease-out;
-  -webkit-tap-highlight-color:transparent;
+/* Botones de la pantalla inicial del QR. Base con valores medidos; estados y medias con reglas por id. */
+#btnSoySocioQR{position:relative;isolation:isolate;overflow-x:hidden;overflow-y:hidden;width:100%;min-height:108px;margin-top:0px;margin-right:0px;margin-bottom:0px;margin-left:0px;display:flex;align-items:center;row-gap:16px;column-gap:16px;padding-top:16px;padding-right:16px;padding-bottom:16px;padding-left:14px;border-top-left-radius:26px !important;border-top-right-radius:26px !important;border-bottom-right-radius:26px !important;border-bottom-left-radius:26px !important;text-align:left;color:rgb(255, 255, 255);cursor:pointer;border-top-width:1px;border-top-style:solid;border-top-color:rgba(167, 243, 208, 0.38);border-right-width:1px;border-right-style:solid;border-right-color:rgba(167, 243, 208, 0.38);border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:rgba(167, 243, 208, 0.38);border-left-width:1px;border-left-style:solid;border-left-color:rgba(167, 243, 208, 0.38);transition-behavior:normal;transition-delay:0s;transition-duration:0s;transition-property:none;transition-timing-function:ease;-webkit-tap-highlight-color:rgba(0, 0, 0, 0);background-image:radial-gradient(130% 150% at 0% 0%, rgb(25, 207, 147) 0%, rgb(12, 157, 108) 46%, rgb(7, 111, 76) 100%);background-color:rgba(0, 0, 0, 0);background-position:0% 0%;background-size:auto;background-repeat:repeat;background-attachment:scroll;background-origin:padding-box;background-clip:border-box;background-blend-mode:normal;box-shadow:rgba(16, 185, 129, 0.9) 0px 24px 42px -20px, rgba(255, 255, 255, 0.38) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.18) 0px -4px 0px 0px inset;animation-composition:replace;animation-delay:1.3s, 2.4s;animation-direction:normal, normal;animation-duration:0.45s, 2.8s;animation-fill-mode:backwards, none;animation-iteration-count:1, infinite;animation-name:cyRise, v54Halo;animation-play-state:running, running;animation-range-end:normal;animation-range-start:normal;animation-timeline:auto;animation-timing-function:cubic-bezier(0.2, 0.7, 0.2, 1), ease-out;outline-color:rgba(0, 0, 0, 0);outline-style:solid;outline-width:2px;outline-offset:0px}
+#btnSoySocioQR::before{content:"";position:absolute;top:0px;right:0px;bottom:0px;left:0px;z-index:-1;pointer-events:none;background-image:linear-gradient(115deg, rgba(0, 0, 0, 0) 35%, rgba(255, 255, 255, 0.26) 50%, rgba(0, 0, 0, 0) 65%);background-color:rgba(0, 0, 0, 0);background-position:0% 0%;background-size:auto;background-repeat:repeat;background-attachment:scroll;background-origin:padding-box;background-clip:border-box;background-blend-mode:normal;transform:translateX(-120%);animation-composition:replace;animation-delay:2.4s;animation-direction:normal;animation-duration:6s;animation-fill-mode:none;animation-iteration-count:infinite;animation-name:cySheenLoop;animation-play-state:running;animation-range-end:normal;animation-range-start:normal;animation-timeline:auto;animation-timing-function:ease-in-out}
+#btnSoySocioQR > span.cy-ico{width:72px;height:72px;flex-grow:0;flex-shrink:0;flex-basis:auto;display:grid;place-items:center;border-top-left-radius:20px;border-top-right-radius:20px;border-bottom-right-radius:20px;border-bottom-left-radius:20px;background-image:none;background-color:rgba(2, 40, 26, 0.32);background-position:0% 0%;background-size:auto;background-repeat:repeat;background-attachment:scroll;background-origin:padding-box;background-clip:border-box;background-blend-mode:normal;box-shadow:rgba(255, 255, 255, 0.14) 0px 0px 0px 1px inset}
+#btnSoySocioQR > span.cy-ico > svg{width:56px;height:56px;overflow-x:visible;overflow-y:visible;display:block}
+#btnSoySocioQR > span.lbl-wiz{flex-grow:1;flex-shrink:1;flex-basis:0%;min-width:0px;display:flex;flex-direction:column;align-items:flex-start;row-gap:4px;column-gap:4px}
+#btnSoySocioQR > span.lbl-wiz > b{font-family:"Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;font-weight:800;font-size:36px;line-height:.92;letter-spacing:0.2px;text-transform:none;text-shadow:rgba(0, 0, 0, 0.18) 0px 2px 0px;white-space-collapse:collapse;text-wrap-mode:nowrap}
+#btnSoySocioQR > span.lbl-wiz > small{font-size:14px;font-weight:500;opacity:.95;letter-spacing:0.2px}
+#btnSoySocioQR > span.flecha{width:46px;height:46px;flex-grow:0;flex-shrink:0;flex-basis:auto;border-top-left-radius:50%;border-top-right-radius:50%;border-bottom-right-radius:50%;border-bottom-left-radius:50%;margin-top:0px;margin-right:0px;margin-bottom:0px;margin-left:0px;background-image:none;background-color:rgb(243, 255, 249);background-position:0% 0%;background-size:auto;background-repeat:repeat;background-attachment:scroll;background-origin:padding-box;background-clip:border-box;background-blend-mode:normal;display:grid;place-items:center;font-size:16px;animation-composition:replace;animation-delay:2.6s;animation-direction:normal;animation-duration:2.8s;animation-fill-mode:none;animation-iteration-count:infinite;animation-name:cyNudge;animation-play-state:running;animation-range-end:normal;animation-range-start:normal;animation-timeline:auto;animation-timing-function:ease-in-out;color:rgb(7, 113, 80);box-shadow:rgba(0, 0, 0, 0.55) 0px 8px 16px -8px}
+#btnPrimeraVezQR{position:relative;isolation:isolate;overflow-x:hidden;overflow-y:hidden;width:100%;min-height:152px;margin-top:0px;margin-right:0px;margin-bottom:0px;margin-left:0px;display:flex;align-items:flex-start;row-gap:14px;column-gap:14px;padding-top:14px;padding-right:14px;padding-bottom:16px;padding-left:14px;border-top-left-radius:22px !important;border-top-right-radius:22px !important;border-bottom-right-radius:22px !important;border-bottom-left-radius:22px !important;text-align:left;color:rgb(255, 255, 255);cursor:pointer;border-top-width:1px;border-top-style:solid;border-top-color:rgba(255, 255, 255, 0.14);border-right-width:1px;border-right-style:solid;border-right-color:rgba(255, 255, 255, 0.14);border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:rgba(255, 255, 255, 0.14);border-left-width:1px;border-left-style:solid;border-left-color:rgba(255, 255, 255, 0.14);transition-behavior:normal;transition-delay:0s;transition-duration:0s;transition-property:none;transition-timing-function:ease;-webkit-tap-highlight-color:rgba(0, 0, 0, 0);background-image:linear-gradient(165deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.035));background-color:rgba(0, 0, 0, 0);background-position:0% 0%;background-size:auto;background-repeat:repeat;background-attachment:scroll;background-origin:padding-box;background-clip:border-box;background-blend-mode:normal;box-shadow:rgba(255, 255, 255, 0.12) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.9) 0px 18px 32px -22px;animation-composition:replace;animation-delay:1.42s;animation-direction:normal;animation-duration:0.45s;animation-fill-mode:backwards;animation-iteration-count:1;animation-name:cyRise;animation-play-state:running;animation-range-end:normal;animation-range-start:normal;animation-timeline:auto;animation-timing-function:cubic-bezier(0.2, 0.7, 0.2, 1);flex-direction:column;justify-content:space-between;-webkit-backdrop-filter:blur(14px) saturate(1.25);backdrop-filter:blur(14px) saturate(1.25)}
+#btnPrimeraVezQR::before{content:"";position:absolute;top:0px;right:0px;bottom:0px;left:0px;z-index:-1;pointer-events:none;background-image:linear-gradient(115deg, rgba(0, 0, 0, 0) 35%, rgba(255, 255, 255, 0.26) 50%, rgba(0, 0, 0, 0) 65%);background-color:rgba(0, 0, 0, 0);background-position:0% 0%;background-size:auto;background-repeat:repeat;background-attachment:scroll;background-origin:padding-box;background-clip:border-box;background-blend-mode:normal;transform:translateX(-120%);animation-composition:replace;animation-delay:3.4s;animation-direction:normal;animation-duration:6s;animation-fill-mode:none;animation-iteration-count:infinite;animation-name:cySheenLoop;animation-play-state:running;animation-range-end:normal;animation-range-start:normal;animation-timeline:auto;animation-timing-function:ease-in-out}
+#btnPrimeraVezQR > span.cy-ico{width:54px;height:54px;flex-grow:0;flex-shrink:0;flex-basis:auto;display:grid;place-items:center;border-top-left-radius:16px;border-top-right-radius:16px;border-bottom-right-radius:16px;border-bottom-left-radius:16px;background-image:linear-gradient(150deg, rgb(79, 140, 255), rgb(29, 78, 216));background-color:rgba(0, 0, 0, 0);background-position:0% 0%;background-size:auto;background-repeat:repeat;background-attachment:scroll;background-origin:padding-box;background-clip:border-box;background-blend-mode:normal;box-shadow:rgba(255, 255, 255, 0.3) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.7) 0px 8px 18px -10px}
+#btnPrimeraVezQR > span.cy-ico > svg{width:42px;height:42px;overflow-x:visible;overflow-y:visible;display:block}
+#btnPrimeraVezQR .cy-hand{transform-origin:32px 54px;animation-composition:replace;animation-delay:1.8s;animation-direction:normal;animation-duration:3.8s;animation-fill-mode:none;animation-iteration-count:infinite;animation-name:cyWaveHand;animation-play-state:running;animation-range-end:normal;animation-range-start:normal;animation-timeline:auto;animation-timing-function:ease-in-out}
+#btnPrimeraVezQR > span.lbl-wiz{flex-grow:1;flex-shrink:1;flex-basis:0%;min-width:0px;display:flex;flex-direction:column;align-items:flex-start;row-gap:5px;column-gap:5px}
+#btnPrimeraVezQR > span.lbl-wiz > b{font-family:"Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;font-weight:800;font-size:23px;line-height:1;letter-spacing:0.2px;text-transform:none;text-shadow:none;white-space-collapse:collapse;text-wrap-mode:wrap}
+#btnPrimeraVezQR > span.lbl-wiz > small{font-size:12.5px;font-weight:500;opacity:1;letter-spacing:0.2px;line-height:1.35;color:rgb(185, 200, 194)}
+#btnInscribirseQR{position:relative;isolation:isolate;overflow-x:hidden;overflow-y:hidden;width:100%;min-height:152px;margin-top:0px;margin-right:0px;margin-bottom:0px;margin-left:0px;display:flex;align-items:flex-start;row-gap:14px;column-gap:14px;padding-top:14px;padding-right:14px;padding-bottom:16px;padding-left:14px;border-top-left-radius:22px !important;border-top-right-radius:22px !important;border-bottom-right-radius:22px !important;border-bottom-left-radius:22px !important;text-align:left;color:rgb(255, 255, 255);cursor:pointer;border-top-width:1px;border-top-style:solid;border-top-color:rgba(255, 255, 255, 0.14);border-right-width:1px;border-right-style:solid;border-right-color:rgba(255, 255, 255, 0.14);border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:rgba(255, 255, 255, 0.14);border-left-width:1px;border-left-style:solid;border-left-color:rgba(255, 255, 255, 0.14);transition-behavior:normal;transition-delay:0s;transition-duration:0s;transition-property:none;transition-timing-function:ease;-webkit-tap-highlight-color:rgba(0, 0, 0, 0);background-image:linear-gradient(165deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.035));background-color:rgba(0, 0, 0, 0);background-position:0% 0%;background-size:auto;background-repeat:repeat;background-attachment:scroll;background-origin:padding-box;background-clip:border-box;background-blend-mode:normal;box-shadow:rgba(255, 255, 255, 0.12) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.9) 0px 18px 32px -22px;animation-composition:replace;animation-delay:1.54s;animation-direction:normal;animation-duration:0.45s;animation-fill-mode:backwards;animation-iteration-count:1;animation-name:cyRise;animation-play-state:running;animation-range-end:normal;animation-range-start:normal;animation-timeline:auto;animation-timing-function:cubic-bezier(0.2, 0.7, 0.2, 1);flex-direction:column;justify-content:space-between;-webkit-backdrop-filter:blur(14px) saturate(1.25);backdrop-filter:blur(14px) saturate(1.25)}
+#btnInscribirseQR::before{content:"";position:absolute;top:0px;right:0px;bottom:0px;left:0px;z-index:-1;pointer-events:none;background-image:linear-gradient(115deg, rgba(0, 0, 0, 0) 35%, rgba(255, 255, 255, 0.26) 50%, rgba(0, 0, 0, 0) 65%);background-color:rgba(0, 0, 0, 0);background-position:0% 0%;background-size:auto;background-repeat:repeat;background-attachment:scroll;background-origin:padding-box;background-clip:border-box;background-blend-mode:normal;transform:translateX(-120%);animation-composition:replace;animation-delay:4.4s;animation-direction:normal;animation-duration:6s;animation-fill-mode:none;animation-iteration-count:infinite;animation-name:cySheenLoop;animation-play-state:running;animation-range-end:normal;animation-range-start:normal;animation-timeline:auto;animation-timing-function:ease-in-out}
+#btnInscribirseQR > span.cy-ico{width:54px;height:54px;flex-grow:0;flex-shrink:0;flex-basis:auto;display:grid;place-items:center;border-top-left-radius:16px;border-top-right-radius:16px;border-bottom-right-radius:16px;border-bottom-left-radius:16px;background-image:linear-gradient(150deg, rgb(251, 191, 36), rgb(234, 88, 12));background-color:rgba(0, 0, 0, 0);background-position:0% 0%;background-size:auto;background-repeat:repeat;background-attachment:scroll;background-origin:padding-box;background-clip:border-box;background-blend-mode:normal;box-shadow:rgba(255, 255, 255, 0.3) 0px 1px 0px 0px inset, rgba(0, 0, 0, 0.7) 0px 8px 18px -10px}
+#btnInscribirseQR > span.cy-ico > svg{width:42px;height:42px;overflow-x:visible;overflow-y:visible;display:block}
+#btnInscribirseQR > span.lbl-wiz{flex-grow:1;flex-shrink:1;flex-basis:0%;min-width:0px;display:flex;flex-direction:column;align-items:flex-start;row-gap:5px;column-gap:5px}
+#btnInscribirseQR > span.lbl-wiz > b{font-family:"Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;font-weight:800;font-size:23px;line-height:1;letter-spacing:0.2px;text-transform:none;text-shadow:none;white-space-collapse:collapse;text-wrap-mode:wrap}
+#btnInscribirseQR > span.lbl-wiz > small{font-size:12.5px;font-weight:500;opacity:1;letter-spacing:0.2px;line-height:1.35;color:rgb(185, 200, 194)}
+#btnSoySocioQR::before{content:"";position:absolute;top:0px;right:0px;bottom:0px;left:0px;z-index:-1;pointer-events:none;background-image:linear-gradient(115deg, rgba(0, 0, 0, 0) 35%, rgba(255, 255, 255, 0.26) 50%, rgba(0, 0, 0, 0) 65%);background-color:rgba(0, 0, 0, 0);background-position:0% 0%;background-size:auto;background-repeat:repeat;background-attachment:scroll;background-origin:padding-box;background-clip:border-box;background-blend-mode:normal;transform:translateX(-120%);animation-composition:replace;animation-delay:2.4s;animation-direction:normal;animation-duration:6s;animation-fill-mode:none;animation-iteration-count:infinite;animation-name:cySheenLoop;animation-play-state:running;animation-range-end:normal;animation-range-start:normal;animation-timeline:auto;animation-timing-function:ease-in-out}
+#btnPrimeraVezQR::before{content:"";position:absolute;top:0px;right:0px;bottom:0px;left:0px;z-index:-1;pointer-events:none;background-image:linear-gradient(115deg, rgba(0, 0, 0, 0) 35%, rgba(255, 255, 255, 0.26) 50%, rgba(0, 0, 0, 0) 65%);background-color:rgba(0, 0, 0, 0);background-position:0% 0%;background-size:auto;background-repeat:repeat;background-attachment:scroll;background-origin:padding-box;background-clip:border-box;background-blend-mode:normal;transform:translateX(-120%);animation-composition:replace;animation-delay:3.4s;animation-direction:normal;animation-duration:6s;animation-fill-mode:none;animation-iteration-count:infinite;animation-name:cySheenLoop;animation-play-state:running;animation-range-end:normal;animation-range-start:normal;animation-timeline:auto;animation-timing-function:ease-in-out}
+#btnInscribirseQR::before{content:"";position:absolute;top:0px;right:0px;bottom:0px;left:0px;z-index:-1;pointer-events:none;background-image:linear-gradient(115deg, rgba(0, 0, 0, 0) 35%, rgba(255, 255, 255, 0.26) 50%, rgba(0, 0, 0, 0) 65%);background-color:rgba(0, 0, 0, 0);background-position:0% 0%;background-size:auto;background-repeat:repeat;background-attachment:scroll;background-origin:padding-box;background-clip:border-box;background-blend-mode:normal;transform:translateX(-120%);animation-composition:replace;animation-delay:4.4s;animation-direction:normal;animation-duration:6s;animation-fill-mode:none;animation-iteration-count:infinite;animation-name:cySheenLoop;animation-play-state:running;animation-range-end:normal;animation-range-start:normal;animation-timeline:auto;animation-timing-function:ease-in-out}
+#btnSoySocioQR:active,#btnSoySocioQR.react{transform:translateY(2px) scale(.985) !important}
+#btnPrimeraVezQR:active,#btnPrimeraVezQR.react{transform:translateY(2px) scale(.985) !important}
+#btnInscribirseQR:active,#btnInscribirseQR.react{transform:translateY(2px) scale(.985) !important}
+#btnSoySocioQR:active{box-shadow:0 8px 16px -10px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(0,0,0,.2) !important}
+#btnPrimeraVezQR:active{box-shadow:0 8px 16px -10px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(0,0,0,.2) !important}
+#btnInscribirseQR:active{box-shadow:0 8px 16px -10px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(0,0,0,.2) !important}
+#btnSoySocioQR:active::before,#btnSoySocioQR.react::before{animation:cySheen .5s ease-out}
+#btnPrimeraVezQR:active::before,#btnPrimeraVezQR.react::before{animation:cySheen .5s ease-out}
+#btnInscribirseQR:active::before,#btnInscribirseQR.react::before{animation:cySheen .5s ease-out}
+#btnSoySocioQR.react .cy-ico svg{animation:cyPop .42s ease-out}
+#btnPrimeraVezQR.react .cy-ico svg{animation:cyPop .42s ease-out}
+#btnInscribirseQR.react .cy-ico svg{animation:cyPop .42s ease-out}
+#btnSoySocioQR.react .cy-hand{animation:cyWaveFast .5s ease-in-out}
+#btnPrimeraVezQR.react .cy-hand{animation:cyWaveFast .5s ease-in-out}
+#btnInscribirseQR.react .cy-hand{animation:cyWaveFast .5s ease-in-out}
+@media (max-width:380px) {
+  #btnSoySocioQR .lbl-wiz b{font-size:27px !important}
+  #btnPrimeraVezQR .lbl-wiz b{font-size:27px !important}
+  #btnInscribirseQR .lbl-wiz b{font-size:27px !important}
 }
-.cy-tile--socio{
-  background:linear-gradient(135deg,#0fa774 0%,#0a7653 100%) !important;
-  box-shadow:0 16px 30px -12px rgba(16,185,129,.7), inset 0 1px 0 rgba(255,255,255,.3), inset 0 -3px 0 rgba(0,0,0,.2) !important;
-  animation:cyRise .45s cubic-bezier(.2,.7,.2,1) 1.3s backwards;
+@media (max-width:380px) {
+  #btnPrimeraVezQR .lbl-wiz b{font-size:18px !important}
 }
-.cy-tile--nuevo{
-  background:linear-gradient(135deg,#2f6df2 0%,#1c44c0 100%) !important;
-  box-shadow:0 16px 30px -12px rgba(37,99,235,.7), inset 0 1px 0 rgba(255,255,255,.3), inset 0 -3px 0 rgba(0,0,0,.22) !important;
-  animation:cyRise .45s cubic-bezier(.2,.7,.2,1) 1.42s backwards;
+@media (max-height:720px) {
+  #btnSoySocioQR{min-height:76px}
+  #btnPrimeraVezQR{min-height:76px}
+  #btnInscribirseQR{min-height:76px}
+}
+@media (max-height:720px) {
+  #btnSoySocioQR .cy-ico{width:54px;height:54px}
+  #btnPrimeraVezQR .cy-ico{width:54px;height:54px}
+  #btnInscribirseQR .cy-ico{width:54px;height:54px}
+}
+@media (max-height:720px) {
+  #btnSoySocioQR .cy-ico svg{width:42px;height:42px}
+  #btnPrimeraVezQR .cy-ico svg{width:42px;height:42px}
+  #btnInscribirseQR .cy-ico svg{width:42px;height:42px}
+}
+@media (prefers-reduced-motion: reduce) {
+  #btnSoySocioQR .cy-hand,#btnSoySocioQR .flecha{animation:none !important}
+  #btnPrimeraVezQR .cy-hand{animation:none !important}
+  #btnInscribirseQR .cy-hand{animation:none !important}
+}
+@media (prefers-reduced-motion: reduce) {
+  #btnSoySocioQR.react::before{animation:none}
+  #btnPrimeraVezQR.react::before{animation:none}
+  #btnInscribirseQR.react::before{animation:none}
+}
+@media (max-width:380px) {
+  #btnSoySocioQR .lbl-wiz b{font-size:19.5px !important}
+  #btnPrimeraVezQR .lbl-wiz b{font-size:19.5px !important}
+  #btnInscribirseQR .lbl-wiz b{font-size:19.5px !important}
+}
+@media (max-height:720px) {
+  #btnSoySocioQR{min-height:70px}
+  #btnPrimeraVezQR{min-height:70px}
+  #btnInscribirseQR{min-height:70px}
+}
+@media (max-height:720px) {
+  #btnSoySocioQR .cy-ico{width:48px;height:48px}
+  #btnPrimeraVezQR .cy-ico{width:48px;height:48px}
+  #btnInscribirseQR .cy-ico{width:48px;height:48px}
+}
+@media (max-height:720px) {
+  #btnSoySocioQR .cy-ico svg{width:38px;height:38px}
+  #btnPrimeraVezQR .cy-ico svg{width:38px;height:38px}
+  #btnInscribirseQR .cy-ico svg{width:38px;height:38px}
+}
+@media (prefers-reduced-motion: reduce) {
+  #btnSoySocioQR::before{animation:none !important}
+  #btnPrimeraVezQR::before,#btnPrimeraVezQR .flecha{animation:none !important}
+  #btnInscribirseQR::before,#btnInscribirseQR .flecha{animation:none !important}
+}
+#btnPrimeraVezQR:active{background:linear-gradient(165deg, rgba(255,255,255,.14), rgba(255,255,255,.06)) !important}
+#btnInscribirseQR:active{background:linear-gradient(165deg, rgba(255,255,255,.14), rgba(255,255,255,.06)) !important}
+#btnSoySocioQR:focus-visible{outline:3px solid var(--v54-menta) !important;outline-offset:3px}
+#btnPrimeraVezQR:focus-visible{outline:3px solid var(--v54-menta) !important;outline-offset:3px}
+#btnInscribirseQR:focus-visible{outline:3px solid var(--v54-menta) !important;outline-offset:3px}
+@media (max-width:370px) {
+  #btnSoySocioQR .lbl-wiz b{font-size:31px !important}
+}
+@media (max-width:370px) {
+  #btnPrimeraVezQR .lbl-wiz b{font-size:21px !important}
+  #btnInscribirseQR .lbl-wiz b{font-size:21px !important}
+}
+@media (max-width:390px) {
+  #btnSoySocioQR .lbl-wiz small{font-size:13px !important}
+}
+@media (max-height:820px) {
+  #btnSoySocioQR{min-height:96px !important}
+}
+@media (max-height:820px) {
+  #btnPrimeraVezQR{min-height:126px !important;gap:10px !important}
+  #btnInscribirseQR{min-height:126px !important;gap:10px !important}
+}
+@media (max-height:820px) {
+  #btnPrimeraVezQR .cy-ico{width:48px !important;height:48px !important}
+  #btnInscribirseQR .cy-ico{width:48px !important;height:48px !important}
+}
+@media (max-height:820px) {
+  #btnPrimeraVezQR .cy-ico svg{width:38px !important;height:38px !important}
+  #btnInscribirseQR .cy-ico svg{width:38px !important;height:38px !important}
+}
+@media (prefers-reduced-motion: reduce) {
+  #btnSoySocioQR{animation:none !important}
 }
 @keyframes cyRise{ from{ opacity:0; transform:translate3d(0,26px,0); } to{ opacity:1; transform:none; } }
-.cy-tile::before{
-  content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
-  background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.26) 50%,transparent 65%);
-  transform:translateX(-120%);
-}
-.cy-tile:active,.cy-tile.react{ transform:translateY(2px) scale(.985) !important; }
-.cy-tile:active{ box-shadow:0 8px 16px -10px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(0,0,0,.2) !important; }
-.cy-tile:active::before,.cy-tile.react::before{ animation:cySheen .5s ease-out; }
 @keyframes cySheen{ to{ transform:translateX(120%); } }
-
-.cy-ico{
-  width:62px; height:62px; flex:none; display:grid; place-items:center; border-radius:18px;
-  background:rgba(0,0,0,.26); box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);
-}
-.cy-ico svg{ width:48px; height:48px; overflow:visible; display:block; }
-.cy-tile.react .cy-ico svg{ animation:cyPop .42s ease-out; }
 @keyframes cyPop{ 0%{ transform:scale(1); } 40%{ transform:translateY(-4px) scale(1.2); } 100%{ transform:scale(1); } }
-
-.cy-tile .lbl-wiz{ flex:1; min-width:0; display:flex; flex-direction:column; align-items:flex-start; gap:4px; }
-.cy-tile .lbl-wiz b{
-  font-family:var(--cy-display); font-weight:800; font-size:32px !important; line-height:.95;
-  letter-spacing:.8px; text-transform:uppercase; text-shadow:0 2px 0 rgba(0,0,0,.18);
-}
-.cy-tile--nuevo .lbl-wiz b{ font-size:20px !important; line-height:1.02; letter-spacing:.5px; }
-.cy-tile .lbl-wiz small{ font-size:12.5px !important; font-weight:500 !important; opacity:.85 !important; letter-spacing:.2px; }
-.cy-tile .flecha{
-  width:34px; height:34px; flex:none; border-radius:50%; margin:0 !important;
-  background:rgba(255,255,255,.18); display:grid; place-items:center; font-size:17px !important;
-}
-.cy-tile--socio .flecha{ animation:cyNudge 2.8s ease-in-out 2.6s infinite; }
 @keyframes cyNudge{ 0%,60%,100%{ transform:translateX(0); } 70%{ transform:translateX(5px); } 80%{ transform:translateX(0); } 90%{ transform:translateX(4px); } }
 
 /* Saludo de la mano: dos oleadas y pausa */
-.cy-hand{ transform-origin:32px 54px; animation:cyWaveHand 3.8s ease-in-out 1.8s infinite; }
 @keyframes cyWaveHand{
   0%,52%,100%{ transform:rotate(0); }
   7%{ transform:rotate(-16deg); } 15%{ transform:rotate(13deg); } 23%{ transform:rotate(-14deg); }
@@ -1526,17 +1612,10 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{ box-shadow:0 0 
 }
 .cy-wl{ opacity:0; animation:cyWl 3.8s ease-in-out 1.8s infinite; }
 @keyframes cyWl{ 0%,3%,50%,100%{ opacity:0; } 12%,36%{ opacity:.9; } }
-.cy-tile.react .cy-hand{ animation:cyWaveFast .5s ease-in-out; }
 @keyframes cyWaveFast{ 0%{ transform:rotate(0); } 25%{ transform:rotate(-20deg); } 50%{ transform:rotate(16deg); } 75%{ transform:rotate(-12deg); } 100%{ transform:rotate(0); } }
 
 
 /* Pantallas pequeñas / bajas: que las dos opciones se vean sin tener que hacer scroll */
-.cy-tile--socio .lbl-wiz b{ white-space:nowrap; }
-@media (max-width:380px){
-  .cy-tile .lbl-wiz b{ font-size:27px !important; }
-  .cy-tile--nuevo .lbl-wiz b{ font-size:18px !important; }
-  .cy-tile{ gap:11px; padding-right:12px !important; }
-}
 @media (max-height:720px){
   .qr-hero-fullbleed{ padding-top:20px !important; }
   .qr-hero-content{ padding-top:2vh !important; }
@@ -1545,17 +1624,12 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{ box-shadow:0 0 
   .qr-hero-content .qr-titulo{ font-size:42px !important; }
   .qr-hero-fullbleed .qr-hero-content .qr-sub{ margin-top:8px !important; font-size:13px !important; }
   .qr-hero-fullbleed .qr-hero-content .qr-hero-divider{ margin:10px auto 16px; }
-  .cy-tile{ min-height:76px; }
-  .cy-ico{ width:54px; height:54px; }
-  .cy-ico svg{ width:42px; height:42px; }
 }
 .wiz-overlay{ animation:cyFadeIn .25s ease-out; }
 
 @media (prefers-reduced-motion: reduce){
-  .cy-bg-photo,.cy-glow,.cy-p,.qr-hero-content .qr-logo-ring::before,.qr-hero-content .qr-logo-ring::after,
-  .qr-hero-content .qr-logo-ring .logo-cy,.cy-hand,.cy-wl,.cy-tile--socio .flecha{ animation:none !important; }
+  .cy-bg-photo,.cy-glow,.cy-p,.qr-hero-content .qr-logo-ring::before,.qr-hero-content .qr-logo-ring::after,.qr-hero-content .qr-logo-ring .logo-cy,.cy-wl{ animation:none !important; }
   .cy-p{ display:none; }
-  .cy-tile.react::before{ animation:none; }
 }
 
 /* ==========================================================================
@@ -2012,23 +2086,7 @@ button#btnActualizar i{color:#00212b !important}
 
 /* ===== v42: pre-registro QR ===== */
 /* Los tres botones: mismo tamaño, tipografía, entrada y brillo */
-.cy-tile{ min-height:80px; gap:12px; }
-.cy-ico{ width:56px; height:56px; }
-.cy-ico svg{ width:44px; height:44px; }
-.cy-tile .lbl-wiz b,.cy-tile--nuevo .lbl-wiz b,.cy-tile--socio .lbl-wiz b{ font-size:21px !important; line-height:1.02; letter-spacing:.6px; white-space:normal !important; }
-.cy-tile .lbl-wiz small{ font-size:12px !important; }
-.cy-tile--inscribir{
-  background:linear-gradient(135deg,#f59e0b 0%,#c2410c 100%) !important;
-  box-shadow:0 16px 30px -12px rgba(234,88,12,.7), inset 0 1px 0 rgba(255,255,255,.3), inset 0 -3px 0 rgba(0,0,0,.22) !important;
-  animation:cyRise .45s cubic-bezier(.2,.7,.2,1) 1.54s backwards;
-}
-.cy-tile--nuevo .flecha,.cy-tile--inscribir .flecha{ animation:cyNudge 2.8s ease-in-out 2.6s infinite; }
-.cy-tile::before{ animation:cySheenLoop 6s ease-in-out 2.4s infinite; }
-.cy-tile--nuevo::before{ animation-delay:3.4s; }
-.cy-tile--inscribir::before{ animation-delay:4.4s; }
 @keyframes cySheenLoop{ 0%,62%{ transform:translateX(-120%); } 100%{ transform:translateX(120%); } }
-@media (max-width:380px){ .cy-tile .lbl-wiz b,.cy-tile--nuevo .lbl-wiz b,.cy-tile--socio .lbl-wiz b{ font-size:19.5px !important; } }
-@media (max-height:720px){ .cy-tile{ min-height:70px; } .cy-ico{ width:48px; height:48px; } .cy-ico svg{ width:38px; height:38px; } }
 
 /* Capas a pantalla completa */
 .cy-ov{ position:fixed; inset:0; z-index:30; overflow-y:auto; overscroll-behavior:contain; background:linear-gradient(160deg,#06140f,#0a1018 60%,#0b0f1c); animation:cyFadeIn .25s ease-out; }
@@ -2090,7 +2148,7 @@ button#btnActualizar i{color:#00212b !important}
 .cel-btn{ margin-top:22px; min-height:54px; padding:0 28px; border:0; border-radius:16px; font-size:16px; font-weight:800; color:#fff; cursor:pointer; background:linear-gradient(135deg,#22e58f,#0aa85f); box-shadow:0 12px 26px -10px rgba(16,220,130,.8); display:inline-flex; align-items:center; gap:10px; }
 @keyframes cyBounceIn{ 0%{ transform:scale(.3); opacity:0; } 100%{ transform:scale(1); opacity:1; } }
 @media (prefers-reduced-motion: reduce){
-  .av,.cel-fx .cf,.cel-fx .bl,.cel-fx .db,.cy-tile::before,.cy-tile--nuevo .flecha,.cy-tile--inscribir .flecha{ animation:none !important; }
+  .av,.cel-fx .cf,.cel-fx .bl,.cel-fx .db{ animation:none !important; }
   .cel-fx .cf,.cel-fx .bl{ display:none; }
 }
 
@@ -2107,7 +2165,6 @@ button#btnActualizar i{color:#00212b !important}
 .pend-info small{ font-size:12.5px; color:#a9bdb6; }
 .pend-premio{ display:inline-block; margin-top:2px; padding:3px 9px; border-radius:10px; font-size:11.5px; font-weight:800; color:#1a0f00; background:#fcd34d; align-self:flex-start; }
 .aviso-premio{ margin:0 0 14px; padding:12px 14px; border-radius:14px; font-size:14px; font-weight:700; line-height:1.35; color:#1a0f00; background:linear-gradient(135deg,#fde68a,#f59e0b); }
-.cy-tile .lbl-wiz b,.cy-tile--nuevo .lbl-wiz b,.cy-tile--socio .lbl-wiz b{font-size:19.5px !important;letter-spacing:.4px !important}
 .av-layer {
   position: absolute;
   inset: 0;
@@ -2832,49 +2889,8 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
 }
 #qrOpcionesInicio[style*="none"]{ display:none !important; }
 
-.cy-tile--socio{
-  min-height:108px !important; padding:16px 16px 16px 14px !important; border-radius:26px !important; gap:16px !important;
-  background:radial-gradient(130% 150% at 0% 0%, #19cf93 0%, #0c9d6c 46%, #076f4c 100%) !important;
-  border:1px solid rgba(167,243,208,.38) !important;
-  box-shadow:0 24px 42px -20px rgba(16,185,129,.9), inset 0 1px 0 rgba(255,255,255,.38), inset 0 -4px 0 rgba(0,0,0,.18) !important;
-  outline:2px solid transparent;
-  animation:cyRise .45s cubic-bezier(.2,.7,.2,1) 1.3s backwards, v54Halo 2.8s ease-out 2.4s infinite;
-}
-.cy-tile--socio .lbl-wiz b{
-  font-size:36px !important; line-height:.92 !important; letter-spacing:.2px !important;
-  text-transform:none !important; white-space:nowrap !important;
-}
-.cy-tile--socio .lbl-wiz small{ font-size:14px !important; font-weight:500 !important; opacity:.95 !important; }
-.cy-tile--socio .cy-ico{ width:72px !important; height:72px !important; border-radius:20px; background:rgba(2,40,26,.32); }
-.cy-tile--socio .cy-ico svg{ width:56px !important; height:56px !important; }
-.cy-tile--socio .flecha{
-  width:46px !important; height:46px !important; background:#f3fff9 !important; color:#077150;
-  font-size:16px !important; box-shadow:0 8px 16px -8px rgba(0,0,0,.55);
-}
-
 .cy-sec{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-.cy-sec .cy-tile{
-  flex-direction:column; align-items:flex-start; justify-content:space-between; gap:14px !important;
-  min-height:152px !important; padding:14px 14px 16px !important; border-radius:22px !important;
-  background:linear-gradient(165deg, rgba(255,255,255,.10), rgba(255,255,255,.035)) !important;
-  -webkit-backdrop-filter:blur(14px) saturate(1.25); backdrop-filter:blur(14px) saturate(1.25);
-  border:1px solid rgba(255,255,255,.14) !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 18px 32px -22px rgba(0,0,0,.9) !important;
-}
-.cy-sec .cy-tile:active{ background:linear-gradient(165deg, rgba(255,255,255,.14), rgba(255,255,255,.06)) !important; }
-.cy-sec .cy-ico{ width:54px !important; height:54px !important; border-radius:16px; box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 8px 18px -10px rgba(0,0,0,.7); }
-.cy-sec .cy-ico svg{ width:42px !important; height:42px !important; }
-.cy-tile--nuevo .cy-ico{ background:linear-gradient(150deg,#4f8cff,#1d4ed8); }
-.cy-tile--inscribir .cy-ico{ background:linear-gradient(150deg,#fbbf24,#ea580c); }
-.cy-sec .lbl-wiz{ gap:5px !important; }
-.cy-sec .lbl-wiz b{
-  font-size:23px !important; line-height:1 !important; letter-spacing:.2px !important;
-  text-transform:none !important; white-space:normal !important; text-shadow:none !important;
-}
-.cy-sec .lbl-wiz small{ font-size:12.5px !important; line-height:1.35; color:#b9c8c2; opacity:1 !important; }
-.cy-sec .flecha{ display:none !important; }
 .cy-sec .tile-promo{ top:12px !important; right:12px !important; left:auto !important; }
-.cy-tile:focus-visible{ outline:3px solid var(--v54-menta) !important; outline-offset:3px; }
 
 /* ----- Tarjeta del socio ----- */
 .qr-hero-card.cy-check{ text-align:left; padding:20px 18px 18px; }
@@ -2944,8 +2960,6 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
 .cy-check .qr-secure-line{ justify-content:center; }
 
 @media (max-width:370px){
-  .cy-tile--socio .lbl-wiz b{ font-size:31px !important; }
-  .cy-sec .lbl-wiz b{ font-size:21px !important; }
   .cy-check .cyc-stats b{ font-size:21px; }
   .cy-check .cyc-stats .largo b{ font-size:15px; }
   .cy-check .cyc-stats{ grid-template-columns:1.3fr 1fr .95fr; }
@@ -2953,7 +2967,6 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
 }
 @media (max-width:390px){
   .qr-hero-card.cy-check .cyc-btn{ font-size:22px; white-space:nowrap; }
-  .cy-tile--socio .lbl-wiz small{ font-size:13px !important; }
 }
 /* Pantallas bajas: logo y título más compactos para que las 3 opciones entren sin scroll */
 @media (max-height:820px){
@@ -2963,13 +2976,9 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
   .qr-hero-content .qr-titulo{ font-size:40px !important; }
   .qr-hero-fullbleed .qr-hero-content .qr-sub{ margin-top:6px !important; font-size:15px !important; }
   .qr-hero-fullbleed .qr-hero-content .qr-hero-divider{ margin:10px auto 16px !important; }
-  .cy-tile--socio{ min-height:96px !important; }
-  .cy-sec .cy-tile{ min-height:126px !important; gap:10px !important; }
-  .cy-sec .cy-ico{ width:48px !important; height:48px !important; }
-  .cy-sec .cy-ico svg{ width:38px !important; height:38px !important; }
 }
 @media (prefers-reduced-motion: reduce){
-  .cy-tile--socio, .qr-hero-card.cy-check .cyc-btn{ animation:none !important; }
+  .qr-hero-card.cy-check .cyc-btn{ animation:none !important; }
   .cy-check .cyc-scan{ display:none; }
   .cy-check .cyc-bar i{ animation:none; }
 }

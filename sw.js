@@ -30,7 +30,7 @@
 // vieja y toma la nueva automáticamente.
 // ============================================================
 
-const CACHE_NAME = 'cy-fitness-gym-v129';
+const CACHE_NAME = 'cy-fitness-gym-v130';
 
 // Dominios externos de los que es seguro guardar copia (son archivos estáticos:
 // librerías, íconos, fuentes, fotos — nunca datos de socios). Cualquier petición
@@ -78,6 +78,18 @@ const ARCHIVOS_APP = [
   './js/panel/atajos-registro.js',
   './js/compartido/tarjeta-estado.js',
   './js/compartido/confirmar-asistencia-qr.js',
+  './js/core/navegador-embebido.js',
+  './js/core/seguridad-inicial.js',
+  './js/core/service-worker.js',
+  './js/core/supabase.js',
+  './js/panel/comprobantes-whatsapp.js',
+  './js/panel/qr-invitacion.js',
+  './js/panel/recibos.js',
+  './js/ui/accesibilidad-v41.js',
+  './js/ui/capa-diseno-v33.js',
+  './js/ui/espaciador-cabecera.js',
+  './js/ui/feedback-marcaje.js',
+  './js/ui/tinte-ambiental.js',
   './js/qr/entrada-campos.js',
   './js/qr/ingreso.js',
   './js/qr/planes-bienvenida.js',

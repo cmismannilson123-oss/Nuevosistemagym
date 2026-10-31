@@ -19,8 +19,10 @@ for n in nombres:
     if not bbox: continue
     # Las tarjetas por separado no toleran nada; las pantallas completas toleran un ruido mínimo de animación
     px = sum(1 for p in d.convert('L').getdata() if p > 0)
-    tolerancia = 0 if n.startswith('tarjeta') else 1200
-    if px <= tolerancia and not n.startswith('tarjeta'):
+    # Solo las capturas con animación conocida toleran unos píxeles; el resto no tolera nada
+    ruidosas = ('panel-390-lista', 'panel-1280-lista', 'qr-390-inicio')
+    tolerancia = 1200 if n.rsplit('.', 1)[0] in ruidosas else 0
+    if px <= tolerancia:
         print('RUIDO (tolerado)', n, 'píxeles', px, 'zona', bbox)
     else:
         print('DIFERENTE', n, 'píxeles', px, 'zona', bbox); malos += 1

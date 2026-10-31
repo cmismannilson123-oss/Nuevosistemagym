@@ -52,7 +52,8 @@ const quieto = '*,*::before,*::after{animation:none!important;transition:none!im
     await page.click('#btnInscribirseQR').catch(() => {}); await page.waitForTimeout(400); await foto(page, `qr-${ancho}-inscripcion`);
     // Pantallas de presentación del socio: conoce el gym, horarios y planes
     for (const [id, nombre] of [['wizConoce', 'conoce'], ['wizHorarios', 'horarios'], ['wizPlanes', 'planes']]) {
-      await page.evaluate((i) => window.wizIr(i), id).catch(() => {}); await page.waitForTimeout(700);
+      // Los planes se dibujan al abrir la bienvenida: se llama primero a esa función
+      await page.evaluate((i) => { if (i === 'wizPlanes') window.mostrarBienvenidaPublicaQR(); window.wizIr(i); }, id).catch(() => {}); await page.waitForTimeout(900);
       await foto(page, `qr-${ancho}-${nombre}`);
       await page.evaluate(() => { const o = document.getElementById('wizOverlay'); if (o) o.style.display = 'none'; }); await page.waitForTimeout(200);
     }

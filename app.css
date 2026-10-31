@@ -491,47 +491,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, .tabbtn:focus-v
 
 .wiz-plan-list{ display:flex; flex-direction:column; gap:10px; margin-bottom:16px; }
 
-.wiz-plan-item{ display:flex; align-items:center; gap:12px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08); border-radius:14px; padding:12px 14px; }
-
-.wiz-plan-item .ic{ width:40px; height:40px; min-width:40px; border-radius:50%; background:rgba(37,99,235,.18); display:flex; align-items:center; justify-content:center; font-size:18px; }
-
-.wiz-plan-item .txt{ flex:1; }
-
-.wiz-plan-item .t{ color:#fff; font-weight:800; font-size:12.5px; }
-
-.wiz-plan-item .d{ color:#94a3b8; font-size:11px; margin-top:2px; }
-
-.wiz-plan-item .chev{ color:#475569; font-size:15px; }
-
-.wiz-plan-card{ border:1.5px solid var(--pc); border-radius:16px; padding:0; margin-bottom:14px; background:rgba(255,255,255,.02); overflow:hidden; }
-
-.wiz-plan-card-foto{ height:88px; background-size:cover; background-position:center; position:relative; }
-
 .wiz-plan-card-foto::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(0,0,0,.15), rgba(10,10,10,.85)); }
-
-.wiz-plan-card-top{ display:flex; align-items:flex-start; gap:12px; padding:14px; margin-top:-26px; position:relative; z-index:1; }
-
-.wiz-plan-card-top .ic{ width:44px; height:44px; min-width:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; box-shadow:0 4px 14px rgba(0,0,0,.35); }
-
-.wiz-plan-card-top .txt{ flex:1; min-width:0; }
-
-.wiz-plan-card-top .t{ font-weight:900; font-size:14.5px; color:#fff; }
-
-.wiz-plan-card-top .d{ font-size:11.5px; color:#94a3b8; margin-top:4px; line-height:1.4; }
-
-.wiz-plan-card-top .badge{ display:inline-block; margin-top:8px; padding:4px 10px; border:1.5px solid; border-radius:20px; font-size:9.5px; font-weight:800; }
-
-.wiz-plan-card-top .chev{ font-size:20px; font-weight:900; align-self:center; }
-
-.wiz-plan-card-includes{ border-top:1px solid rgba(255,255,255,.08); margin:0 14px 14px; padding-top:10px; }
-
-.wiz-plan-card-includes .lbl{ font-size:10px; font-weight:900; letter-spacing:.5px; margin-bottom:6px; }
-
-.wiz-plan-card-includes .item{ display:flex; align-items:flex-start; gap:8px; font-size:11.5px; color:#e2e8f0; line-height:1.4; margin-bottom:5px; }
-
-.wiz-plan-card-includes .item:last-child{ margin-bottom:0; }
-
-.wiz-plan-card-includes .item i{ margin-top:2px; }
 
 /* ---- Tarjetas de planes con color por plan + lista "INCLUYE" (estilo referencia) ---- */
 
@@ -609,31 +569,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, .tabbtn:focus-v
 }
 .modal-backdrop{ animation: modalBackdropFade .25s ease-out; }
 .modal-panel{ animation: modalPanelPop .35s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-
-.catalogo-promo-btn{
-  display:flex; align-items:center; gap:12px;
-  background: linear-gradient(135deg, rgba(220,38,38,.14), rgba(22,30,49,.9));
-  border: 1px solid rgba(220,38,38,.4);
-  border-radius: 16px;
-  padding: 12px 14px;
-  margin-bottom: 14px;
-  cursor: pointer;
-  transition: transform .25s, box-shadow .25s;
-}
 .catalogo-promo-btn:hover, .catalogo-promo-btn:active{
   transform: translateY(-2px);
   box-shadow: 0 10px 24px rgba(220,38,38,.25);
 }
-.catalogo-promo-thumbs{
-  display:grid; grid-template-columns: 1fr 1fr; gap:3px;
-  width:52px; height:52px; flex-shrink:0;
-  border-radius:10px; overflow:hidden;
-}
-.catalogo-promo-thumbs img{ width:100%; height:100%; object-fit:cover; display:block; }
-.catalogo-promo-text{ flex:1; min-width:0; }
-.catalogo-promo-text .t1{ font-weight:800; color:#fff; font-size:14.5px; }
-.catalogo-promo-text .t2{ font-size:11.5px; color:#94a3b8; margin-top:2px; }
-.catalogo-promo-arrow{ font-size:26px; color:#dc2626; font-weight:900; }
 
 /* TARJETAS PREMIUM Y CONTENEDORES */
 .card{
@@ -1220,52 +1159,10 @@ input:focus, select:focus, textarea:focus{
 
 /* Planes: protagonista + filas que se expanden */
 .wiz-plan-list{ gap:10px !important; }
-.plan{
-  --pc:#22c55e;
-  position:relative; overflow:hidden;
-  border-radius:var(--cy-r-md);
-  background:rgba(255,255,255,.035);
-  border:1px solid rgba(255,255,255,.08);
-  transform:perspective(800px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(var(--s,1));
-  transition:transform .18s ease-out, border-color .25s ease, background .25s ease;
-}
 .plan::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--pc); }
-.plan.open{ border-color:var(--pc); background:rgba(255,255,255,.055); }
-.plan-head{
-  display:flex; align-items:center; gap:12px; padding:12px 14px 12px 18px;
-  cursor:pointer; user-select:none; -webkit-tap-highlight-color:transparent;
-}
 .plan-head:focus-visible{ outline:2px solid var(--pc); outline-offset:-2px; }
-.plan-ic{
-  width:50px; height:50px; flex:none; border-radius:14px; display:grid; place-items:center; font-size:21px;
-  border:2px solid var(--pc);
-  background:linear-gradient(rgba(0,0,0,.38),rgba(0,0,0,.38)), var(--ph) center/cover no-repeat;
-}
-.plan-txt{ flex:1; min-width:0; text-align:left; }
-.plan-name{ display:block; font-family:var(--cy-display); font-weight:700; font-size:23px; line-height:1; color:#fff; letter-spacing:.3px; }
-.plan-tag{ display:block; margin-top:4px; font-size:11.5px; color:#94a3b8; line-height:1.3; }
-.plan-chev{ color:#64748b; font-size:13px; transition:transform .28s var(--cy-ease), color .2s; }
-.plan.open .plan-chev{ transform:rotate(180deg); color:var(--pc); }
-.plan-body{ display:grid; grid-template-rows:0fr; transition:grid-template-rows .3s var(--cy-ease); }
-.plan.open .plan-body{ grid-template-rows:1fr; }
-.plan-body-in{ overflow:hidden; min-height:0; visibility:hidden; transition:visibility 0s linear .3s; }
-.plan.open .plan-body-in{ visibility:visible; transition-delay:0s; }
-.plan-pad{ padding:0 16px 16px 18px; text-align:left; }
-.plan-desc{ margin:0 0 12px; font-size:12.5px; color:#cbd5e1; line-height:1.5; }
-.plan-list{ list-style:none; margin:0; padding:12px 0 0; border-top:1px solid rgba(255,255,255,.08); display:grid; gap:8px; }
-.plan-list li{ display:flex; gap:9px; font-size:12.5px; color:#e2e8f0; line-height:1.4; }
-.plan-list i{ color:var(--pc); margin-top:3px; font-size:11px; }
-.plan--hero{ border-color:var(--pc); box-shadow:0 12px 34px -12px var(--pc); }
 .plan--hero::before{ display:none; }
-.plan-photo{ position:relative; height:140px; background:var(--ph) center/cover no-repeat; }
 .plan-photo::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(7,13,20,.95)); }
-.plan-ribbon{
-  position:absolute; top:12px; left:14px; z-index:1; background:var(--pc); color:#fff;
-  font-weight:800; font-size:12px; padding:5px 12px; border-radius:20px;
-}
-.plan--hero .plan-head{ margin-top:-34px; position:relative; z-index:1; }
-.plan--hero .plan-name{ font-size:32px; }
-.plan--hero .plan-ic{ width:56px; height:56px; }
 
 /* Revelado al hacer scroll (solo cuando el script lo activa) */
 .rv-ready .rv{ opacity:0; translate:0 12px; transition:opacity .4s ease, translate .4s var(--cy-ease); }
@@ -1282,14 +1179,14 @@ input:focus, select:focus, textarea:focus{
 .open-chip.cerrado .dot{ background:#94a3b8; box-shadow:0 0 0 4px rgba(148,163,184,.15); }
 
 /* Botones de la experiencia pública */
-.wiz-whatsapp-btn,.catalogo-promo-btn{ transition:transform .15s ease-out; -webkit-tap-highlight-color:transparent; }
+.wiz-whatsapp-btn{ transition:transform .15s ease-out; -webkit-tap-highlight-color:transparent; }
 .wiz-whatsapp-btn:active,.catalogo-promo-btn:active{ transform:scale(.985); }
 .wiz-whatsapp-btn{ position:sticky; bottom:calc(14px + env(safe-area-inset-bottom,0px)); z-index:3; }
 
 @media (min-width:760px){
   .wiz-overlay .wiz-screen{ max-width:760px; }
   .wiz-grid2{ grid-template-columns:repeat(4,1fr) !important; }
-  #wizPlanes .wiz-plan-list{ display:grid; grid-template-columns:1fr 1fr; align-items:start; }#wizPlanes .plan--hero{ grid-column:1/-1; }
+  #wizPlanes .wiz-plan-list{ display:grid; grid-template-columns:1fr 1fr; align-items:start; }
 }
 
 /* ---------- Panel administrativo ---------- */
@@ -1334,7 +1231,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{ box-shadow:0 0 
 
 @media (prefers-reduced-motion: reduce){
   .rv-ready .rv{ opacity:1 !important; translate:none !important; }.cy-hero-img{ transform:none !important; }
-  .plan,.wiz-feat-card2{ transform:none !important; }
+  .wiz-feat-card2{ transform:none !important; }
   #wizProgress{ display:none; }
 }
 
@@ -2335,7 +2232,6 @@ button#btnActualizar i{color:#00212b !important}
   background:linear-gradient(135deg,#ffe14d,#ffc400); box-shadow:0 4px 12px -3px rgba(255,196,0,.7); animation:prChip 2.2s ease-in-out infinite; }
 .pr-card{ position:relative; border-radius:15px; padding:10px 12px 11px; background:rgba(4,12,12,.72); border:1.5px solid rgba(52,211,153,.55);
   box-shadow:inset 0 0 18px rgba(16,185,129,.07), 0 0 14px -4px rgba(52,211,153,.5); }
-.plan.open .pr-card{ animation:prIn .55s cubic-bezier(.2,.8,.2,1) calc(.12s + var(--i) * .11s) backwards; }
 .pr-card::after{ content:""; position:absolute; inset:-1.5px; border-radius:inherit; pointer-events:none; opacity:0;
   box-shadow:0 0 0 1.5px #6ee7b7, 0 0 20px rgba(52,211,153,.75); animation:prGlow 3.6s ease-in-out calc(var(--i) * .9s) infinite; }
 .pr-top{ display:flex; align-items:center; gap:10px; margin-bottom:7px; }
@@ -2364,7 +2260,7 @@ button#btnActualizar i{color:#00212b !important}
 @keyframes prIn{ from{ opacity:0; transform:translateY(14px) scale(.97); } to{ opacity:1; transform:none; } }
 @keyframes prGlow{ 0%,70%,100%{ opacity:0; } 80%{ opacity:.9; } }
 @keyframes prFloat{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-3px); } }
-@media (prefers-reduced-motion: reduce){ .pr-wrap::before,.pr-fire,.pr-chip,.pr-ic,.pr-card::after,.pr-card:nth-child(3) .pr-tag,.plan.open .pr-card{ animation:none !important; } }
+@media (prefers-reduced-motion: reduce){ .pr-wrap::before,.pr-fire,.pr-chip,.pr-ic,.pr-card::after,.pr-card:nth-child(3) .pr-tag{ animation:none !important; } }
 
 /* ===== v48: SCROLL ÚNICO Y ESPACIOS CORRECTOS (causa raíz de cortes/espacios en blanco) =====
    Antes, <html> y <body> tenían a la vez height:100% y overflow-x:hidden: eso convertía al <body> en una
@@ -2480,7 +2376,6 @@ html.qr-mode .container{ padding-bottom:calc(24px + env(safe-area-inset-bottom,0
 .ap-ok .ap-rv.ap-in{ opacity:1; translate:0 0; scale:1; }
 
 /* Horarios y planes: tarjetas con el mismo lenguaje */
-#wizPlanes .plan{ border-radius:26px !important; }
 #wizHorarios .wiz-whatsapp-btn, #wizPlanes .wiz-whatsapp-btn{ border-radius:999px; }
 
 @media (prefers-reduced-motion: reduce){
@@ -2496,13 +2391,10 @@ html.qr-mode .container{ padding-bottom:calc(24px + env(safe-area-inset-bottom,0
 #wizHorarios .d1,#wizHorarios .d2{ overflow-wrap:break-word; }
 
 /* -- Planes: sin inclinación 3D; presionar = un leve hundimiento, nada de temblor -- */
-.plan,.wiz-feat-card2{ transform:none !important; }
-.plan{ contain:layout style; transition:border-color .25s ease, background .25s ease; }
-.plan-head{ transition:background .2s ease; }
+.wiz-feat-card2{ transform:none !important; }
 .plan-head:active{ background:rgba(255,255,255,.04); }
 .wiz-feat-card2{ transition:scale .2s var(--cy-ease); }
 .wiz-feat-card2:active{ scale:.985; }
-.plan-body{ transition:grid-template-rows .28s var(--cy-ease); }
 .pr-card::after{ display:none; }
 .pr-ic,.pr-chip,.pr-card:nth-child(3) .pr-tag{ animation:none !important; }
 
@@ -2527,10 +2419,6 @@ html.qr-mode .container{ padding-bottom:calc(24px + env(safe-area-inset-bottom,0
   animation: none;
   transform-origin: 50% 90%;
 }
-.plan.open .pr-wrap.live .pr-fire{ animation:prFire 2.4s ease-in-out infinite; }
-.plan.open:not(.seen) .pr-card{ animation:prIn2 .45s ease backwards; animation-delay:calc(.1s + var(--i) * .06s); }
-.plan.open .pr-card{ animation:none; }
-.plan.open:not(.seen) .pr-card{ animation:prIn2 .45s ease backwards; animation-delay:calc(.1s + var(--i) * .06s); }
 @keyframes prIn2{ from{ opacity:0; } to{ opacity:1; } }
 
 /* -- "Conoce el gym": solo transformaciones/opacidad, cero repintados continuos -- */
@@ -3938,7 +3826,6 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 .pp-lista li{ display:flex; gap:10px; align-items:flex-start; font-size:14px; color:#e2e8f0; line-height:1.4; }
 .pp-lista li > i{ color:var(--pc); margin-top:3px; flex:0 0 auto; width:14px; text-align:center; }
 .pp-extra-item{ display:none; }
-.pp-abierto .pp-extra-item{ display:flex; }
 .pp-ver-mas{ margin-top:10px; background:none; border:0; padding:4px 0; color:var(--pc); font-weight:700; font-size:14px; cursor:pointer; }
 
 .pp-extra{ margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,.08); }

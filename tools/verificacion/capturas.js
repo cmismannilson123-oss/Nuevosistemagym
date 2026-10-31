@@ -50,6 +50,12 @@ const quieto = '*,*::before,*::after{animation:none!important;transition:none!im
     await page.click('#btnSoySocioQR').catch(() => {}); await page.waitForTimeout(400); await foto(page, `qr-${ancho}-ingreso`);
     await page.click('#loginFormGym .wiz-back').catch(() => {}); await page.waitForTimeout(200);
     await page.click('#btnInscribirseQR').catch(() => {}); await page.waitForTimeout(400); await foto(page, `qr-${ancho}-inscripcion`);
+    // Pantallas de presentación del socio: conoce el gym, horarios y planes
+    for (const [id, nombre] of [['wizConoce', 'conoce'], ['wizHorarios', 'horarios'], ['wizPlanes', 'planes']]) {
+      await page.evaluate((i) => window.wizIr(i), id).catch(() => {}); await page.waitForTimeout(700);
+      await foto(page, `qr-${ancho}-${nombre}`);
+      await page.evaluate(() => { const o = document.getElementById('wizOverlay'); if (o) o.style.display = 'none'; }); await page.waitForTimeout(200);
+    }
   }
   // Panel del personal: login, lista de socios (cada estado), tienda, ajustes
   for (const ancho of [390, 1280]) {

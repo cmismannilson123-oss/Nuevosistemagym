@@ -15,6 +15,16 @@ const SUPA_JS = fs.readFileSync(path.join(supaDir, 'npm/package/dist/umd/supabas
     await page.goto(base + '/qr.html'); await page.waitForTimeout(1500);
     // Animaciones apagadas: así los valores de opacidad y posición no dependen del instante de la medición
     await page.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' });
+    // Pantalla inicial del socio (botones de Soy socio, Conocer el gym e Inscribirme)
+    {
+      await page.waitForTimeout(300);
+      const datos = await page.evaluate(() => {
+        const raiz = document.getElementById('qrCardPrimeraVez');
+        const els = [raiz, ...raiz.querySelectorAll('*')];
+        return els.map((el) => { const cs = getComputedStyle(el); const o = {}; for (let k = 0; k < cs.length; k++) { const p = cs[k]; if (!/^(transition|animation)/.test(p)) o[p] = cs.getPropertyValue(p); } return o; });
+      });
+      out[ancho + '|inicio'] = datos;
+    }
     for (const pantalla of ['wizConoce', 'wizHorarios', 'wizPlanes']) {
       await page.evaluate((p) => { if (p === 'wizPlanes') window.mostrarBienvenidaPublicaQR(); window.wizIr(p); }, pantalla);
       // Los precios de los planes se cuentan con animación de JavaScript: se espera a que terminen

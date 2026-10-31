@@ -58,52 +58,6 @@ body{
 }
 
 /* TOPBAR PREMIUM */
-.topbar{
-  background: linear-gradient(135deg, #0a1512, #0f1e1a);
-  padding: 14px 20px;
-  box-shadow: 0 0 14px rgba(16,185,129,.18), 0 4px 18px rgba(0,0,0,.4);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 999;
-  
-  border-bottom: 2px solid rgba(16,185,129,.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-}
-
-.topbar .titulo-wrap{ display:flex; align-items:center; gap:10px; min-width:0; }
-.btn-cerrar-sesion{
-  position:absolute; right:12px; top:50%; transform:translateY(-50%);
-  width:36px; height:36px; border-radius:50%; border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.05); color:#94a3b8; font-size:15px; cursor:pointer;
-  display:flex; align-items:center; justify-content:center; padding:0;
-}
-.btn-cerrar-sesion:active{ background:rgba(239,68,68,.15); color:#ef4444; }
-
-.topbar h2{
-  margin: 0;
-  font-size: 22px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  color: #ffffff;
-  text-transform: uppercase;
-  white-space: nowrap;
-  animation: fadeDown 0.6s ease-out;
-}
-.topbar h2 .accent{ color: #34d399; text-shadow: 0 0 10px rgba(16,185,129,.5); }
-
-.topbar h2 i {
-  color: #10b981;
-  margin-right: 10px;
-}
-
-.topbar-spacer{
-  height: 62px;
-}
 
 .container{
   padding: 15px;
@@ -1489,7 +1443,6 @@ html, body{
     radial-gradient(640px 360px at 100% 38%, rgba(16,185,129,.05), transparent 62%) !important;
   background-attachment:scroll !important;
 }
-.topbar{ background:linear-gradient(135deg,#08120f,#0d1b17) !important; }
 
 /* ---------- Superficies y jerarquía tipográfica ---------- */
 .panel .card, .dashboard .kpi-card{
@@ -2168,7 +2121,6 @@ html{ height:auto !important; min-height:100% !important; padding:0 !important; 
   scroll-padding-top:var(--cy-top,70px); scroll-padding-bottom:var(--cy-nav-space,120px); -webkit-text-size-adjust:100%; }
 body{ height:auto !important; min-height:100vh !important; min-height:100dvh !important; padding:0 !important; overflow-x:clip !important; overflow-y:visible !important; }
 .container{ padding-bottom:var(--cy-nav-space,120px) !important; }
-.topbar-spacer{ height:var(--cy-top,62px) !important; flex-shrink:0; }
 body > .panel{ padding-bottom:var(--cy-nav-space,120px) !important; }
 html.qr-mode .container{ padding-bottom:calc(24px + env(safe-area-inset-bottom,0px)) !important; }
 
@@ -2838,34 +2790,9 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
    ========================================================================== */
 
 /* ----- Encabezado ----- */
-.topbar{
-  justify-content:space-between !important; padding:10px 14px 10px 16px !important;
-  background:linear-gradient(180deg,#0c1916 0%,#08110f 100%) !important;
-  border-bottom:1px solid rgba(52,211,153,.14) !important;
-  box-shadow:0 12px 28px -20px rgba(0,0,0,.95) !important;
-}
 .topbar::after{
   content:""; position:absolute; left:0; right:0; bottom:-1px; height:1px; pointer-events:none;
   background:linear-gradient(90deg, transparent 0%, rgba(52,211,153,.75) 50%, transparent 100%);
-}
-.topbar .titulo-wrap{ gap:11px !important; min-width:0; }
-.tb-logo{
-  width:44px; height:44px; flex:none; border-radius:50%; display:grid; place-items:center;
-  background:radial-gradient(circle, rgba(16,185,129,.16), rgba(0,0,0,.35) 72%);
-  box-shadow:inset 0 0 0 1.5px rgba(52,211,153,.5), 0 0 18px -2px rgba(16,185,129,.35);
-}
-.tb-logo .logo-cy{ width:34px !important; height:34px !important; }
-.tb-marca{ display:flex; flex-direction:column; min-width:0; line-height:1; }
-.topbar .tb-marca h2{
-  font-family:var(--cy-display) !important; font-size:25px !important; font-weight:800 !important; line-height:.95 !important;
-  letter-spacing:.7px !important; margin:0 !important; color:#f4fbf8 !important; animation:none !important;
-}
-.topbar .tb-marca h2 .accent{ color:#34d399 !important; text-shadow:0 0 16px rgba(52,211,153,.35) !important; }
-.tb-marca small{ margin-top:3px; font-size:11.5px; font-weight:600; color:#8fa59d; letter-spacing:.2px; }
-.topbar .btn-cerrar-sesion{
-  position:static !important; transform:none !important; flex:none; width:40px !important; height:40px !important;
-  border-radius:12px !important; color:#a9bcb5 !important; background:rgba(255,255,255,.05) !important;
-  border:1px solid rgba(255,255,255,.1) !important; box-shadow:none !important;
 }
 
 /* ----- Filtros con conteo ----- */
@@ -3007,7 +2934,6 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
 @media (max-width:370px){
   .sc .sc-btn span{ font-size:10px; }
   .sc-stats b{ font-size:19px; }
-  .topbar .tb-marca h2{ font-size:22px !important; }
 }
 @media (prefers-reduced-motion: reduce){ .sc{ transition:none; } }
 
@@ -3453,12 +3379,6 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 /* ==========================================================================
    v68 — App y notificaciones (botón campana del encabezado)
    ========================================================================== */
-.topbar .tb-acc{ display:flex; align-items:center; gap:8px; flex:none; }
-.topbar .tb-avisos{
-  position:relative; flex:none; width:40px !important; height:40px !important; min-height:0 !important; margin:0 !important; padding:0 !important;
-  display:grid; place-items:center; border-radius:12px !important; font-size:16px !important;
-  color:#fbbf24 !important; background:rgba(251,191,36,.1) !important; border:1px solid rgba(251,191,36,.3) !important; box-shadow:none !important;
-}
 .topbar .tb-avisos:active{ transform:scale(.94); }
 .topbar .tb-punto{ position:absolute; top:7px; right:7px; width:8px; height:8px; border-radius:50%; background:#f87171; box-shadow:0 0 0 2px #0b1714; }
 .topbar .tb-punto[hidden]{ display:none; }
@@ -3881,11 +3801,6 @@ html:not([data-rol="admin"]) [data-solo-admin]{ display:none !important; }
 /* Encabezado: el administrador tiene Ajustes (y cierra sesión desde ahí);
    recepción ve campana y cerrar sesión. Los tres botones usan el mismo tamaño. */
 html[data-rol="admin"] #btnCerrarSesion{ display:none !important; }
-.topbar .tb-acc{ gap:8px !important; }
-.topbar .tb-acc .btn-cerrar-sesion{ width:40px !important; height:40px !important; font-size:15px; display:grid; place-items:center; padding:0 !important; }
-.topbar .titulo-wrap{ flex:1 1 auto; overflow:hidden; }
-.topbar .tb-marca h2{ font-size:clamp(19px,5.6vw,25px) !important; white-space:nowrap; }
-.tb-marca small{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
 /* ==========================================================================
    Flujo QR público — formularios de ingreso de socio e inscripción.
@@ -3962,3 +3877,47 @@ html[data-rol="admin"] #btnCerrarSesion{ display:none !important; }
 .insc-wrap .wiz-topbar{ margin-bottom:6px; }
 
 
+
+/* ==========================================================================
+   Encabezado fijo del panel y del QR. Una sola regla por elemento (antes había
+   capas de correcciones que se pisaban). Verificado con el navegador: mismos
+   valores calculados en 360, 390 y 1280 px.
+   ========================================================================== */
+.topbar{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  position:fixed; top:0; left:0; right:0; z-index:999;
+  padding:10px 14px 10px 16px;
+  background:linear-gradient(180deg,#0c1916 0%,#08110f 100%);
+  border-bottom:1px solid rgba(52,211,153,.14);
+  box-shadow:0 12px 28px -20px rgba(0,0,0,.95);
+}
+.topbar .titulo-wrap{ display:flex; align-items:center; gap:11px; min-width:0; flex:1 1 auto; overflow:hidden; }
+.tb-logo{
+  width:44px; height:44px; flex:none; border-radius:50%; display:grid; place-items:center;
+  background:radial-gradient(circle, rgba(16,185,129,.16), rgba(0,0,0,.35) 72%);
+  box-shadow:inset 0 0 0 1.5px rgba(52,211,153,.5), 0 0 18px -2px rgba(16,185,129,.35);
+}
+.tb-logo .logo-cy{ width:34px; height:34px; }
+.tb-marca{ display:flex; flex-direction:column; min-width:0; line-height:1; }
+.topbar h2{
+  /* !important: vence la regla global de h1-h3 (Syne) que está más arriba en este archivo */
+  margin:0; font-family:var(--cy-display) !important; font-size:clamp(19px,5.6vw,25px); font-weight:800; line-height:.95;
+  letter-spacing:.7px; color:#f4fbf8; text-transform:uppercase; white-space:nowrap; animation:none;
+}
+.topbar h2 .accent{ color:#34d399; text-shadow:0 0 16px rgba(52,211,153,.35); }
+.tb-marca small{
+  margin-top:3px; font-size:11.5px; font-weight:600; color:#8fa59d; letter-spacing:.2px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.topbar .btn-cerrar-sesion{
+  position:static; right:12px; top:50%; transform:none; flex:none; width:40px; height:40px; border-radius:12px;
+  border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.05); color:#a9bcb5; box-shadow:none;
+  font-size:15px; cursor:pointer; display:grid; place-items:center; padding:0;
+}
+.topbar .tb-acc{ display:flex; align-items:center; gap:8px; flex:none; }
+.topbar .tb-avisos{
+  position:relative; flex:none; width:40px; height:40px; min-height:0; margin:0; padding:0;
+  display:grid; place-items:center; border-radius:12px; font-size:16px;
+  color:#fbbf24; background:rgba(251,191,36,.1); border:1px solid rgba(251,191,36,.3); box-shadow:none;
+}
+.topbar-spacer{ height:var(--cy-top,62px) !important; flex-shrink:0; }

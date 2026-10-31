@@ -3160,12 +3160,9 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
   color:#fecaca; background:rgba(239,68,68,.12); border:1px solid rgba(239,68,68,.35);
 }
 .sc-alerta i{ color:#f87171; margin-right:4px; }
-.sc-plan{
-  margin-top:12px; max-width:100%; display:inline-flex; align-items:center; gap:7px; padding:6px 11px; border-radius:10px;
-  font-size:13px; font-weight:600; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08);
-}
-.sc-plan i{ font-size:12px; }
-.sc-plan span{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sc .sc-plan{ margin-top:12px; max-width:100%; display:inline-flex; align-items:center; gap:7px; padding:6px 11px; border-radius:10px; font-size:13px; font-weight:600; background:rgba(56,189,248,.1) !important; border:1px solid rgba(56,189,248,.28) !important; color:#bae6fd !important; }
+.sc .sc-plan i{ font-size:12px; color:#38bdf8 !important; }
+.sc .sc-plan span{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .sc .sc-stats{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; margin-top:12px; padding-top:0; border-top:0; }
 .sc .sc-stats > div{ --t:#fbbf24; position:relative; min-width:0; padding:9px 10px 9px 12px; border-left:0; border-radius:13px; background:rgba(251,191,36,.07); border:1px solid rgba(251,191,36,.2); }
 .sc .sc-stats > div:first-child{ padding-left:12px; }
@@ -3178,8 +3175,8 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
 .sc .sc-stats b.warn{ color:#fbbf24; }
 .sc .sc-stats b.mal{ color:#fb7185; }
 .sc .sc-stats small{ display:block; margin-top:2px; font-size:11px; color:#6f847d; }
-.sc-bar{ margin-top:12px; border-radius:4px; background:rgba(255,255,255,.06); overflow:hidden; }
-.sc-bar i{ display:block; height:100%; border-radius:inherit; background:var(--c); transform-origin:left; transform:scaleX(var(--p)); }
+.sc .sc-bar{ margin-top:12px; border-radius:4px; background:rgba(255,255,255,.06); overflow:hidden; height:5px; }
+.sc .sc-bar i{ display:block; height:100%; border-radius:inherit; transform-origin:left; transform:scaleX(var(--p)); background:linear-gradient(90deg,#60a5fa,#a78bfa 55%,#34d399) !important; }
 .sc-deuda{
   margin-top:12px; display:flex; align-items:center; justify-content:space-between; gap:10px; padding:8px 12px; border-radius:12px;
   font-size:13px; font-weight:600;
@@ -3642,10 +3639,6 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
    v66 — Tarjeta del socio: datos con su propio color (armonía, no un solo tono)
    Vence = ámbar · Quedan = azul · Asistencias = violeta · Plan = celeste
    ========================================================================== */
-.sc .sc-plan{ color:#bae6fd !important; background:rgba(56,189,248,.1) !important; border:1px solid rgba(56,189,248,.28) !important; }
-.sc .sc-plan i{ color:#38bdf8 !important; }
-.sc .sc-bar{ height:5px; }
-.sc .sc-bar i{ background:linear-gradient(90deg,#60a5fa,#a78bfa 55%,#34d399) !important; }
 @media (max-width:370px){ .sc .sc-stats{ gap:6px; } .sc .sc-stats > div{ padding:8px 8px 8px 10px; } }
 
 /* v67 — Avisos del formulario del QR (número/DNI equivocado) */

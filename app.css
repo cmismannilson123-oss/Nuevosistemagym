@@ -895,183 +895,6 @@ audio{
   margin-top: 20px;
   width: 100%;
 }
-.modern-socio-card {
-  background: rgba(22, 30, 49, 0.94);
-  border-radius: 20px;
-  padding: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: transform 180ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 180ms ease, border-color 180ms ease;
-  animation: fade .35s ease-out;
-  width: 100%;
-  box-sizing: border-box;
-}
-.modern-socio-card:hover {
-  box-shadow: 0 18px 38px rgba(0,0,0,0.4);
-  border-color: rgba(16, 185, 129, 0.25);
-}
-.modern-socio-card:hover .socio-avatar{
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
-  border-color: rgba(16, 185, 129, 0.4);
-}
-.socio-avatar {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #1e293b, #0f172a);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 16px;
-  color: #10b981;
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  flex-shrink: 0;
-  transition: box-shadow .3s, border-color .3s;
-}
-.socio-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-  gap: 8px;
-  width: 100%;
-}
-.socio-avatar-info {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  min-width: 0;
-  flex: 1;
-}
-.socio-badge.vencido{
-  animation: badgePulse 2.2s ease-in-out 3;
-}
-.neon-activo{
-  background: linear-gradient(160deg, rgba(16,185,129,0.4), rgba(16,185,129,0.16) 45%, rgba(22,30,49,0.9) 100%) !important;
-  border-color: rgba(16,185,129,.55) !important;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2), 0 0 26px rgba(16,185,129,.32), inset 0 0 55px rgba(16,185,129,.1) !important;
-}
-.neon-activo:hover{
-  box-shadow: 0 18px 38px rgba(0,0,0,0.4), 0 0 32px rgba(16,185,129,.4) !important;
-  border-color: rgba(16,185,129,.7) !important;
-}
-.neon-activo.tocando{
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3), 0 0 50px rgba(16,185,129,.7) !important;
-  border-color: rgba(16,185,129,.95) !important;
-}
-.neon-deudor{
-  background: linear-gradient(160deg, rgba(245,158,11,0.42), rgba(245,158,11,0.17) 45%, rgba(22,30,49,0.9) 100%) !important;
-  border-color: rgba(245,158,11,.6) !important;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2), 0 0 26px rgba(245,158,11,.34), inset 0 0 55px rgba(245,158,11,.1) !important;
-}
-.neon-deudor:hover{
-  box-shadow: 0 18px 38px rgba(0,0,0,0.4), 0 0 32px rgba(245,158,11,.42) !important;
-  border-color: rgba(245,158,11,.75) !important;
-}
-.neon-deudor.tocando{
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3), 0 0 50px rgba(245,158,11,.75) !important;
-  border-color: rgba(245,158,11,1) !important;
-}
-.neon-vencido{
-  background: linear-gradient(160deg, rgba(239,68,68,0.4), rgba(239,68,68,0.15) 45%, rgba(22,30,49,0.9) 100%) !important;
-  border-color: rgba(239,68,68,.55) !important;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2), 0 0 26px rgba(239,68,68,.3), inset 0 0 55px rgba(239,68,68,.1) !important;
-}
-.neon-vencido:hover{
-  box-shadow: 0 18px 38px rgba(0,0,0,0.4), 0 0 32px rgba(239,68,68,.4) !important;
-  border-color: rgba(239,68,68,.7) !important;
-}
-.neon-vencido.tocando{
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3), 0 0 50px rgba(239,68,68,.7) !important;
-  border-color: rgba(239,68,68,.95) !important;
-}
-.neon-bloqueado{
-  background: linear-gradient(160deg, rgba(239,68,68,0.48), rgba(239,68,68,0.2) 45%, rgba(22,30,49,0.9) 100%) !important;
-  border: 2px solid rgba(239,68,68,.7) !important;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.25), 0 0 34px rgba(239,68,68,.4) !important;
-  animation: badgePulse 2.2s ease-in-out 3;
-}
-.neon-bloqueado.tocando{
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3), 0 0 55px rgba(239,68,68,.8) !important;
-}
-.modern-socio-card{
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 180ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 180ms ease, border-color 180ms ease;
-}
-.modern-socio-card:active:not(:has(button:active)){
-  transform: scale(0.985);
-  box-shadow: 0 14px 30px rgba(0,0,0,0.35), 0 0 30px rgba(255,255,255,.15);
-}
-.modern-socio-card.seleccionada{
-  transform: translateY(-6px) scale(1.015);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.45), 0 0 0 1.5px rgba(16,185,129,.5), 0 0 30px rgba(16,185,129,.25);
-  border-color: rgba(16,185,129,.4);
-}
-.socio-badge {
-  padding: 6px 10px;
-  border-radius: 10px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  flex-shrink: 0;
-}
-.socio-badge.activo {
-  background: rgba(16, 185, 129, 0.12);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.25);
-}
-.socio-badge.vencido {
-  background: rgba(239, 68, 68, 0.12);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.25);
-}
-.socio-body-info {
-  background: rgba(15, 23, 42, 0.5);
-  padding: 14px;
-  border-radius: 14px;
-  margin-bottom: 15px;
-  font-size: 14px;
-  border: 1px solid rgba(255,255,255,0.02);
-  width: 100%;
-}
-.socio-info-row {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  color: #94a3b8;
-  gap: 10px;
-}
-.socio-info-row:last-child {
-  margin-bottom: 0;
-}
-.socio-card-actions {
-  display: flex;
-  gap: 6px;
-  width: 100%;
-  box-sizing: border-box;
-}
-.socio-card-actions button {
-  margin-top: 0;
-  padding: 2px 0;
-  font-size: 14px;
-  border-radius: 8px;
-  white-space: nowrap;
-}
-.socio-card-actions button:not(.btn-red) {
-  flex: 1;
-  min-width: 0;
-}
-.socio-card-actions .btn-red {
-  width: 42px;
-  flex-shrink: 0;
-}
 @keyframes badgePulse{
   0%,100%{ box-shadow: 0 0 0 0 rgba(239,68,68,.25); }
   50%{ box-shadow: 0 0 0 5px rgba(239,68,68,0); }
@@ -1369,48 +1192,6 @@ input:focus, select:focus, textarea:focus{
   background: var(--emerald-soft) !important;
   border-color: rgba(16,185,129,.5) !important;
   color: var(--emerald) !important;
-}
-.modern-socio-card{
-  padding: 16px !important;
-  border-radius: 20px !important;
-}
-.socio-avatar{
-  border-radius: 50% !important;
-  background: linear-gradient(135deg, rgba(16,185,129,.35), rgba(59,130,246,.35)) !important;
-  border: 1px solid var(--glass-border);
-}
-.socio-badge{
-  border-radius: 999px !important;
-  
-  font-weight: 700 !important;
-  font-size: 10px !important;
-  letter-spacing: .3px;
-}
-.socio-body-info{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4px 12px;
-}
-.socio-info-row{
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.socio-info-row span:first-child{
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: .4px;
-  color: var(--text-dim);
-}
-.socio-card-actions{
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-  border-top: 1px solid var(--glass-border);
-  padding-top: 12px;
-}
-.socio-card-actions button{
-  border-radius: 12px !important;
 }
 
 /* -------- Tarjetas de socio refinadas -------- */
@@ -1967,43 +1748,9 @@ html, body{
 #tab1 > .card:first-child h3{ grid-column:1/-1; margin-bottom:4px !important; }
 #tab1 > .card:first-child input, #tab1 > .card:first-child button{ margin:0 !important; }
 #tab1 > .card:first-child .btn-blue{ width:auto !important; min-height:54px; padding:0 20px !important; display:flex; align-items:center; gap:8px; }
-.res-card{
-  --st:#10b981; position:relative; overflow:hidden; margin-bottom:16px; padding:16px;
-  background:linear-gradient(180deg,color-mix(in srgb,var(--st) 10%,var(--cy-surface)),var(--cy-surface) 55%);
-  border:1px solid color-mix(in srgb,var(--st) 35%,transparent); border-radius:20px;
-  box-shadow:0 18px 34px -20px rgba(0,0,0,.9);
-  animation:cyPanelIn .28s ease-out;
-}
-.res-head{ display:flex; align-items:center; gap:12px; margin-bottom:14px; }
-.res-avatar{
-  width:48px; height:48px; flex:none; border-radius:50%; display:grid; place-items:center;
-  font-family:var(--cy-display); font-weight:800; font-size:24px; color:#03140d;
-  background:linear-gradient(135deg,#34d399,#0c9468);
-}
-.res-id{ flex:1; min-width:0; }
-.res-id h3{ margin:0 !important; font-size:24px !important; line-height:1.05; display:block !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.res-id h3::before{ display:none !important; }
-.res-id small{ color:var(--cy-dim); font-size:12px; }
-.res-badge{
-  padding:5px 11px; border-radius:20px; font-size:11.5px; font-weight:800; letter-spacing:.3px;
-  color:var(--st); background:color-mix(in srgb,var(--st) 14%,transparent); border:1px solid color-mix(in srgb,var(--st) 40%,transparent);
-}
-.res-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px 14px; padding:2px 2px 14px; }
-.res-grid div{ display:flex; flex-direction:column; gap:2px; min-width:0; }
-.res-grid span{ font-size:11.5px; color:var(--cy-dim); }
-.res-grid b{ font-size:15px; color:var(--cy-text); font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.res-uso{ padding:12px 0 2px; border-top:1px solid var(--cy-line); }
 .res-uso-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; font-size:12.5px; color:var(--cy-dim); }
 .res-uso-top i{ color:var(--cy-green-2); margin-right:5px; }
 .res-uso-top b{ font-family:var(--cy-display); font-size:20px; color:var(--cy-text); letter-spacing:.3px; }
-.res-bar{ height:8px; border-radius:8px; background:rgba(255,255,255,.08); overflow:hidden; }
-.res-bar i{ display:block; height:100%; width:100%; border-radius:8px; transform-origin:0 50%; animation:cyBar .55s var(--cy-ease) backwards; }
-.res-deuda{ display:flex; justify-content:space-between; align-items:center; padding:12px 0 0; margin-top:12px; border-top:1px solid var(--cy-line); font-size:13px; color:var(--cy-dim); }
-.res-deuda b{ font-family:var(--cy-display); font-size:20px; letter-spacing:.3px; }
-.res-card > button{ width:100%; min-height:52px; margin-top:14px !important; display:flex; align-items:center; justify-content:center; gap:9px; font-size:15.5px; }
-.res-alert{ text-align:center; padding:22px 16px; color:#fda4a4; background:rgba(240,106,106,.08); border:1px solid rgba(240,106,106,.3); border-radius:18px; margin-bottom:16px; }
-.res-alert h3{ justify-content:center; color:#fca5a5 !important; margin-bottom:6px !important; }
-.res-alert h3::before{ display:none !important; }
 
 /* Tarjeta de resultado del socio */
 @keyframes cyBar{ from{ transform:scaleX(0); } }
@@ -2063,13 +1810,6 @@ html, body{
   box-shadow:0 8px 18px -8px var(--fc) !important;
 }
 .list-filter-container .filter-btn.active #contadorPorAvisar{ background:#03140d !important; color:var(--fc) !important; }
-.socio-card-actions button{ border:none !important; border-radius:8px !important; color:#fff !important; box-shadow:none !important; font-weight:inherit; letter-spacing:normal; }
-.socio-card-actions .btn-blue{ background:linear-gradient(135deg,#3b82f6,#1d4ed8) !important; }
-.socio-card-actions .btn-purple{ background:linear-gradient(135deg,#8b5cf6,#6d28d9) !important; }
-.socio-card-actions .btn-green{ background:linear-gradient(135deg,#22c55e,#15803d) !important; }
-.socio-card-actions .btn-amber{ background:linear-gradient(135deg,#f59e0b,#b45309) !important; }
-.socio-card-actions .btn-red{ background:linear-gradient(135deg,#ef4444,#b91c1c) !important; }
-.socio-card-actions button:active{ transform:scale(.96) !important; filter:none; }
 
 /* Tarjetas de socio: botones con sus colores originales */
 
@@ -2268,26 +2008,8 @@ html, body{
 #tab5 .btn-whatsapp{background:linear-gradient(135deg,#2be36f,#12a84a) !important;color:#fff !important;border:0 !important;box-shadow:0 10px 22px -8px rgba(37,211,102,.8) !important;display:flex !important;align-items:center;justify-content:center;gap:9px}
 #tab5 .btn-whatsapp i{font-size:19px;color:#fff !important}
 #modalRenovar button:not([style*="background:#"]),#modalEditarSocio button{font-weight:800}
-.res-card{background:linear-gradient(165deg,color-mix(in srgb,var(--st) 26%,var(--cy-surface)),color-mix(in srgb,var(--st) 6%,var(--cy-surface)) 60%) !important;border:1.5px solid color-mix(in srgb,var(--st) 65%,transparent) !important;box-shadow:0 18px 34px -18px rgba(0,0,0,.9),0 0 28px -6px color-mix(in srgb,var(--st) 55%,transparent) !important}
-.res-avatar{background:linear-gradient(135deg,color-mix(in srgb,var(--st) 85%,#fff),var(--st)) !important;color:#04120c !important}
-.res-id h3{white-space:normal !important;overflow:visible !important;text-overflow:clip !important;font-size:21px !important;line-height:1.08 !important;word-break:break-word}
-.res-badge{background:var(--st) !important;color:#07110d !important;border-color:transparent !important;font-weight:900 !important;box-shadow:0 0 14px -2px var(--st)}
-.res-grid div:nth-child(1) b{color:#60c3ff}
-.res-grid div:nth-child(2) b{color:var(--st);font-family:var(--cy-display);font-size:20px}
-.res-grid div:nth-child(3) b{color:#c4a8ff}
-.res-grid div:nth-child(4) b{color:#ffcb5c}
-.res-grid span{color:#a9bdb6 !important}
-.res-card > button{border:0 !important;color:#fff !important;font-weight:800 !important;font-size:16px !important;letter-spacing:.3px;border-radius:15px !important}
-.res-card > button.btn-green{background:linear-gradient(135deg,#22e58f,#0aa85f) !important;box-shadow:0 12px 26px -8px rgba(16,220,130,.85) !important}
-.res-card > button.btn-blue{background:linear-gradient(135deg,#19c3ff,#2f6bff) !important;box-shadow:0 12px 26px -8px rgba(30,140,255,.85) !important}
-.res-card > button i{color:#fff !important;font-size:19px}
 #tab1 > .card:first-child button.btn-blue{background:linear-gradient(135deg,#19c3ff,#2f6bff) !important;color:#fff !important;font-weight:800 !important;box-shadow:0 10px 24px -8px rgba(30,140,255,.9) !important;border:0 !important}
 #tab1 > .card:first-child button.btn-blue i{color:#fff !important}
-.modern-socio-card .socio-avatar-info strong{max-width:none !important;white-space:normal !important;overflow:visible !important;text-overflow:clip !important;line-height:1.1;font-size:16px !important;word-break:break-word}
-.modern-socio-card .socio-avatar-info > div{max-width:none}
-.modern-socio-card .socio-info-row > span:first-child{color:#a9bdb6}
-.modern-socio-card .socio-info-row:nth-child(2) > span:last-child{color:#c4a8ff !important}
-.modern-socio-card .socio-info-row:nth-child(3) > span:last-child{color:#ffcb5c !important}
 
 /* ===== v39: tarjetas con color, nombre completo, botones vivos ===== */
 /* Lista de socios: nombre completo en hasta 2 líneas + datos de colores */

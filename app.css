@@ -3982,7 +3982,6 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 .hz-hasta{ font-size:13px; color:#cbd5e1; margin-top:4px; }
 .hz-sub{ font-size:13px; color:#94a3b8; margin:4px 0 0; }
 .hz-sub i{ color:#34d399; margin-right:4px; }
-#wizHorarios .hz-baile{ display:flex; gap:14px; align-items:center; }
 .hz-baile-txt{ min-width:0; }
 .hz-baile-txt .hz-nombre{ color:#e2e8f0; }
 .hz-dir{ font-size:18px; font-weight:700; color:#fff; margin:12px 0 0; }
@@ -3993,7 +3992,6 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 .hz-servicios{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
 .hz-chip{ display:inline-flex; align-items:center; gap:8px; padding:9px 12px; border-radius:999px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); font-size:13px; color:#e2e8f0; }
 .hz-chip i{ color:#34d399; }
-#wizHorarios .wiz-whatsapp-btn{ position:static; margin-top:18px; }
 @media (prefers-reduced-motion: reduce){ .hz-turno{ transition:none; } #wizHorarios .hz-turno.ahora::before, #wizHorarios .wiz-whatsapp-btn::before{ animation:none; } }
 
 /* ===== Horarios y ubicación: animaciones (solo transform y opacity) =====
@@ -4014,14 +4012,13 @@ html.cq-abierto, html.cq-abierto body{ overflow:hidden !important; }
 #wizHorarios .hz-card:nth-of-type(3){ animation-delay:.16s; }
 #wizHorarios .hz-card:nth-of-type(4){ animation-delay:.24s; }
 #wizHorarios .hz-servicios{ animation-delay:.32s; }
-#wizHorarios .wiz-whatsapp-btn{ position:relative; isolation:isolate; animation:hz-subir .55s .4s cubic-bezier(.2,.8,.2,1) both; }
+#wizHorarios .wiz-whatsapp-btn{ position:relative; isolation:isolate; animation:hz-subir .55s .4s cubic-bezier(.2,.8,.2,1) both; margin-top:18px; }
 #wizHorarios .wiz-whatsapp-btn::before{ content:""; position:absolute; inset:0; border-radius:inherit; background:#25d366; z-index:-1; animation:hz-halo 2.8s 1.2s ease-out infinite; pointer-events:none; }
-#wizHorarios .hz-turno{ animation:hz-subir .5s cubic-bezier(.2,.8,.2,1) both; }
+#wizHorarios .hz-turno{ animation:hz-subir .5s cubic-bezier(.2,.8,.2,1) both; position:relative; }
 #wizHorarios .hz-turno:nth-child(2){ animation-delay:.08s; }
 
 #wizHorarios .hz-turno.ahora{ animation:hz-subir .5s cubic-bezier(.2,.8,.2,1) both; }
 #wizHorarios .hz-turno.ahora::before{ content:""; position:absolute; inset:0; border-radius:inherit; box-shadow:0 14px 28px -16px #34d399; animation:hz-resplandor 2.4s .5s ease-in-out infinite; pointer-events:none; }
-#wizHorarios .hz-turno{ position:relative; }
 #wizHorarios .hz-girar{ animation:hz-girar 18s linear infinite; }
 #wizHorarios .hz-flotar{ animation:hz-flotar 3.2s ease-in-out infinite; }
 

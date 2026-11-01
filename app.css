@@ -689,12 +689,6 @@ button:active {
   box-shadow: 0 4px 14px rgba(16,185,129,.35);
 }
 
-.btn-blue{
-  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-  color:white;
-  box-shadow: 0 4px 14px rgba(59,130,246,.35);
-}
-
 .btn-red{
   background: linear-gradient(135deg, #ef4444, #b91c1c);
   color:white;
@@ -1119,7 +1113,7 @@ input:focus, select:focus, textarea:focus{
 /* -------- Tarjetas de socio refinadas -------- */
 
 /* Botones generales redondeados y suaves */
-.btn-blue, .btn-green, .btn-red, .btn-purple, .btn-whatsapp{
+.btn-green, .btn-red, .btn-whatsapp{
   border-radius: 14px !important;
   font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
@@ -1230,7 +1224,7 @@ input:focus, select:focus, textarea:focus{
 input:focus-visible,select:focus-visible,textarea:focus-visible{ box-shadow:0 0 0 3px rgba(16,185,129,.28) !important; }
 .tabbtn{ -webkit-tap-highlight-color:transparent; }
 .tabbtn:active{ opacity:.8; }
-.btn-blue:active,.btn-green:active,.btn-red:active,.btn-purple:active,.btn-whatsapp:active{ transform:scale(.985); }
+.btn-green:active,.btn-red:active,.btn-whatsapp:active{ transform:scale(.985); }
 @keyframes cyToast{
   0%{ opacity:0; translate:-50% -10px; }
   8%,88%{ opacity:1; translate:-50% 0; }
@@ -1569,20 +1563,16 @@ html, body{
 
 /* ---------- Sistema de botones ---------- */
 .panel button, .modal-panel button{ -webkit-tap-highlight-color:transparent; }
-.btn-green, .btn-blue{
+.btn-green{
   background:linear-gradient(180deg,#17c590,#0c9468) !important; color:#03140d !important;
   border:0 !important; border-radius:14px !important; font-weight:800 !important; letter-spacing:.2px;
   box-shadow:0 10px 22px -10px rgba(16,185,129,.8), inset 0 1px 0 rgba(255,255,255,.35) !important;
   transition:transform .15s ease-out, box-shadow .15s ease-out, filter .15s;
 }
-.btn-green:active, .btn-blue:active{ transform:scale(.975) !important; filter:brightness(.94); }
+.btn-green:active{ transform:scale(.975) !important; filter:brightness(.94); }
 .btn-red{
   background:rgba(240,106,106,.12) !important; color:#fda4a4 !important;
   border:1px solid rgba(240,106,106,.3) !important; border-radius:14px !important; box-shadow:none !important; font-weight:700 !important;
-}
-.btn-purple{
-  background:rgba(255,255,255,.06) !important; color:var(--cy-text) !important;
-  border:1px solid rgba(255,255,255,.12) !important; box-shadow:none !important;
 }
 .btn-whatsapp{
   background:rgba(37,211,102,.12) !important; color:#6ee7a0 !important;
@@ -1599,7 +1589,7 @@ html, body{
 .btn-cuaderno:active, #btnActualizar:active{ transform:scale(.98) !important; background:rgba(16,185,129,.1) !important; }
 #btnActualizar{ padding:13px !important; margin-bottom:12px !important; letter-spacing:.2px; }
 @media (hover:hover){
-  .btn-green:hover, .btn-blue:hover{ filter:brightness(1.06); }
+  .btn-green:hover{ filter:brightness(1.06); }
   .btn-cuaderno:hover, #btnActualizar:hover{ border-color:var(--cy-line-g) !important; }
 }
 .panel button:focus-visible, .modal-panel button:focus-visible{ outline:2px solid var(--cy-green-2); outline-offset:2px; }
@@ -1644,7 +1634,6 @@ html, body{
 #tab1 > .card:first-child{ display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; }
 #tab1 > .card:first-child h3{ grid-column:1/-1; margin-bottom:4px !important; }
 #tab1 > .card:first-child input, #tab1 > .card:first-child button{ margin:0 !important; }
-#tab1 > .card:first-child .btn-blue{ width:auto !important; min-height:54px; padding:0 20px !important; display:flex; align-items:center; gap:8px; }
 .res-uso-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px; font-size:12.5px; color:var(--cy-dim); }
 .res-uso-top i{ color:var(--cy-green-2); margin-right:5px; }
 .res-uso-top b{ font-family:var(--cy-display); font-size:20px; color:var(--cy-text); letter-spacing:.3px; }
@@ -1902,10 +1891,9 @@ html, body{
 #tab2 .card .cy-action-row .cy-act-save{background:linear-gradient(135deg,#00e0a4,#00a6ff) !important;box-shadow:0 10px 22px -8px rgba(0,200,190,.8) !important}
 #tab2 .card .cy-action-row .cy-act-wa{background:linear-gradient(135deg,#2be36f,#12a84a) !important;box-shadow:0 10px 22px -8px rgba(37,211,102,.8) !important}
 #tab2 .card .cy-action-row button:active{transform:scale(.96);filter:brightness(1.1)}
-@media(max-width:360px){#tab2 .card .cy-action-row button{font-size:12.5px !important;gap:6px}.dashboard #tab1 > .card:first-child .btn-blue,.dashboard .btn-blue:not(.socio-card-actions .btn-blue){background:linear-gradient(135deg,#00c2ff,#2f6bff) !important;color:#fff !important;border:0 !important;box-shadow:0 8px 20px -8px rgba(0,150,255,.8) !important}}
+@media(max-width:360px){#tab2 .card .cy-action-row button{font-size:12.5px !important;gap:6px}}
 .dashboard .btn-green:not(.socio-card-actions .btn-green){background:linear-gradient(135deg,#1fe08f,#0fae6a) !important;color:#fff !important;border:0 !important;box-shadow:0 8px 20px -8px rgba(16,185,129,.8) !important}
 .dashboard .btn-red:not(.socio-card-actions .btn-red){background:linear-gradient(135deg,#ff6b6b,#e0303f) !important;color:#fff !important;border:0 !important;box-shadow:0 8px 20px -8px rgba(240,70,80,.7) !important}
-.dashboard .btn-purple:not(.socio-card-actions .btn-purple){background:linear-gradient(135deg,#a77bff,#6d4aff) !important;color:#fff !important;border:0 !important;box-shadow:0 8px 20px -8px rgba(130,90,255,.7) !important}
 .dashboard .btn-cuaderno{background:linear-gradient(135deg,#ffb938,#ff8a1e) !important;color:#1a0f00 !important;border:0 !important;box-shadow:0 8px 20px -8px rgba(255,150,30,.7) !important}
 .dashboard #btnActualizar{background:linear-gradient(135deg,#22d3ee,#0ea5e9) !important;color:#00212b !important;border:0 !important;box-shadow:0 8px 20px -8px rgba(14,165,233,.7) !important}
 #tab5 .btn-whatsapp {
@@ -1923,8 +1911,6 @@ html, body{
 }
 #tab5 .btn-whatsapp i{font-size:19px;color:#fff !important}
 #modalRenovar button:not([style*="background:#"]),#modalEditarSocio button{font-weight:800}
-#tab1 > .card:first-child button.btn-blue{background:linear-gradient(135deg,#19c3ff,#2f6bff) !important;color:#fff !important;font-weight:800 !important;box-shadow:0 10px 24px -8px rgba(30,140,255,.9) !important;border:0 !important}
-#tab1 > .card:first-child button.btn-blue i{color:#fff !important}
 
 /* ===== v39: tarjetas con color, nombre completo, botones vivos ===== */
 /* Lista de socios: nombre completo en hasta 2 líneas + datos de colores */

@@ -7,8 +7,69 @@
 .td-grid{ display:grid; grid-template-columns:1fr; gap:14px; align-items:start; }
 @media (min-width: 900px){ .td-grid{ grid-template-columns:1.25fr 1fr; } }
 
-.td-catalogo, .td-venta, .td-hoy{ padding:16px; }
-.td-venta h4, .td-hoy h4{ margin:0 0 12px; font-size:15px; font-weight:800; color:#e2e8f0; letter-spacing:.2px; }
+/* ---------- Venta actual: tarjeta de cobro ---------- */
+
+.td-venta{
+  padding:18px; border:1px solid rgba(245,158,11,.22);
+  background:linear-gradient(180deg, rgba(245,158,11,.07) 0%, rgba(15,23,42,.6) 44%);
+}
+
+.td-venta h4{ margin:0 0 4px; font-size:16px; font-weight:800; letter-spacing:.2px; color:#f8fafc; }
+
+.td-linea{ display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(148,163,184,.12); }
+
+.td-linea b{ display:block; font-size:14px; color:#e2e8f0; }
+
+.td-linea small{ color:#64748b; font-size:12px; }
+
+.td-linea strong{ color:#fde68a; font-size:14px; min-width:64px; text-align:right; font-variant-numeric:tabular-nums; }
+
+.td-cant{ display:flex; align-items:center; gap:6px; }
+
+.td-cant button{
+  width:34px; height:34px; border-radius:10px; cursor:pointer; font-size:18px;
+  border:1px solid rgba(245,158,11,.35); background:rgba(245,158,11,.08); color:#fde68a;
+}
+
+.td-cant span{ min-width:22px; text-align:center; font-weight:700; color:#f8fafc; }
+
+.td-total{ display:flex; justify-content:space-between; align-items:flex-end; margin:14px 0; padding:14px 0 6px; border-top:1px dashed rgba(245,158,11,.3); }
+
+.td-total span{ color:#94a3b8; font-size:12px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; }
+
+.td-total b{ font-size:32px; font-weight:800; line-height:1; color:#fbbf24; font-variant-numeric:tabular-nums; }
+
+.td-metodos{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:4px; padding:4px; margin-bottom:12px;
+  border-radius:16px; background:rgba(2,6,23,.6); border:1px solid rgba(148,163,184,.12);
+}
+
+.td-metodos button{
+  min-height:44px; padding:11px 6px; border:0; border-radius:12px; background:transparent;
+  color:#94a3b8; font-size:13.5px; font-weight:700; cursor:pointer; transition:background .2s, color .2s;
+}
+
+.td-metodos button.activo{ background:linear-gradient(180deg,#fbbf24 0%,#d97706 100%); color:#1c1000; box-shadow:0 8px 18px -10px rgba(245,158,11,.9); }
+
+.td-socio-ok{ margin:8px 0; display:flex; gap:8px; align-items:center; font-size:14px; font-weight:700; color:#6ee7b7; }
+
+.td-confirmar{
+  margin:12px 0; padding:14px; border-radius:16px; background:rgba(34,211,160,.08);
+  border:1px solid rgba(34,211,160,.35); animation:tdEntra .25s ease-out;
+}
+
+.td-confirmar p{ margin:0 0 12px; font-size:14px; line-height:1.45; color:#e2e8f0; }
+
+.td-botones{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+.td-btn--main{
+  width:100%; margin-top:6px; color:#02150d;
+  background:linear-gradient(180deg,#34d8a8 0%,#0f9d6e 100%);
+  box-shadow:0 14px 26px -14px rgba(16,185,129,.9), inset 0 1px 0 rgba(255,255,255,.25);
+}
+
+.td-catalogo, .td-hoy{ padding:16px; }
+.td-hoy h4{ margin:0 0 12px; font-size:15px; font-weight:800; color:#e2e8f0; letter-spacing:.2px; }
 
 .td-cats{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
 .td-cats .td-cat{ width:auto; min-height:38px; }
@@ -48,41 +109,9 @@
 .td-campo input:focus, .td-campo select:focus, .td-fila-acciones input:focus, .td-accion input:focus{
   outline:none; border-color:#f59e0b; box-shadow:0 0 0 3px rgba(245,158,11,.18);
 }
-
-.td-linea{ display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(148,163,184,.12); }
-.td-linea b{ display:block; font-size:14px; color:#e2e8f0; }
-.td-linea small{ color:#64748b; font-size:12px; }
-.td-linea strong{ color:#e2e8f0; font-size:14px; min-width:64px; text-align:right; }
-.td-cant{ display:flex; align-items:center; gap:6px; }
-.td-cant button{
-  width:34px; height:34px; border-radius:10px; border:1px solid rgba(148,163,184,.3);
-  background:transparent; color:#e2e8f0; font-size:18px; cursor:pointer;
-}
-.td-cant span{ min-width:22px; text-align:center; font-weight:700; color:#f1f5f9; }
-
-.td-total{ display:flex; justify-content:space-between; align-items:baseline; margin:14px 0; padding:12px 0; border-top:1px dashed rgba(148,163,184,.25); }
-.td-total span{ color:#94a3b8; font-weight:600; }
-.td-total b{ font-size:26px; color:#f8fafc; font-weight:800; }
-
-.td-metodos{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; }
-.td-metodos button{
-  padding:11px 6px; border-radius:12px; border:1px solid rgba(148,163,184,.25); background:transparent;
-  color:#cbd5e1; font-weight:700; font-size:13.5px; cursor:pointer; min-height:44px;
-  transition:background .2s, border-color .2s, color .2s;
-}
-.td-metodos button.activo{ background:rgba(34,211,160,.15); border-color:#22d3a0; color:#6ee7b7; }
-
-.td-socio-ok{ margin:8px 0; color:#6ee7b7; font-weight:700; font-size:14px; display:flex; gap:8px; align-items:center; }
 .td-error{ margin:8px 0; color:#f87171; font-weight:600; font-size:13.5px; display:flex; gap:8px; align-items:center; }
 .td-ayuda{ margin:8px 0; color:#94a3b8; font-size:13px; line-height:1.45; display:flex; gap:8px; align-items:flex-start; }
 .td-vacio{ margin:6px 0; color:#64748b; font-size:13.5px; }
-
-.td-confirmar{
-  margin:12px 0; padding:14px; border-radius:14px; background:rgba(34,211,160,.08);
-  border:1px solid rgba(34,211,160,.35); animation:tdEntra .25s ease-out;
-}
-.td-confirmar p{ margin:0 0 12px; color:#e2e8f0; font-size:14px; line-height:1.45; }
-.td-botones{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
 .td-btn{
   border:0; border-radius:13px; padding:13px 14px; font-size:15px; font-weight:800; cursor:pointer;
@@ -91,7 +120,6 @@
 }
 .td-btn:active{ transform:scale(.98); }
 .td-btn:disabled{ opacity:.45; cursor:not-allowed; }
-.td-btn--main{ background:linear-gradient(180deg,#22d3a0 0%,#0d9b6c 100%); color:#02150d; box-shadow:0 10px 22px -14px rgba(16,185,129,.9); width:100%; margin-top:6px; }
 .td-btn--sec{ background:rgba(148,163,184,.14); color:#e2e8f0; border:1px solid rgba(148,163,184,.25); }
 
 .td-hoy .td-venta-fila{ display:grid; grid-template-columns:52px 1fr auto; gap:10px; align-items:center; padding:10px 0; border-bottom:1px solid rgba(148,163,184,.12); }

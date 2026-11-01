@@ -173,6 +173,25 @@ async function traerSocioPorDni(dni){
   return (error || !data) ? null : data;
 }
 
+// Estado que impide ingresar: la misma tarjeta que se muestra en el QR (mismo orden de reglas).
+// Devuelve el HTML de la tarjeta, o null si el socio puede ingresar.
+function tarjetaEstadoBusqueda(socio, resumen){
+  if (resumen && resumen.bloquea) return cyTarjetaBloqueoTienda(socio.nombre, resumen.bloqueos);
+  const deuda = parseFloat(socio.deuda || 0);
+  if (deuda > 0 && socio.fecha_deuda) {
+    const dias = Math.floor((new Date() - new Date(socio.fecha_deuda)) / 86400000);
+    if (dias > 7) return pantallaEstado({ icono: "fa-lock", titulo: "ACCESO BLOQUEADO", nombre: socio.nombre,
+      texto: `Deuda pendiente: <b>S/ ${escaparHTML(socio.deuda)}</b><br>Regularice su pago para habilitar su acceso.` });
+  }
+  if (estadoSocio(socio) === "AGOTADO") {
+    return pantallaEstado({ icono: "fa-ban", titulo: "MEMBRESÍA AGOTADA", nombre: socio.nombre,
+      texto: "Ha consumido todas las asistencias de su plan.<br>Acérquese a recepción para renovar." });
+  }
+  if (estadoSocio(socio) === "VENCIDO") return pantallaEstado({ icono: "fa-calendar-xmark", titulo: "MEMBRESÍA VENCIDA", nombre: socio.nombre,
+    texto: "Su membresía ha vencido por fecha calendario.<br>Acérquese a recepción para renovar." });
+  return null;
+}
+
 async function mostrarTarjetaBusqueda(socio){
   const div = document.getElementById("resultado");
   if(!div) return;
@@ -182,6 +201,8 @@ async function mostrarTarjetaBusqueda(socio){
   if(bDni && bDni.value !== String(socio.dni)) return;
   const puede = !!resumen && !resumen.bloquea && socioPuedeIngresar(socio);
   estadoBotonIngreso(puede ? "listo" : "no");
+  const estadoHtml = tarjetaEstadoBusqueda(socio, resumen);
+  if (estadoHtml) { div.innerHTML = estadoHtml; return; }
   const c = scCuerpo(socio);
   const aviso = !resumen
     ? `<p class="td-error"><i class="fa-solid fa-circle-exclamation"></i> No se pudo verificar la deuda de tienda. Intente de nuevo.</p>`

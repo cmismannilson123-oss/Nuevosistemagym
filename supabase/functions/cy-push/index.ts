@@ -8,6 +8,8 @@
 import webpush from "npm:web-push@3.6.7";
 import { createClient } from "npm:@supabase/supabase-js@2";
 
+import type { ResultadoFcm } from "./entrega.ts";
+import { enviarConReintentos, debeConfirmar } from "./entrega.ts";
 const sb = createClient(
   Deno.env.get("SUPABASE_URL")!,
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
@@ -71,28 +73,22 @@ async function accesoFcm(): Promise<string | null> {
 }
 
 // Envía el mismo aviso a cada celular de la app nativa. Devuelve cuántos lo recibieron.
-async function enviarFcm(tokens: string[], datos: Record<string, string>): Promise<number> {
-  if (!tokens.length) return 0;
+async function enviarFcm(tokens: string[], datos: Record<string, string>): Promise<ResultadoFcm[]> {
+  if (!tokens.length) return [];
   const acceso = await accesoFcm();
-  if (!acceso) return 0;
-  let ok = 0;
-  const muertos: string[] = [];
-  await Promise.all(tokens.map(async (token) => {
+  if (!acceso) return tokens.map(() => "fallo" as ResultadoFcm);
+  const resultados = await Promise.all(tokens.map((token) => enviarConReintentos(async () => {
     const r = await fetch(`https://fcm.googleapis.com/v1/projects/${fcmCuenta!.project_id}/messages:send`, {
       method: "POST",
       headers: { "Authorization": "Bearer " + acceso, "Content-Type": "application/json" },
-      body: JSON.stringify({ message: { token, data: datos, android: { priority: "HIGH", ttl: "3600s" } } }),
+      body: JSON.stringify({ message: { token, data: datos, android: { priority: "HIGH", ttl: "21600s" } } }),
     });
-    if (r.ok) ok++;
-    else {
-      const txt = await r.text();
-      // Token que ya no existe (app desinstalada): se borra
-      if (r.status === 404 || txt.includes("UNREGISTERED")) muertos.push(token);
-      else console.error("FCM falló", r.status, txt.slice(0, 200));
-    }
-  }));
+    return { status: r.status, texto: r.ok ? "" : await r.text() };
+  })));
+  // Celulares cuyo token ya no existe (app desinstalada): se borran
+  const muertos = tokens.filter((_, i) => resultados[i] === "muerto");
   if (muertos.length) await sb.from("fcm_tokens").delete().in("token", muertos);
-  return ok;
+  return resultados;
 }
 
 // Saludo de bienvenida, igual criterio que el panel (terminación del nombre)
@@ -210,11 +206,13 @@ Deno.serve(async (req) => {
     const datosFcm: Record<string, string> = {};
     for (const [k, v] of Object.entries(aviso)) if (v !== undefined && v !== null) datosFcm[k] = String(v);
     datosFcm.tipo = String(aviso.tipo ?? ev.tipo);
-    // Si Firebase falla, el aviso por Web Push sigue su camino
-    const enviadosFcm = await enviarFcm((fcmTokens ?? []).map((t) => t.token), datosFcm)
-      .catch((e) => { console.error("FCM error", (e as Error).message); return 0; });
+    // Identificador del aviso: el celular lo usa para no mostrar dos veces un reenvío
+    if (ev.pendiente_id) datosFcm.pendiente_id = String(ev.pendiente_id);
+    const tokensFcm = (fcmTokens ?? []).map((t) => t.token);
+    const resFcm = await enviarFcm(tokensFcm, datosFcm)
+      .catch((e) => { console.error("FCM error", (e as Error).message); return tokensFcm.map(() => "fallo" as ResultadoFcm); });
     const payload = JSON.stringify(aviso);
-    let enviados = enviadosFcm;
+    let webOk = 0;
     const vencidos: number[] = [];
     await Promise.all((subs ?? []).map(async (s) => {
       try {
@@ -223,7 +221,7 @@ Deno.serve(async (req) => {
           payload,
           { TTL: 3600, urgency: "high", topic: String(aviso.tag).replace(/[^A-Za-z0-9_-]/g, "").slice(0, 32) },
         );
-        enviados++;
+        webOk++;
       } catch (e) {
         const st = (e as { statusCode?: number }).statusCode;
         if (st === 404 || st === 410) vencidos.push(s.id);
@@ -234,10 +232,12 @@ Deno.serve(async (req) => {
     if (vencidos.length) await sb.from("push_suscripciones").delete().in("id", vencidos);
     // Confirmar el aviso en la cola: solo si llegó a algún celular (o no hay celulares),
     // así el reenvío de cada minuto recupera los que fallaron
-    if (ev.pendiente_id && (enviados > 0 || !(subs ?? []).length)) {
+    // Solo se confirma cuando todos los celulares Android lo recibieron (o no hay ninguno):
+    // si uno falló, la cola lo reintenta y el celular no lo pierde.
+    if (ev.pendiente_id && debeConfirmar({ resultadosFcm: resFcm, subsWeb: (subs ?? []).length, webOk })) {
       await sb.from("push_pendientes").update({ enviado_en: new Date().toISOString() }).eq("id", ev.pendiente_id);
     }
-    return Response.json({ enviados, vencidos: vencidos.length, total: subs?.length ?? 0 });
+    return Response.json({ fcm: resFcm, webOk, vencidos: vencidos.length, total: subs?.length ?? 0 });
   } catch (e) {
     console.error(e);
     return new Response("error", { status: 500 });

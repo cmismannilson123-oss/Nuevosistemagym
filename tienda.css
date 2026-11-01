@@ -1,7 +1,7 @@
 /* Tienda del gym — panel del personal. Usa los mismos colores del panel. */
 .td-wrap{ display:flex; flex-direction:column; gap:14px; padding-bottom:20px; }
 .td-head h3{ margin:0; display:flex; align-items:center; gap:10px; font-size:20px; font-weight:800; color:#f1f5f9; }
-.td-head h3 i{ color:#22d3a0; }
+.td-head h3 i{ color:#f59e0b; }
 .td-head p{ margin:4px 0 0; color:#94a3b8; font-size:13.5px; }
 
 .td-grid{ display:grid; grid-template-columns:1fr; gap:14px; align-items:start; }
@@ -17,7 +17,9 @@
   padding:7px 13px; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer;
   transition:background .2s, border-color .2s, color .2s;
 }
-.td-cat.activa{ background:#22d3a0; border-color:#22d3a0; color:#02150d; }
+.td-cat i{ margin-right:6px; color:var(--cat); }
+.td-cat.activa{ background:var(--cat); border-color:var(--cat); color:#140c00; }
+.td-cat.activa i{ color:#140c00; }
 
 .td-productos{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
 @media (min-width: 560px){ .td-productos{ grid-template-columns:repeat(3,1fr); } }
@@ -27,11 +29,12 @@
   padding:12px; color:#e2e8f0; cursor:pointer; min-height:86px;
   transition:transform .15s, border-color .2s, background .2s;
 }
-.td-prod:hover{ border-color:rgba(34,211,160,.6); background:rgba(15,23,42,.9); }
+.td-prod:hover{ border-color:var(--cat); background:rgba(15,23,42,.9); }
+.td-prod-ico{ font-size:18px; color:var(--cat); margin-bottom:2px; }
 .td-prod:active{ transform:scale(.97); }
-.td-prod-cat{ font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; color:#64748b; font-weight:700; }
+.td-prod-cat{ font-size:10.5px; text-transform:uppercase; letter-spacing:.6px; color:var(--cat); font-weight:700; }
 .td-prod b{ font-size:14px; line-height:1.25; }
-.td-prod strong{ margin-top:auto; color:#34d399; font-size:15px; }
+.td-prod strong{ margin-top:auto; color:#fbbf24; font-size:15px; }
 
 .td-nuevo{ margin-top:14px; border-top:1px solid rgba(148,163,184,.15); padding-top:12px; }
 .td-nuevo summary{ cursor:pointer; color:#94a3b8; font-size:13.5px; font-weight:600; list-style:none; }
@@ -43,7 +46,7 @@
 .td-campo input, .td-campo select, .td-fila-acciones input, .td-fila-acciones select, .td-accion input{ font-size:15px; min-height:44px; box-sizing:border-box; width:100%;
 }
 .td-campo input:focus, .td-campo select:focus, .td-fila-acciones input:focus, .td-accion input:focus{
-  outline:none; border-color:#22d3a0; box-shadow:0 0 0 3px rgba(34,211,160,.18);
+  outline:none; border-color:#f59e0b; box-shadow:0 0 0 3px rgba(245,158,11,.18);
 }
 
 .td-linea{ display:grid; grid-template-columns:1fr auto auto; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid rgba(148,163,184,.12); }
@@ -169,7 +172,7 @@
 }
 .td-ticket-main b{ color:#6ee7b7; font-variant-numeric:tabular-nums; }
 .td-ticket-x{ width:34px; height:46px; border:0; background:transparent; color:#94a3b8; font-size:20px; cursor:pointer; }
-.td-ticket--nuevo{ gap:8px; padding:0 14px; height:46px; border-style:dashed; color:#6ee7b7; background:transparent; font-size:14px; font-weight:700; cursor:pointer; }
+.td-ticket--nuevo{ gap:8px; padding:0 14px; height:46px; border-style:dashed; color:#fbbf24; background:transparent; font-size:14px; font-weight:700; cursor:pointer; }
 
 /* ---------- Stock ---------- */
 .td-stock{

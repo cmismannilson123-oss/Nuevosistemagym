@@ -169,10 +169,23 @@
       : "");
   }
 
+  // Identidad de cada categoría: color e icono (la clave es el nombre sin tildes, en minúscula)
+  const ESTILO_CATEGORIA = {
+    bebidas: { color: "#38bdf8", icono: "fa-glass-water" },
+    suplementos: { color: "#f59e0b", icono: "fa-capsules" },
+    accesorios: { color: "#a78bfa", icono: "fa-dumbbell" },
+    quemador: { color: "#f43f5e", icono: "fa-fire" },
+    otros: { color: "#94a3b8", icono: "fa-box" },
+  };
+  const estiloCategoria = (nombre) => {
+    const clave = String(nombre || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+    return ESTILO_CATEGORIA[clave] || { color: "#94a3b8", icono: "fa-tag" };
+  };
+
   function pintarCategorias() {
     const cats = ["Todas", ...cat.categorias];
     q("tdCats").innerHTML = cats.map((c) =>
-      `<button type="button" class="td-cat${ui.categoria === c ? " activa" : ""}" data-cat="${esc(c)}">${esc(c)}</button>`).join("");
+      `<button type="button" class="td-cat${ui.categoria === c ? " activa" : ""}" data-cat="${esc(c)}" style="--cat:${c === "Todas" ? "#f59e0b" : estiloCategoria(c).color}"><i class="fa-solid ${c === "Todas" ? "fa-layer-group" : estiloCategoria(c).icono}"></i>${esc(c)}</button>`).join("");
   }
 
   function pintarProductos() {
@@ -185,8 +198,10 @@
           const badge = !tieneControl(p) ? ""
             : agotado ? `<em class="td-stock td-stock--cero">Sin stock</em>`
             : `<em class="td-stock${stockBajo(p) ? " td-stock--bajo" : ""}">Quedan ${p.stock}</em>`;
+          const est = estiloCategoria(p.categoria);
           return `
-        <button type="button" class="td-prod${agotado ? " agotado" : ""}" data-id="${esc(p.id)}" ${agotado ? "disabled" : ""}>
+        <button type="button" class="td-prod${agotado ? " agotado" : ""}" data-id="${esc(p.id)}" ${agotado ? "disabled" : ""} style="--cat:${est.color}">
+          <i class="fa-solid ${est.icono} td-prod-ico" aria-hidden="true"></i>
           <span class="td-prod-cat">${esc(p.categoria)}</span>
           <b>${esc(p.nombre)}</b>
           <strong>${soles(p.precio)}</strong>

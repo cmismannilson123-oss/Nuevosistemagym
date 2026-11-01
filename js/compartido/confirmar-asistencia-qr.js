@@ -18,7 +18,7 @@ window.confirmarAsistenciaQR = async function () {
     const div = document.getElementById("qrResult");
     // Al instante: se muestra la bienvenida con los datos que ya verificó el sistema
     // al abrir la pantalla. El servidor confirma en segundo plano (ver abajo).
-    cyPintarExitoQR(Object.assign({}, socio, { dias_restantes: Math.max(0, (socio.dias_restantes || 0) - 1) }), "pendiente");
+    cyPintarPendienteQR(socio);
     
     window.metodoIngreso = "QR";
 
@@ -96,6 +96,19 @@ window.confirmarAsistenciaQR = async function () {
     clearTimeout(window._qrLockTimeout);
     window.yaProcesandoQR = false;
   }
+};
+
+// Pantalla de espera mientras el servidor responde. Es neutra: no muestra éxito
+// hasta saber si el socio ya había registrado hoy (ver cyPintarExitoQR abajo).
+window.cyPintarPendienteQR = function (socio) {
+  const div = document.getElementById("qrResult");
+  if (!div) return;
+  div.innerHTML = `
+      <div class="qr-hero-card">
+        <h1 class="qr-titulo ok-brand"><span class="logo-cy"></span><span>C&Y <span class="accent">FITNESS</span></span></h1>
+        <h3 class="ok-hi"><small>Hola,</small><b>${escaparHTML(socio.nombre)}</b></h3>
+        <div class="qr-conf" style="text-align:center; font-size:14px; margin:14px 0; color:#94a3b8;">Registrando tu asistencia…</div>
+      </div>`;
 };
 
 // Pinta la pantalla de bienvenida. estado: "pendiente" (aún sin respuesta del

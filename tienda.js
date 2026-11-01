@@ -726,6 +726,9 @@
 
   // ---------- Formulario de deuda del socio (botón "Deuda") ----------
 
+  // Último socio y resumen cargados en el modal: cambiar de pestaña usa esto (sin consultar otra vez)
+  let deudaEnPantalla = null;
+
   TD.abrirDeuda = async function (dni) {
     const modal = q("modalDeuda");
     const root = q("tdDeudaRoot");
@@ -740,6 +743,7 @@
       if (e1 || !socio) throw new Error("No se encontró al socio.");
       root.dataset.dni = dni;
       root.dataset.tab = "membresia";
+      deudaEnPantalla = { dni, socio, resumen };
       pintarDeuda(socio, resumen);
     } catch (e) {
       root.innerHTML = `<p class="td-error">${esc(mensajeError(e))}</p>`;
@@ -768,6 +772,7 @@
     if (socio) {
       const idx = (window.dataGlobal || []).findIndex((s) => String(s.dni) === String(dni));
       if (idx >= 0) Object.assign(window.dataGlobal[idx], socio);
+      deudaEnPantalla = { dni, socio, resumen };
       pintarDeuda(socio, resumen);
       if (q("buscarDni") && q("buscarDni").value === dni && window.buscarAutomatico) window.buscarAutomatico();
     }
@@ -919,7 +924,12 @@
       if (ev.target === modal) return TD.cerrarDeuda();
       const pestana = ev.target.closest("[data-pestana]");
       if (pestana) {
-        q("tdDeudaRoot").dataset.tab = pestana.dataset.pestana;
+        const root = q("tdDeudaRoot");
+        root.dataset.tab = pestana.dataset.pestana;
+        if (deudaEnPantalla && deudaEnPantalla.dni === root.dataset.dni) {
+          pintarDeuda(deudaEnPantalla.socio, deudaEnPantalla.resumen);
+          return;
+        }
         return recargarDeuda().catch((e) => mostrarToast("❌ " + mensajeError(e), "#ef4444"));
       }
       accionDeuda(ev);

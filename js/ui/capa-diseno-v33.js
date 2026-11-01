@@ -36,7 +36,7 @@
       overlay.classList.add('rv-ready');
     }
     function registrarReveal(){
-      var sel = '.wiz-feat-card2,.plan,.wiz-info-card,.wiz-banner,.wiz-quote,.wiz-secondary-btn,.catalogo-promo-btn';
+      var sel = '.wiz-feat-card2,.plan,.wiz-info-card,.wiz-banner,.wiz-quote,.wiz-secondary-btn,.estado-cta';
       overlay.querySelectorAll(sel).forEach(function(el){
         if(el.dataset.rv) return; el.dataset.rv = '1';
         if(io){ el.classList.add('rv'); io.observe(el); }

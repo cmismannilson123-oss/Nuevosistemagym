@@ -73,6 +73,25 @@ window.cyAvisarIntento = function(){
   } catch (e) {}
 };
 
+// Pantalla de estado al marcar (bloqueada, agotada o vencida). Un solo diseño para las tres.
+// conPlanes: añade el botón "Ver todos los planes".
+function pantallaEstado({ icono, titulo, nombre, texto, conPlanes }) {
+  const cta = conPlanes ? `<button type="button" class="estado-cta" onclick="abrirPlanesDesdeVencimiento()">
+      <span class="estado-cta-ico"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i></span>
+      <span class="estado-cta-txt"><b>Ver todos los planes</b><small>Elige el plan que mejor te convenga</small></span>
+      <i class="fa-solid fa-chevron-right estado-cta-flecha" aria-hidden="true"></i>
+    </button>` : "";
+  return `<div class="estado-pantalla">
+    <section class="estado" role="alert">
+      <div class="estado-icono" aria-hidden="true"><i class="fa-solid ${icono}"></i></div>
+      <h2 class="estado-titulo">${titulo}</h2>
+      <h3 class="estado-nombre">${escaparHTML(nombre)}</h3>
+      <p class="estado-texto">${texto}</p>
+    </section>
+    ${cta}
+  </div>`;
+}
+
 window.buscarQR = async function(esPrimeraVez){
   let telefonoGuardado = leerTelefonoSeguro();
   let phoneInput = document.getElementById("qrPhone");
@@ -137,7 +156,7 @@ window.buscarQR = async function(esPrimeraVez){
   if (parseFloat(socio.deuda || 0) > 0 && socio.fecha_deuda) {
     const diasDeuda = Math.floor((new Date() - new Date(socio.fecha_deuda)) / 86400000);
     if (diasDeuda > 7) {
-      div.innerHTML = `<div class="card" style="border:2px solid #ef4444; text-align:center;"><h2 style="color:#ef4444;">🚫 ACCESO BLOQUEADO</h2><h3>${escaparHTML(socio.nombre)}</h3><p>💰 Deuda pendiente: S/ ${escaparHTML(socio.deuda)}</p><p>Regularice su pago para habilitar su acceso.</p></div>`;
+      div.innerHTML = pantallaEstado({ icono: "fa-lock", titulo: "ACCESO BLOQUEADO", nombre: socio.nombre, texto: `Deuda pendiente: <b>S/ ${escaparHTML(socio.deuda)}</b><br>Regularice su pago para habilitar su acceso.` });
       playSound("VENCIDO");
       cyAvisarIntento();
       return;
@@ -147,19 +166,7 @@ window.buscarQR = async function(esPrimeraVez){
   // 2. VALIDACIÓN DE ASISTENCIAS AGOTADAS (Planes interdiarios / por cupos)
   const esInterdiario = (socio.tipo_memb || "").toLowerCase().includes("interdiario");
   if ((esInterdiario && socio.dias_restantes <= 0) || estado === "AGOTADO") {
-    div.innerHTML = `<div class="card" style="border:2px solid #ef4444; text-align:center;">
-      <h2 style="color:#ef4444;">🚫 MEMBRESÍA AGOTADA</h2>
-      <h3>${escaparHTML(socio.nombre)}</h3>
-      <p>Ha consumido todas las asistencias de su plan.<br><br>Acérquese a recepción para renovar.</p>
-    </div>
-    <div class="catalogo-promo-btn" onclick="abrirPlanesDesdeVencimiento()">
-      <div style="width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#dc2626,#7f1d1d);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">📋</div>
-      <div class="catalogo-promo-text">
-        <div class="t1">Ver todos los planes</div>
-        <div class="t2">Elige el plan que mejor te convenga</div>
-      </div>
-      <div class="catalogo-promo-arrow">›</div>
-    </div>`;
+    div.innerHTML = pantallaEstado({ icono: "fa-ban", titulo: "MEMBRESÍA AGOTADA", nombre: socio.nombre, texto: "Ha consumido todas las asistencias de su plan.<br>Acérquese a recepción para renovar.", conPlanes: true });
     playSound("VENCIDO");
     cyAvisarIntento();
     return;
@@ -167,19 +174,7 @@ window.buscarQR = async function(esPrimeraVez){
 
   // 3. VALIDACIÓN DE MEMBRESÍA VENCIDA POR FECHA
   if(estado === "VENCIDO"){
-    div.innerHTML = `<div class="card" style="border:2px solid #ef4444; text-align:center;">
-      <h2 style="color:#ef4444;">❌ MEMBRESÍA VENCIDA</h2>
-      <h3>${escaparHTML(socio.nombre)}</h3>
-      <p>Su membresía ha vencido por fecha calendario.<br><br>Acérquese a recepción para renovar.</p>
-    </div>
-    <div class="catalogo-promo-btn" onclick="abrirPlanesDesdeVencimiento()">
-      <div style="width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#dc2626,#7f1d1d);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;">📋</div>
-      <div class="catalogo-promo-text">
-        <div class="t1">Ver todos los planes</div>
-        <div class="t2">Elige el plan que mejor te convenga</div>
-      </div>
-      <div class="catalogo-promo-arrow">›</div>
-    </div>`;
+    div.innerHTML = pantallaEstado({ icono: "fa-calendar-xmark", titulo: "MEMBRESÍA VENCIDA", nombre: socio.nombre, texto: "Su membresía ha vencido por fecha calendario.<br>Acérquese a recepción para renovar.", conPlanes: true });
     playSound("VENCIDO");
     cyAvisarIntento();
     return;

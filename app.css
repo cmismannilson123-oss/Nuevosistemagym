@@ -600,10 +600,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, .tabbtn:focus-v
 }
 .modal-backdrop{ animation: modalBackdropFade .25s ease-out; }
 .modal-panel{ animation: modalPanelPop .35s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-.catalogo-promo-btn:hover, .catalogo-promo-btn:active{
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(220,38,38,.25);
-}
 
 /* TARJETAS PREMIUM Y CONTENEDORES */
 .card{
@@ -1191,7 +1187,6 @@ input:focus, select:focus, textarea:focus{
 .open-chip.cerrado .dot{ background:#94a3b8; box-shadow:0 0 0 4px rgba(148,163,184,.15); }
 
 /* Botones de la experiencia pública */
-.catalogo-promo-btn:active{ transform:scale(.985); }
 
 @media (min-width:760px){
   .wiz-overlay .wiz-screen{ max-width:760px; }
@@ -4150,3 +4145,48 @@ html[data-rol="admin"] #btnCerrarSesion{ display:none !important; }
   color:#fbbf24; background:rgba(251,191,36,.1); border:1px solid rgba(251,191,36,.3); box-shadow:none;
 }
 .topbar-spacer{ height:var(--cy-top,62px) !important; flex-shrink:0; }
+
+/* ---------- Pantallas de estado al marcar: bloqueada, agotada o vencida ---------- */
+.estado-pantalla{ display:grid; gap:14px; max-width:440px; margin:0 auto; padding:4px 0 14px; }
+.estado{
+  padding:26px 22px 22px; border-radius:24px; text-align:center;
+  background:linear-gradient(180deg, rgba(127,29,29,.30) 0%, rgba(10,16,23,.96) 52%);
+  border:1px solid rgba(248,113,113,.32);
+  box-shadow:0 24px 48px -28px rgba(220,38,38,.55), inset 0 1px 0 rgba(255,255,255,.06);
+}
+.estado-icono{
+  width:64px; height:64px; margin:0 auto 14px; border-radius:50%;
+  display:grid; place-items:center; font-size:26px; color:#fecaca;
+  background:radial-gradient(circle at 30% 25%, rgba(248,113,113,.38), rgba(127,29,29,.55));
+  box-shadow:0 0 0 6px rgba(248,113,113,.10), 0 12px 28px -12px rgba(248,113,113,.7);
+}
+.estado-titulo{
+  margin:0; font-family:var(--cy-display); font-size:26px; font-weight:800;
+  letter-spacing:.6px; line-height:1.1; text-transform:uppercase; color:#fca5a5;
+}
+.estado-nombre{
+  margin:14px 0 0; padding-top:14px; border-top:1px solid rgba(255,255,255,.08);
+  font-size:20px; font-weight:700; color:#f8fafc;
+}
+.estado-texto{ margin:12px 0 0; font-size:14.5px; line-height:1.55; color:#cbd5e1; }
+.estado-texto b{ color:#fef2f2; }
+.estado-cta{
+  width:100%; display:flex; align-items:center; gap:14px; padding:16px 18px; box-sizing:border-box;
+  border-radius:20px; border:1px solid rgba(255,255,255,.1); cursor:pointer; text-align:left;
+  font:inherit; color:#f8fafc;
+  background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  box-shadow:0 18px 36px -24px rgba(0,0,0,.9);
+  transition:transform .15s ease-out, border-color .2s ease;
+}
+.estado-cta:active{ transform:scale(.985); }
+.estado-cta:focus-visible{ outline:3px solid #fca5a5; outline-offset:3px; }
+.estado-cta-ico{
+  width:52px; height:52px; flex:none; border-radius:16px; display:grid; place-items:center;
+  font-size:20px; color:#fff; background:linear-gradient(145deg, #f43f5e, #9f1239);
+  box-shadow:0 10px 22px -10px rgba(244,63,94,.9);
+}
+.estado-cta-txt{ flex:1; min-width:0; display:grid; gap:3px; }
+.estado-cta-txt b{ font-size:16px; font-weight:800; }
+.estado-cta-txt small{ font-size:12.5px; line-height:1.35; color:#94a3b8; }
+.estado-cta-flecha{ flex:none; color:#fca5a5; font-size:14px; }
+@media (prefers-reduced-motion: reduce){ .estado-cta{ transition:none; } }

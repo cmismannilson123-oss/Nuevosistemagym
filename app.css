@@ -497,7 +497,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, .tabbtn:focus-v
 }
 #wizConoce .wiz-topbar.scrolled{ background:rgba(7,13,20,.94); border-bottom-color:rgba(52,211,153,.2); }
 .wiz-back{ width:38px; height:38px; min-width:38px; border-radius:50%; background:#dc2626; border:none; color:#fff; display:flex; align-items:center; justify-content:center; font-size:19px; font-weight:900; cursor:pointer; box-shadow:0 0 14px rgba(220,38,38,.65), 0 4px 10px rgba(0,0,0,.35); }
-.wiz-title{ color:#34d399; font-weight:800; font-size:12.5px; letter-spacing:.6px; text-transform:uppercase; }
+/* Título de las pantallas de bienvenida, inscripción e ingreso */
+.wiz-title{ font-family:var(--cy-display); font-size:21px; font-weight:700; letter-spacing:.4px; text-transform:none; color:#fff; }
 .wiz-p{ color:#94a3b8; font-size:13px; text-align:left; margin:0 0 18px; line-height:1.5; }
 
 .wiz-grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px; }
@@ -1157,10 +1158,6 @@ input:focus, select:focus, textarea:focus{
 
 .wiz-overlay{ padding-top:0 !important; background:#070d14 !important; }
 .wiz-overlay .wiz-screen{ max-width:460px; }
-.wiz-title{
-  font-family:var(--cy-display); font-size:21px !important; font-weight:700 !important;
-  letter-spacing:.4px !important; text-transform:none !important; color:#fff !important;
-}
 .cy-hero{ position:relative; height:200px; border-radius:var(--cy-r-lg); overflow:hidden; margin-bottom:18px; isolation:isolate; background:#0b1220; }
 .cy-hero-img{
   position:absolute; left:0; right:0; top:-14%; bottom:-14%;
@@ -4058,7 +4055,6 @@ html[data-rol="admin"] #btnCerrarSesion{ display:none !important; }
 .qr-login{ margin-top:6px; text-align:left; animation:qrLoginIn .32s cubic-bezier(.2,.8,.2,1); }
 @keyframes qrLoginIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
 .qr-login-top{ display:flex; align-items:center; gap:12px; margin:0 0 14px; }
-.qr-login .wiz-title{ font-family:var(--cy-display); font-size:14px; letter-spacing:.9px; }
 
 .qr-login-card, .insc-card{
   padding:22px 18px 20px; border-radius:22px;

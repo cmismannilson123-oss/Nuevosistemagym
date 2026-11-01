@@ -19,3 +19,26 @@ window.cyConfirmarIngreso = function(nombre){
     setTimeout(cerrar, 2400);
   }catch(e){}
 };
+
+// Sonido de error fuerte del panel (sintetizado: no depende de internet ni de archivos).
+// Tres tonos cuadrados que bajan: se usa con las tarjetas de vencido, agotado o bloqueado.
+window.cyAlertaError = function(){
+  try{
+    var Ctx = window.AudioContext || window.webkitAudioContext;
+    if(!Ctx) return;
+    var ctx = window._cyAudioError || (window._cyAudioError = new Ctx());
+    if(ctx.state === "suspended") ctx.resume();
+    var t = ctx.currentTime;
+    [0, 0.42, 0.84].forEach(function(dt){
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = "square";
+      o.frequency.setValueAtTime(880, t + dt);
+      o.frequency.linearRampToValueAtTime(330, t + dt + 0.32);
+      g.gain.setValueAtTime(0.0001, t + dt);
+      g.gain.exponentialRampToValueAtTime(0.5, t + dt + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dt + 0.34);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t + dt); o.stop(t + dt + 0.36);
+    });
+  }catch(e){}
+};

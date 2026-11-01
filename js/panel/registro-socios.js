@@ -202,7 +202,7 @@ async function mostrarTarjetaBusqueda(socio){
   const puede = !!resumen && !resumen.bloquea && socioPuedeIngresar(socio);
   estadoBotonIngreso(puede ? "listo" : "no");
   const estadoHtml = tarjetaEstadoBusqueda(socio, resumen);
-  if (estadoHtml) { div.innerHTML = estadoHtml; return; }
+  if (estadoHtml) { cyAlertaError(); div.innerHTML = estadoHtml; return; }
   const c = scCuerpo(socio);
   const aviso = !resumen
     ? `<p class="td-error"><i class="fa-solid fa-circle-exclamation"></i> No se pudo verificar la deuda de tienda. Intente de nuevo.</p>`
@@ -298,7 +298,7 @@ window.asistenciaNueva = async function(dni, diasRestantesPasados, socioConocido
   const esInterdiario = (socio.tipo_memb || "").toLowerCase().includes("interdiario");
   if(esInterdiario && socio.dias_restantes <= 0){
     mostrarTarjetaEstado("🚫 MEMBRESÍA AGOTADA", `<b>${escaparHTML(socio.nombre)}</b><br><br>Ha consumido las 15 asistencias de su plan Interdiario.<br><br>Acérquese a recepción para renovar su membresía.`);
-    playSound("VENCIDO");
+    cyAlertaError();
     return false;
   }
 
@@ -306,7 +306,7 @@ window.asistenciaNueva = async function(dni, diasRestantesPasados, socioConocido
   let estado = estadoSocio(socio);
   if(estado === "VENCIDO"){
     mostrarTarjetaEstado("❌ MEMBRESÍA VENCIDA", "Su membresía ha vencido por fecha calendario.<br><br>Acérquese a recepción para renovarla.");
-    playSound("VENCIDO");
+    cyAlertaError();
     return false;
   }
 
@@ -314,7 +314,7 @@ window.asistenciaNueva = async function(dni, diasRestantesPasados, socioConocido
     const diasDeuda = Math.floor((new Date() - new Date(socio.fecha_deuda)) / 86400000);
     if (diasDeuda > 7) {
       mostrarTarjetaEstado("🚫 ACCESO BLOQUEADO", `<b>${escaparHTML(socio.nombre)}</b><br><br>💰 Deuda pendiente: <b>S/ ${escaparHTML(socio.deuda)}</b><br><br>Regularice su pago para habilitar su acceso.`, "#ef4444");
-      playSound("VENCIDO");
+      cyAlertaError();
       return false;
     }
   }

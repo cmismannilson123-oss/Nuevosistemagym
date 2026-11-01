@@ -399,36 +399,11 @@ window.asistenciaNueva = async function(dni, diasRestantesPasados, socioConocido
     render();
   }
 
-  // Si es ingreso manual por DNI, pintamos el mensaje local
+  // La confirmación es la pantalla animada de cyConfirmarIngreso (arriba). Aquí solo se
+  // limpia la búsqueda tras un momento, igual que antes.
   const resDiv = document.getElementById("resultado");
   if(resDiv) {
-    const dateHoy = new Date();
-    dateHoy.setHours(0,0,0,0);
-    const dateFinSocio = new Date(socio.fecha_fin + "T00:00:00");
-    const diasRestantesCard = Math.max(0, Math.round((dateFinSocio - dateHoy) / 86400000));
-
-    const _tot = Number(socio.dias_totales) || 0;
-    const _deuda = parseFloat(socio.deuda || 0) > 0;
-    resDiv.innerHTML = `
-    <article class="sc sc--activo ig-ok">
-      <div class="ig-ok-top">
-        <span class="ig-ok-check" aria-hidden="true"><i class="fa-solid fa-check"></i></span>
-        <div class="sc-id">
-          <span>Ingreso registrado a las ${escaparHTML(hora.slice(0, 5))}</span>
-          <h4>${escaparHTML(socio.nombre)}</h4>
-        </div>
-      </div>
-      <div class="sc-stats">
-        <div><span>Plan</span><b class="ig-ok-plan">${escaparHTML(String(socio.tipo_memb || "—").trim())}</b></div>
-        <div><span>Quedan</span><b class="${diasRestantesCard <= 5 ? "warn" : ""}">${diasRestantesCard} ${diasRestantesCard === 1 ? "día" : "días"}</b></div>
-        <div><span>Asistencias</span><b>${_tot ? (_tot - nuevosDias) + `<i>/${_tot}</i>` : "—"}</b></div>
-      </div>
-      ${_deuda ? `<div class="sc-deuda si"><span><i class="fa-solid fa-sack-dollar"></i> Deuda pendiente</span><b>S/ ${escaparHTML(socio.deuda)}</b></div>`
-               : `<div class="sc-deuda no"><span><i class="fa-solid fa-circle-check"></i> Sin deuda</span><b>S/ 0</b></div>`}
-    </article>`;
-
-    // Si el recepcionista empieza a escribir el siguiente DNI antes de que
-    // termine esta pausa, buscarAutomatico() cancela la limpieza (no le borra lo escrito)
+    if (cyLimpiarBusqueda) clearTimeout(cyLimpiarBusqueda);
     cyLimpiarBusqueda = setTimeout(()=>{
       const bDni = document.getElementById("buscarDni");
       if(bDni) bDni.value="";

@@ -51,6 +51,11 @@ class MainActivity : AppCompatActivity() {
             override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
                 val host = Uri.parse(PANEL_URL).host
                 if (request.url.host == host) return false
+                // Enlaces de WhatsApp (wa.me, api.whatsapp.com, whatsapp://): van directo a la app de WhatsApp
+                if (request.url.host == "wa.me" || request.url.host == "api.whatsapp.com" || request.url.scheme == "whatsapp") {
+                    Comprobantes.abrirWhatsApp(this@MainActivity, request.url)
+                    return true
+                }
                 startActivity(Intent(Intent.ACTION_VIEW, request.url))
                 return true
             }

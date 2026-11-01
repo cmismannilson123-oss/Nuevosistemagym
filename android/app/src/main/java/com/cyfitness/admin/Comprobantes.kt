@@ -66,6 +66,17 @@ object Comprobantes {
         act.startActivity(intent)
     }
 
+    // Enlace wa.me / api.whatsapp.com / whatsapp:// abierto dentro de la app: va a WhatsApp (o WhatsApp Business)
+    // con el mismo chat y texto. Si no se puede, se usa cualquier app que lo maneje.
+    fun abrirWhatsApp(act: Activity, enlace: Uri) {
+        val paquete = whatsapp(act)
+        try {
+            act.startActivity(Intent(Intent.ACTION_VIEW, enlace).apply { if (paquete != null) setPackage(paquete) })
+        } catch (e: Exception) {
+            act.startActivity(Intent(Intent.ACTION_VIEW, enlace))
+        }
+    }
+
     // Sin número o sin WhatsApp: se comparte la imagen con el selector de apps
     private fun compartir(act: Activity, archivo: File, mensaje: String) {
         val uri = FileProvider.getUriForFile(act, act.packageName + ".fileprovider", archivo)

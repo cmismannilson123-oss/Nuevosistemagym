@@ -67,11 +67,15 @@ async function enviarReciboPremium(){
     // Descarga del comprobante. Dentro de la app Android la descarga normal no funciona:
     // la app lo guarda en Descargas.
     const nombreArchivo = `voucher-${dni}-${numero}.png`;
-    if (window.AndroidApp) {
+    const appNueva = !!(window.AndroidApp && typeof window.AndroidApp.compartirComprobante === "function");
+    if (appNueva) {
       // En la app: se guarda en Descargas y se abre WhatsApp con la imagen adjunta
       const listo = window.AndroidApp.compartirComprobante(img, nombreArchivo, mensaje, "51" + telefono);
       mostrarToast(listo ? "✅ Se abrió el chat del socio. Adjunta el comprobante de Descargas y envía" : "⚠️ No se pudo preparar el comprobante", listo ? "#10b981" : "#ef4444");
       return;
+    } else if (window.AndroidApp) {
+      // APK antiguo instalado: no tiene el envío con imagen y no puede descargar desde la web
+      mostrarToast("⚠️ Actualiza la app C&Y Recepción para enviar el comprobante con imagen", "#f59e0b");
     } else {
       const a = document.createElement("a");
       a.href = img;

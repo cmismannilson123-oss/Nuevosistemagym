@@ -5,6 +5,7 @@ async function inicializarFlujoQR(){
   // compitiendo entre sí por la misma conexión y haciendo sentir todo más lento.
   if (window._flujoQREnCurso) return;
   window._flujoQREnCurso = true;
+  cyAplicarFondoPortada(); // sin esperar: el fondo no retrasa la pantalla
   try {
     await inicializarFlujoQRInterno();
   } finally {

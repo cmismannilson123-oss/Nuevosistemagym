@@ -801,6 +801,7 @@ async function inicializarFlujoQR(){
   // compitiendo entre sí por la misma conexión y haciendo sentir todo más lento.
   if (window._flujoQREnCurso) return;
   window._flujoQREnCurso = true;
+  cyAplicarFondoPortada(); // sin esperar: el fondo no retrasa la pantalla
   try {
     await inicializarFlujoQRInterno();
   } finally {
@@ -944,6 +945,27 @@ async function sincronizarDatosSilencioso() {
 const SUPABASE_URL = "https://ygbiqnbygjbrmwyttkku.supabase.co";
 
 const SUPABASE_KEY = "sb_publishable_M9fPsgu2VkCyu9ro0ECx8A_no-0RLLt";
+
+let _fondoPortadaPedido = false;
+
+async function cyAplicarFondoPortada(){
+  if (_fondoPortadaPedido) return; // una sola lectura por carga de página
+  _fondoPortadaPedido = true;
+  try {
+    if (typeof supabaseClient === 'undefined') return;
+    const { data, error } = await supabaseClient.rpc('fondo_portada_url');
+    if (error || !data) return;
+    // Solo imágenes del almacenamiento de este proyecto
+    if (!/^https:\/\/.+\/storage\/v1\/object\/public\/fondo-portada\//.test(data)) return;
+    const el = document.querySelector('.cy-bg-photo');
+    if (!el) return;
+    const img = new Image();
+    img.onload = () => { el.style.backgroundImage = 'url("' + data + '")'; };
+    img.src = data;
+  } catch (e) {
+    // Sin fondo subido o sin conexión: se queda la foto por defecto
+  }
+}
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 

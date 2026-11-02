@@ -13,8 +13,8 @@ App web del gimnasio: `gym.html` (panel de administración y check-in por QR con
   `registrar_asistencia_qr`, `registrar_prospecto_qr` y `premio_activo_qr`. El socio se
   identifica con **teléfono + DNI** (solo la primera vez en cada celular; queda guardado).
   Tras 8 intentos fallidos con un mismo teléfono, se bloquea 15 minutos.
-- Los avisos de ingreso al celular (ntfy) los manda la base de datos al guardarse cada
-  asistencia. El canal es aleatorio y está guardado en `admin_config`, no en la página.
+- Los avisos de ingreso al celular los manda la base de datos al guardarse cada asistencia
+  (Web Push / FCM, ver más abajo). ntfy ya no se usa.
 
 Migración: `supabase/migrations/20261006000000_seguridad_auth_rls.sql`.
 
@@ -38,10 +38,7 @@ Hay que hacerlo **todo junto**: en cuanto se aplica la migración, la versión v
    ```
 
 5. **Subir `gym.html` y `sw.js` nuevos** al hosting donde está la app.
-6. **Suscribirse al canal nuevo de avisos.** En el *SQL Editor*:
-   `select valor from public.admin_config where clave = 'ntfy_topic';`
-   En la app ntfy, suscríbete a ese nombre y borra la suscripción vieja
-   (`gym-clisman-alertas-2026`, que ya es público).
+6. **Activar las notificaciones del celular** con el botón de la campana del panel (ver *Notificaciones* más abajo).
 7. En cada celular o PC del gimnasio: abrir la app, **recargar una vez** (el service worker
    puede mostrar la versión anterior en la primera carga) e iniciar sesión con el correo y la
    contraseña.
@@ -63,7 +60,7 @@ el estado llega en la misma consulta del QR, así que no hace más lento el regi
 | **Pase de invitado** | Socios activos cuyo plan no es interdiario | 1 por mes calendario (no se acumula) |
 | **10% por pago anticipado** | Planes que mencionan "mes" o "personalizado", excepto interdiario | Hasta un día antes del vencimiento; una vez por periodo. Se reactiva al renovar |
 
-Cada uso queda guardado en `public.cupones_uso` y manda un aviso al canal de ntfy. En el panel:
+Cada uso queda guardado en `public.cupones_uso`. En el panel:
 - **Ingreso → "Cupones usados hoy"**: se actualiza en vivo cuando un socio usa un cupón.
 - **Invitar → Cupones**: historial por mes con totales (`listar_cupones_usados`,
   `supabase/migrations/20261007010000_cupones_panel.sql`).
@@ -112,8 +109,6 @@ movimientos agrupados por día con su total.
   cerrada y el celular bloqueado. Migración: `supabase/migrations/20261010000000_push.sql`.
   Las llaves VAPID y el secreto están en `admin_config` (no en el código).
 - **Voz en recepción:** con el panel abierto, anuncia los ingresos por QR.
-- ntfy sigue funcionando en paralelo; para apagarlo:
-  `delete from public.admin_config where clave = 'ntfy_topic';`
 
 ## Voz natural (IA) — gratis
 

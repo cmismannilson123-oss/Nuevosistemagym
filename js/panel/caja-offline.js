@@ -51,8 +51,8 @@ window.addEventListener('online', () => cyCajaVaciarCola());
 setInterval(() => { if (cyCajaCola().length) cyCajaVaciarCola(); }, 30000);
 setTimeout(() => { if (cyCajaCola().length) cyCajaVaciarCola(); }, 4000);
 
-// Los avisos de ingreso al celular (ntfy) los manda la base de datos al
-// guardarse cada asistencia; el canal es secreto y NO está en esta página.
+// Los avisos de ingreso al celular los manda la base de datos (Web Push / FCM) al
+// guardarse cada asistencia.
 
 let accesoAdmin = false; 
 let dataGlobal = [];

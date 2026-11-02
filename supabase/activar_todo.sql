@@ -224,51 +224,6 @@ grant execute on function public.listar_prospectos_qr() to authenticated;
 alter function public._premio_defecto() set search_path = '';
 revoke all on function public.rls_auto_enable() from public, anon, authenticated;
 create extension if not exists pg_net;
-insert into public.admin_config (clave, valor)
-values ('ntfy_topic', 'cy-gym-' || replace(gen_random_uuid()::text, '-', ''))
-on conflict (clave) do nothing;
-create or replace function public._notificar_asistencia()
-returns trigger
-language plpgsql
-security definer
-set search_path = ''
-as $$
-declare
-v_topic text;
-s record;
-v_fecha text := '^(\d{4})-(\d{2})-(\d{2})$';
-begin
-select valor into v_topic from public.admin_config where clave = 'ntfy_topic';
-if v_topic is null then
-return new;
-end if;
-select tipo_memb, inicio, fecha_fin, dias_restantes into s
-from public.socios where dni = new.dni limit 1;
-perform net.http_post(
-url := 'https://ntfy.sh/',
-body := jsonb_build_object(
-'topic', v_topic,
-'title', '🏋️ C&Y Fitness Gym',
-'priority', 4,
-'tags', jsonb_build_array('dumbbell'),
-'message', format(E'Ingreso registrado (%s): %s.\nPlan: %s.\nInicio: %s | Vence: %s.\nRestan: %s asistencias.',
-coalesce(new.metodo, 'Manual'), new.nombre, coalesce(s.tipo_memb, '-'),
-coalesce(regexp_replace(s.inicio, v_fecha, '\3/\2/\1'), '--/--/----'),
-coalesce(regexp_replace(s.fecha_fin, v_fecha, '\3/\2/\1'), '--/--/----'),
-greatest(0, coalesce(s.dias_restantes, 0) - 1))
-),
-headers := '{"Content-Type": "application/json"}'::jsonb
-);
-return new;
-exception when others then
-return new;
-end;
-$$;
-revoke all on function public._notificar_asistencia() from public, anon, authenticated;
-drop trigger if exists tr_notificar_asistencia on public.historial_asistencia;
-create trigger tr_notificar_asistencia
-after insert on public.historial_asistencia
-for each row execute function public._notificar_asistencia();
 insert into public.staff (user_id, nombre) select id, 'Administrador' from auth.users where lower(email) = 'fitnessgym21@gmail.com' on conflict (user_id) do nothing;
 select set_config('prueba.tel', telefono, true), set_config('prueba.dni', dni, true), set_config('prueba.total', (select count(*) from public.socios)::text, true) from public.socios where telefono ~ '^[0-9]{6,15}$' and dni ~ '^[0-9]{6,12}$' limit 1;
 set local role anon;
@@ -295,4 +250,4 @@ end $$;
 reset role;
 delete from public.qr_intentos;
 commit;
-select 'TODO LISTO' as estado, (select valor from public.admin_config where clave = 'ntfy_topic') as canal_ntfy_nuevo, (select count(*) from public.socios) as socios;
+select 'TODO LISTO' as estado, (select count(*) from public.socios) as socios;

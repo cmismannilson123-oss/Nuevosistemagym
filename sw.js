@@ -83,6 +83,7 @@ const ARCHIVOS_APP = [
   './js/core/service-worker.js',
   './js/core/supabase.js',
   './js/panel/comprobantes-whatsapp.js',
+  './js/panel/fondo-portada.js',
   './js/panel/qr-invitacion.js',
   './js/panel/recibos.js',
   './js/ui/accesibilidad-v41.js',

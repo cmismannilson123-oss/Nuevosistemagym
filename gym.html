@@ -265,7 +265,7 @@
            el propio sistema del celular. No se ve, no interrumpe la búsqueda, y solo
            se activa después de encontrar al socio (ver guardarCredencialNavegador). -->
       <iframe name="credSaveFrame" style="display:none;" tabindex="-1" aria-hidden="true"></iframe>
-      <form id="credSaveForm" target="credSaveFrame" style="display:none;" autocomplete="on">
+      <form id="credSaveForm" method="post" action="guardar-acceso.html" target="credSaveFrame" style="display:none;" autocomplete="on">
         <input type="text" name="username" id="credSaveUser" autocomplete="username">
         <input type="password" name="password" id="credSavePass" autocomplete="new-password">
       </form>

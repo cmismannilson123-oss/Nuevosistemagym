@@ -22,11 +22,9 @@ object Comprobantes {
         return try {
             val bytes = Base64.decode(dataUrl.substringAfter("base64,"), Base64.DEFAULT)
             guardarEnDescargas(act, bytes, nombre)
-            val numero = telefono.filter { it.isDigit() }
-            // Socio sin WhatsApp: el comprobante solo queda en Descargas, no se abre ningún chat ni selector
-            if (numero.isEmpty()) return true
             val carpeta = File(act.cacheDir, "comprobantes").apply { mkdirs() }
             val archivo = File(carpeta, nombre).apply { writeBytes(bytes) }
+            val numero = telefono.filter { it.isDigit() }
             val paquete = whatsapp(act)
             act.runOnUiThread {
                 // Con WhatsApp y número válido: abre el chat de ese socio con el mensaje listo.

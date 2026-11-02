@@ -1,10 +1,8 @@
 // Recibo premium del panel.
 // Clásico (no módulo): mismo ámbito global y mismo orden que antes.
 let _reciboOcupado = false;
-// opts.soloDescarga: socio sin WhatsApp -> solo genera y descarga el comprobante, sin abrir chat
-async function enviarReciboPremium(opts){
+async function enviarReciboPremium(){
   if (_reciboOcupado) return; // evita toques repetidos mientras se genera
-  const soloDescarga = !!(opts && opts.soloDescarga);
   let telefono = document.getElementById("telefono").value;
   let nombre = document.getElementById("nombre").value;
   let dni = document.getElementById("dni").value;
@@ -13,13 +11,13 @@ async function enviarReciboPremium(opts){
   let inicio = document.getElementById("inicio").value;
   let fin = document.getElementById("fin").value;
 
-  if(!soloDescarga && !telefono){
+  if(!telefono){
     mostrarToast("📱 Ingrese un número de WhatsApp", "#f59e0b");
     return;
   }
 
   _reciboOcupado = true;
-  const btn = document.querySelector(".cy-act-combo");
+  const btn = document.querySelector(".cy-act-wa");
   if (btn) { btn.disabled = true; btn.style.opacity = ".75"; }
   mostrarToast("⏳ Preparando comprobante…", "#3b82f6");
 
@@ -72,9 +70,8 @@ async function enviarReciboPremium(opts){
     const appNueva = !!(window.AndroidApp && typeof window.AndroidApp.compartirComprobante === "function");
     if (appNueva) {
       // En la app: se guarda en Descargas y se abre WhatsApp con la imagen adjunta
-      const listo = window.AndroidApp.compartirComprobante(img, nombreArchivo, mensaje, soloDescarga ? "" : "51" + telefono);
-      if (soloDescarga) mostrarToast(listo ? "✅ Comprobante guardado en Descargas" : "⚠️ No se pudo guardar el comprobante", listo ? "#10b981" : "#ef4444");
-      else mostrarToast(listo ? "✅ Se abrió el chat del socio. Adjunta el comprobante de Descargas y envía" : "⚠️ No se pudo preparar el comprobante", listo ? "#10b981" : "#ef4444");
+      const listo = window.AndroidApp.compartirComprobante(img, nombreArchivo, mensaje, "51" + telefono);
+      mostrarToast(listo ? "✅ Se abrió el chat del socio. Adjunta el comprobante de Descargas y envía" : "⚠️ No se pudo preparar el comprobante", listo ? "#10b981" : "#ef4444");
       return;
     } else if (window.AndroidApp) {
       // APK antiguo instalado: no tiene el envío con imagen y no puede descargar desde la web
@@ -89,7 +86,6 @@ async function enviarReciboPremium(opts){
     }
 
     // Abrir WhatsApp enseguida: en celular directo a la app, con respaldo a la web
-    if (soloDescarga) { mostrarToast("✅ Comprobante descargado", "#10b981"); return; }
     setTimeout(() => {
       if (esMovil) {
         window.location.href = urlApp;
@@ -100,7 +96,6 @@ async function enviarReciboPremium(opts){
     }, 250);
   } catch (e) {
     console.error("Error generando comprobante:", e);
-    if (soloDescarga) { mostrarToast("⚠️ No se pudo generar el comprobante", "#ef4444"); return; }
     mostrarToast("⚠️ No se pudo generar el comprobante, abriendo WhatsApp…", "#f59e0b");
     window.open(urlWeb, "_blank");
   } finally {

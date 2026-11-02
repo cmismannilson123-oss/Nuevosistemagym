@@ -464,7 +464,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, .tabbtn:focus-v
     url('https://images.unsplash.com/photo-1744551154623-4b5336e95c28?q=80&w=1400&auto=format&fit=crop') center/cover no-repeat;
 }
 .qr-hero-content{ max-width: 420px; margin: 0 auto; text-align:center; padding-top: 8vh; }
-.qr-hero-divider{ width:60px; height:3px; background:#34d399; border-radius:3px; margin:16px auto 26px; }
+.qr-hero-divider{ width:60px; height:3px; background:linear-gradient(90deg,#A9823F,#F3DFA2,#A9823F); border-radius:3px; margin:16px auto 26px; }
 
 /* ---- Ventana flotante a pantalla completa para "Nuevo / Quiero conocer el gym" ---- */
 .wiz-overlay{
@@ -1134,7 +1134,7 @@ input:focus, select:focus, textarea:focus{
   font-weight:800 !important;
   letter-spacing:.5px;
 }
-.qr-hero-content .qr-titulo .accent{ font-size:1.16em !important; letter-spacing:2px; }
+.qr-hero-content .qr-titulo .accent{ font-size:1.16em !important; letter-spacing:2px; color:#E8C77F; }
 .qr-hero-content .qr-sub{ font-size:14px !important; font-weight:600 !important; letter-spacing:.2px; }
 
 @keyframes cyFadeIn{ from{ opacity:0; } to{ opacity:1; } }
@@ -1259,17 +1259,17 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{ box-shadow:0 0 
 }
 .cy-bg::after{
   content:""; position:absolute; inset:0;
-  background:linear-gradient(180deg,rgba(4,8,7,.52) 0%,rgba(4,8,7,.64) 45%,rgba(3,6,6,.92) 78%,rgba(2,4,4,.98) 100%);
+  background:linear-gradient(180deg,rgba(9,8,6,.52) 0%,rgba(9,8,6,.64) 45%,rgba(7,6,5,.92) 78%,rgba(4,3,3,.98) 100%);
 }
 .cy-glow{
   position:absolute; left:50%; top:25%; width:560px; height:560px; margin:-280px 0 0 -280px; z-index:1;
-  background:radial-gradient(circle,rgba(16,185,129,.30),transparent 62%);
+  background:radial-gradient(circle,rgba(212,175,106,.26),transparent 62%);
   animation:cyGlow 5.5s ease-in-out infinite;
 }
 @keyframes cyGlow{ 0%,100%{ opacity:.45; } 50%{ opacity:.95; } }
 .cy-p{
   position:absolute; bottom:-10px; left:var(--x); width:var(--s); height:var(--s); z-index:2;
-  border-radius:50%; background:rgba(110,231,183,.85); opacity:0;
+  border-radius:50%; background:rgba(243,223,162,.85); opacity:0;
   animation:cyRiseP var(--t) linear var(--d) infinite;
 }
 @keyframes cyRiseP{
@@ -1283,20 +1283,20 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{ box-shadow:0 0 
 .qr-hero-content .qr-logo-ring{
   position:relative; width:136px; height:136px; margin:0 auto 18px;
   border:0; border-radius:50%;
-  background:radial-gradient(circle,rgba(16,185,129,.16),rgba(0,0,0,.4) 72%);
-  box-shadow:inset 0 0 0 2px rgba(16,185,129,.38), 0 0 26px rgba(16,185,129,.22);
+  background:radial-gradient(circle,rgba(212,175,106,.16),rgba(0,0,0,.4) 72%);
+  box-shadow:inset 0 0 0 2px rgba(212,175,106,.42), 0 0 26px rgba(212,175,106,.20);
   animation:cyLogoIn .5s ease-out .2s backwards;
 }
 .qr-hero-content .qr-logo-ring::before{
   content:""; position:absolute; inset:0; border-radius:50%;
-  background:conic-gradient(from 0deg, transparent 0deg, #34d399 62deg, #ecfdf5 82deg, transparent 96deg, transparent 180deg, rgba(52,211,153,.7) 245deg, transparent 268deg);
+  background:conic-gradient(from 0deg, transparent 0deg, #E8C77F 62deg, #FFF6DD 82deg, transparent 96deg, transparent 180deg, rgba(212,175,106,.75) 245deg, transparent 268deg);
   -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3.5px));
           mask:radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3.5px));
   animation:cyFadeIn .4s ease-out .4s backwards, cySpin 6.5s linear .4s infinite;
 }
 .qr-hero-content .qr-logo-ring::after{
   content:""; position:absolute; inset:0; border-radius:50%;
-  border:2px solid rgba(52,211,153,.6); opacity:0;
+  border:2px solid rgba(212,175,106,.6); opacity:0;
   animation:cyWave 3.6s ease-out 1.2s infinite;
 }
 .qr-hero-content .qr-logo-ring .logo-cy{

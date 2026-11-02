@@ -4149,7 +4149,7 @@ html[data-rol="admin"] #btnCerrarSesion{ display:none !important; }
 .ap-hero-img .cy-slide{ inset:0; }
 .ap-hero-photo{ background-color:#070d14; }
 @keyframes cyZoomSlide{ from{ transform:scale(1.04); } to{ transform:scale(1.10); } }
-.cy-galeria-link{ align-items:center; gap:8px; margin:14px auto 0; padding:9px 16px; border-radius:999px; border:1px solid rgba(232,199,127,.45); background:rgba(11,11,13,.55); color:#F3DFA2; font-size:13px; font-weight:600; letter-spacing:.4px; cursor:pointer; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+.cy-galeria-link{ align-self:center; width:auto; align-items:center; gap:8px; margin:14px auto 0; padding:9px 16px; border-radius:999px; border:1px solid rgba(232,199,127,.45); background:rgba(11,11,13,.55); color:#F3DFA2; font-size:13px; font-weight:600; letter-spacing:.4px; cursor:pointer; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
 .cy-galeria{ position:fixed; inset:0; z-index:200; background:rgba(8,7,6,.97); flex-direction:column; padding:18px 14px; opacity:0; transition:opacity .3s ease; }
 .cy-galeria.on{ opacity:1; }
 .cy-galeria-top{ display:flex; align-items:center; justify-content:space-between; color:#F3DFA2; font-family:"Barlow Condensed","Arial Narrow",sans-serif; font-weight:800; font-size:22px; letter-spacing:.6px; text-transform:uppercase; padding:4px 4px 14px; }
@@ -4182,3 +4182,9 @@ html[data-rol="admin"] #btnCerrarSesion{ display:none !important; }
 .fp-acc button:disabled{ opacity:.3; cursor:default; }
 .fp-acc button[title="Quitar"]{ background:rgba(239,68,68,.35); }
 @media (max-width:360px){ .fp-lista{ gap:6px; } }
+
+/* "Conocer el gym": collage fijo de fotos (sin transiciones ni zoom) */
+.ap-collage{ position:absolute; inset:0; display:grid; grid-template-columns:1fr 1fr; gap:3px; background:#070d14; }
+.ap-collage i{ display:block; min-height:0; background-size:cover; background-position:center; }
+.ap-collage .ap-collage-ancha{ grid-column:1 / -1; }
+.ap-collage::after{ content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, rgba(4,8,7,.55) 0%, rgba(4,8,7,.72) 45%, rgba(3,6,6,.94) 80%, rgba(2,4,4,.98) 100%); }

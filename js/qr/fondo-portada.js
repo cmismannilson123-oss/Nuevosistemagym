@@ -1,4 +1,4 @@
-// Fotos de la portada del socio y de la galería.
+// Fotos de la portada del socio, de "Conocer el gym" y de la galería.
 // Orden: 1) la última lista conocida de este celular (aparece al instante),
 // 2) lo que diga el servidor, 3) la foto sola subida antes, 4) la foto por defecto.
 // Si el servidor tarda más de 4 s y no hay nada conocido, se muestra la foto por defecto.
@@ -7,28 +7,26 @@ const FONDO_POR_DEFECTO = 'images/fondo-defecto.jpg';
 const FONDO_CLAVE_FOTOS = 'cyFondoFotos';
 const FONDO_CLAVE_UNICA = 'cyFondoPortada';
 const FONDO_ESPERA_MAX = 4000;
-const FONDO_INTERVALO = 6500;
 let _fondoPortadaPedido = false;
 let _fondoAplicado = '';
-let _pase = null; // { urls, idx, timer, capas }
+const _pases = {};   // id -> { capas, urls, i, vez, paso, timer, activo, clave }
 window.cyFondoLista = [];
 
 function fondoEsValido(url) {
   return typeof url === 'string' && /^https:\/\/.+\/storage\/v1\/object\/public\/fondo-portada\//.test(url);
 }
-
-function fondoLeerLocal(clave) {
-  try { return localStorage.getItem(clave) || ''; } catch (e) { return ''; }
-}
+function fondoLeerLocal(clave) { try { return localStorage.getItem(clave) || ''; } catch (e) { return ''; } }
 function fondoGuardarLocal(clave, valor) {
   try { if (valor) localStorage.setItem(clave, valor); else localStorage.removeItem(clave); } catch (e) {}
 }
-
 function fondoLimpiarLista(lista) {
   return (Array.isArray(lista) ? lista : []).filter(f => f && fondoEsValido(f.g) && fondoEsValido(f.t));
 }
+function fondoMovimientoReducido() {
+  return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
 
-// Una sola foto (sin cambios): en la portada y en "Conocer el gym"
+// Una sola foto (sin cambios): portada y "Conocer el gym"
 function fondoPintarUnica(url, esRespaldo) {
   const els = document.querySelectorAll('.cy-bg-photo, .ap-hero-photo');
   if (!els.length || !url || url === _fondoAplicado) return;
@@ -39,48 +37,70 @@ function fondoPintarUnica(url, esRespaldo) {
   img.src = url;
 }
 
-// Varias fotos: cambian solas con un desvanecido suave
-function fondoIniciarPase(urls) {
-  const par = document.querySelector('.cy-bg-par');
-  if (!par || urls.length < 2) return;
+// Varias fotos: cambian solas con transición. Se alternan cambios lentos y rápidos:
+// lento = 5 s de pausa y fundido de 1,8 s; rápido = 2,2 s de pausa y fundido de 0,7 s.
+function fondoPase(id, contenedor, urls) {
+  if (!contenedor || urls.length < 2) return;
   const clave = urls.join('|');
-  if (_pase && _pase.clave === clave) return;
-  if (_pase && _pase.timer) clearInterval(_pase.timer);
-  // Capas: dos fondos que se alternan
-  if (!_pase || !_pase.capas) {
-    const capas = [0, 1].map(() => {
+  let p = _pases[id];
+  if (p && p.clave === clave) return;
+  if (p) { clearTimeout(p.timer); p.activo = false; }
+  if (!p) {
+    p = { capas: [0, 1].map(() => {
       const d = document.createElement('div');
       d.className = 'cy-slide';
-      par.appendChild(d);
+      contenedor.appendChild(d);
       return d;
-    });
-    _pase = { capas, idx: -1, urls, clave, timer: null, vez: 0 };
-  } else {
-    _pase.urls = urls; _pase.clave = clave; _pase.idx = -1;
+    }) };
+    _pases[id] = p;
   }
-  document.querySelectorAll('.cy-bg-photo').forEach(el => { el.style.opacity = '0'; });
-  document.querySelectorAll('.ap-hero-photo').forEach(el => { el.style.backgroundImage = 'url("' + urls[0] + '")'; });
-  mostrarSiguienteFoto();
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  _pase.timer = setInterval(() => { if (!document.hidden) mostrarSiguienteFoto(); }, FONDO_INTERVALO);
+  Object.assign(p, { clave, urls, i: -1, vez: 0, paso: 0, timer: null, activo: true });
+  if (id === 'portada') document.querySelectorAll('.cy-bg-photo').forEach(el => { el.style.opacity = '0'; });
+  // La primera foto se muestra ya, sin esperar a las demás
+  fondoCargar(urls[0], () => { if (p.activo) { p.i = 0; fondoPoner(p, urls[0], 0); programarCambio(p); } });
 }
 
-function mostrarSiguienteFoto() {
-  if (!_pase) return;
-  const p = _pase;
-  p.idx = (p.idx + 1) % p.urls.length;
-  const url = p.urls[p.idx];
+function fondoCargar(url, alCargar) {
   const img = new Image();
-  img.onload = () => {
-    if (!_pase || _pase !== p) return;
-    const entra = p.capas[p.vez % 2], sale = p.capas[(p.vez + 1) % 2];
-    entra.style.backgroundImage = 'url("' + url + '")';
-    entra.classList.add('on');
-    sale.classList.remove('on');
-    p.vez++;
-  };
+  img.onload = () => alCargar(false);
+  img.onerror = () => alCargar(true);
   img.src = url;
 }
+
+function fondoPoner(p, url, duracion) {
+  const entra = p.capas[p.vez % 2], sale = p.capas[(p.vez + 1) % 2];
+  entra.style.backgroundImage = 'url("' + url + '")';
+  entra.style.transitionDuration = duracion + 'ms';
+  entra.classList.add('on');
+  sale.classList.remove('on');
+  p.vez++;
+}
+
+function programarCambio(p) {
+  if (!p.activo || fondoMovimientoReducido()) return;
+  const lento = p.paso % 2 === 0;
+  const pausa = lento ? 5000 : 2200;
+  p.timer = setTimeout(() => siguienteFoto(p), pausa);
+}
+
+function siguienteFoto(p) {
+  if (!p.activo) return;
+  if (document.hidden) { p.timer = null; return; } // se reanuda al volver a la pestaña
+  p.i = (p.i + 1) % p.urls.length;
+  const url = p.urls[p.i];
+  const fundido = p.paso % 2 === 0 ? 1800 : 700;
+  fondoCargar(url, error => {
+    if (!p.activo) return;
+    if (!error) fondoPoner(p, url, fundido);
+    p.paso++;
+    programarCambio(p);
+  });
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) return;
+  Object.values(_pases).forEach(p => { if (p.activo && !p.timer) programarCambio(p); });
+});
 
 async function cyAplicarFondoPortada() {
   if (_fondoPortadaPedido) return;
@@ -98,7 +118,7 @@ async function cyAplicarFondoPortada() {
   // 2) Lo que dice el servidor, con límite de espera
   let respondio = false;
   const temporizador = setTimeout(() => {
-    if (!respondio && !_fondoAplicado && !_pase) fondoPintarUnica(FONDO_POR_DEFECTO, true);
+    if (!respondio && !_fondoAplicado && !Object.keys(_pases).length) fondoPintarUnica(FONDO_POR_DEFECTO, true);
   }, FONDO_ESPERA_MAX);
   try {
     if (typeof supabaseClient === 'undefined') throw new Error('sin cliente');
@@ -119,7 +139,7 @@ async function cyAplicarFondoPortada() {
     }
   } catch (e) {
     respondio = true;
-    if (!_fondoAplicado && !_pase) fondoPintarUnica(FONDO_POR_DEFECTO, true);
+    if (!_fondoAplicado && !Object.keys(_pases).length) fondoPintarUnica(FONDO_POR_DEFECTO, true);
   } finally {
     clearTimeout(temporizador);
   }
@@ -129,8 +149,12 @@ function fondoAplicarLista(lista) {
   window.cyFondoLista = lista;
   const boton = document.getElementById('btnGaleriaQR');
   if (boton) boton.style.display = lista.length ? 'inline-flex' : 'none';
-  if (lista.length === 1) fondoPintarUnica(lista[0].g);
-  else if (lista.length > 1) fondoIniciarPase(lista.map(f => f.g));
+  if (lista.length === 1) { fondoPintarUnica(lista[0].g); return; }
+  if (lista.length > 1) {
+    const urls = lista.map(f => f.g);
+    fondoPase('portada', document.querySelector('.cy-bg-par'), urls);
+    fondoPase('conoce', document.querySelector('.ap-hero-img'), urls);
+  }
 }
 
 // ---------- Galería (cuadrícula + visor) ----------
@@ -185,5 +209,5 @@ document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   const visor = document.getElementById('galeriaVisor');
   if (visor && visor.classList.contains('on')) cyCerrarVisor();
-  else cyCerrarGaleria();
+  else window.cyCerrarGaleria();
 });

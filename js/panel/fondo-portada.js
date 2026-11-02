@@ -50,6 +50,8 @@ function fondoPintarLista() {
       '</div>';
     cont.appendChild(fila);
   });
+  const cuenta = document.getElementById('fpCuenta');
+  if (cuenta) cuenta.textContent = orden.length + ' de ' + FONDO_MAX_FOTOS + ' fotos' + (orden.some(it => it.tipo === 'n') ? ' · sin guardar' : '');
   if (guardar) guardar.disabled = !fondoHayCambios();
 }
 

@@ -461,7 +461,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, .tabbtn:focus-v
   padding: 34px 24px 30px;
   background:
     linear-gradient(180deg, rgba(4,8,7,.55) 0%, rgba(4,8,7,.65) 45%, rgba(3,6,6,.92) 78%, rgba(2,4,4,.98) 100%),
-    url('https://images.unsplash.com/photo-1744551154623-4b5336e95c28?q=80&w=1400&auto=format&fit=crop') center/cover no-repeat;
+    url('images/fondo-defecto.jpg') center/cover no-repeat;
 }
 .qr-hero-content{ max-width: 420px; margin: 0 auto; text-align:center; padding-top: 8vh; }
 .qr-hero-divider{ width:60px; height:3px; background:linear-gradient(90deg,#A9823F,#F3DFA2,#A9823F); border-radius:3px; margin:16px auto 26px; }

@@ -946,24 +946,67 @@ const SUPABASE_URL = "https://ygbiqnbygjbrmwyttkku.supabase.co";
 
 const SUPABASE_KEY = "sb_publishable_M9fPsgu2VkCyu9ro0ECx8A_no-0RLLt";
 
+const FONDO_POR_DEFECTO = 'https://images.unsplash.com/photo-1744551154623-4b5336e95c28?q=80&w=1400&auto=format&fit=crop';
+
+const FONDO_CLAVE_LOCAL = 'cyFondoPortada';
+
+const FONDO_ESPERA_MAX = 4000;
+
 let _fondoPortadaPedido = false;
 
-async function cyAplicarFondoPortada(){
+let _fondoPortadaAplicado = '';
+
+function fondoEsValido(url) {
+  return typeof url === 'string' && /^https:\/\/.+\/storage\/v1\/object\/public\/fondo-portada\//.test(url);
+}
+
+function fondoPintar(url) {
+  const el = document.querySelector('.cy-bg-photo');
+  if (!el || !url || url === _fondoPortadaAplicado) return;
+  _fondoPortadaAplicado = url;
+  const img = new Image();
+  img.onload = () => { if (_fondoPortadaAplicado === url) el.style.backgroundImage = 'url("' + url + '")'; };
+  img.src = url;
+}
+
+function fondoLeerLocal() {
+  try { const v = localStorage.getItem(FONDO_CLAVE_LOCAL); return fondoEsValido(v) ? v : ''; } catch (e) { return ''; }
+}
+
+function fondoGuardarLocal(url) {
+  try { if (url) localStorage.setItem(FONDO_CLAVE_LOCAL, url); else localStorage.removeItem(FONDO_CLAVE_LOCAL); } catch (e) {}
+}
+
+async function cyAplicarFondoPortada() {
   if (_fondoPortadaPedido) return; // una sola lectura por carga de página
   _fondoPortadaPedido = true;
+
+  // 1) Lo último conocido de este celular: se muestra de inmediato
+  const local = fondoLeerLocal();
+  if (local) fondoPintar(local);
+
+  // 2) Lo que dice el servidor, con límite de espera
+  let respondio = false;
+  const temporizador = setTimeout(() => {
+    if (!respondio && !_fondoPortadaAplicado) fondoPintar(FONDO_POR_DEFECTO);
+  }, FONDO_ESPERA_MAX);
   try {
-    if (typeof supabaseClient === 'undefined') return;
+    if (typeof supabaseClient === 'undefined') throw new Error('sin cliente');
     const { data, error } = await supabaseClient.rpc('fondo_portada_url');
-    if (error || !data) return;
-    // Solo imágenes del almacenamiento de este proyecto
-    if (!/^https:\/\/.+\/storage\/v1\/object\/public\/fondo-portada\//.test(data)) return;
-    const el = document.querySelector('.cy-bg-photo');
-    if (!el) return;
-    const img = new Image();
-    img.onload = () => { el.style.backgroundImage = 'url("' + data + '")'; };
-    img.src = data;
+    respondio = true;
+    if (error) throw error;
+    if (fondoEsValido(data)) {
+      fondoGuardarLocal(data);
+      fondoPintar(data);
+    } else {
+      fondoGuardarLocal('');
+      fondoPintar(FONDO_POR_DEFECTO);
+    }
   } catch (e) {
-    // Sin fondo subido o sin conexión: se queda la foto por defecto
+    respondio = true;
+    if (!_fondoPortadaAplicado) fondoPintar(FONDO_POR_DEFECTO);
+  } finally {
+    clearTimeout(temporizador);
   }
 }
 

@@ -4,7 +4,8 @@
 // Así no se descarga la foto por defecto cuando ya hay un fondo subido, y nunca se
 // queda esperando: si el servidor tarda, en 4 s se muestra la foto por defecto.
 // No bloquea el flujo: se llama sin esperar (ver arranque.js).
-const FONDO_POR_DEFECTO = 'https://images.unsplash.com/photo-1744551154623-4b5336e95c28?q=80&w=1400&auto=format&fit=crop';
+// Foto por defecto: archivo dentro del sitio (images/fondo-defecto.jpg). Si no existe, la portada queda con fondo oscuro.
+const FONDO_POR_DEFECTO = 'images/fondo-defecto.jpg';
 const FONDO_CLAVE_LOCAL = 'cyFondoPortada';
 const FONDO_ESPERA_MAX = 4000;
 let _fondoPortadaPedido = false;
@@ -14,12 +15,16 @@ function fondoEsValido(url) {
   return typeof url === 'string' && /^https:\/\/.+\/storage\/v1\/object\/public\/fondo-portada\//.test(url);
 }
 
-function fondoPintar(url) {
+function fondoPintar(url, esRespaldo) {
   const el = document.querySelector('.cy-bg-photo');
   if (!el || !url || url === _fondoPortadaAplicado) return;
   _fondoPortadaAplicado = url;
   const img = new Image();
   img.onload = () => { if (_fondoPortadaAplicado === url) el.style.backgroundImage = 'url("' + url + '")'; };
+  img.onerror = () => {
+    // Si la foto subida no carga (p. ej. bucket borrado), se usa la foto por defecto
+    if (!esRespaldo && url !== FONDO_POR_DEFECTO) fondoPintar(FONDO_POR_DEFECTO, true);
+  };
   img.src = url;
 }
 
@@ -41,7 +46,7 @@ async function cyAplicarFondoPortada() {
   // 2) Lo que dice el servidor, con límite de espera
   let respondio = false;
   const temporizador = setTimeout(() => {
-    if (!respondio && !_fondoPortadaAplicado) fondoPintar(FONDO_POR_DEFECTO);
+    if (!respondio && !_fondoPortadaAplicado) fondoPintar(FONDO_POR_DEFECTO, true);
   }, FONDO_ESPERA_MAX);
   try {
     if (typeof supabaseClient === 'undefined') throw new Error('sin cliente');
@@ -53,11 +58,11 @@ async function cyAplicarFondoPortada() {
       fondoPintar(data);
     } else {
       fondoGuardarLocal('');
-      fondoPintar(FONDO_POR_DEFECTO);
+      fondoPintar(FONDO_POR_DEFECTO, true);
     }
   } catch (e) {
     respondio = true;
-    if (!_fondoPortadaAplicado) fondoPintar(FONDO_POR_DEFECTO);
+    if (!_fondoPortadaAplicado) fondoPintar(FONDO_POR_DEFECTO, true);
   } finally {
     clearTimeout(temporizador);
   }

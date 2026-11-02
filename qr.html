@@ -946,7 +946,7 @@ const SUPABASE_URL = "https://ygbiqnbygjbrmwyttkku.supabase.co";
 
 const SUPABASE_KEY = "sb_publishable_M9fPsgu2VkCyu9ro0ECx8A_no-0RLLt";
 
-const FONDO_POR_DEFECTO = 'https://images.unsplash.com/photo-1744551154623-4b5336e95c28?q=80&w=1400&auto=format&fit=crop';
+const FONDO_POR_DEFECTO = 'images/fondo-defecto.jpg';
 
 const FONDO_CLAVE_LOCAL = 'cyFondoPortada';
 
@@ -960,12 +960,16 @@ function fondoEsValido(url) {
   return typeof url === 'string' && /^https:\/\/.+\/storage\/v1\/object\/public\/fondo-portada\//.test(url);
 }
 
-function fondoPintar(url) {
+function fondoPintar(url, esRespaldo) {
   const el = document.querySelector('.cy-bg-photo');
   if (!el || !url || url === _fondoPortadaAplicado) return;
   _fondoPortadaAplicado = url;
   const img = new Image();
   img.onload = () => { if (_fondoPortadaAplicado === url) el.style.backgroundImage = 'url("' + url + '")'; };
+  img.onerror = () => {
+    // Si la foto subida no carga (p. ej. bucket borrado), se usa la foto por defecto
+    if (!esRespaldo && url !== FONDO_POR_DEFECTO) fondoPintar(FONDO_POR_DEFECTO, true);
+  };
   img.src = url;
 }
 
@@ -988,7 +992,7 @@ async function cyAplicarFondoPortada() {
   // 2) Lo que dice el servidor, con límite de espera
   let respondio = false;
   const temporizador = setTimeout(() => {
-    if (!respondio && !_fondoPortadaAplicado) fondoPintar(FONDO_POR_DEFECTO);
+    if (!respondio && !_fondoPortadaAplicado) fondoPintar(FONDO_POR_DEFECTO, true);
   }, FONDO_ESPERA_MAX);
   try {
     if (typeof supabaseClient === 'undefined') throw new Error('sin cliente');
@@ -1000,11 +1004,11 @@ async function cyAplicarFondoPortada() {
       fondoPintar(data);
     } else {
       fondoGuardarLocal('');
-      fondoPintar(FONDO_POR_DEFECTO);
+      fondoPintar(FONDO_POR_DEFECTO, true);
     }
   } catch (e) {
     respondio = true;
-    if (!_fondoPortadaAplicado) fondoPintar(FONDO_POR_DEFECTO);
+    if (!_fondoPortadaAplicado) fondoPintar(FONDO_POR_DEFECTO, true);
   } finally {
     clearTimeout(temporizador);
   }

@@ -239,7 +239,7 @@
       </div>
 
       <section class="ap-hero" id="apHero">
-        <div class="ap-hero-img"><div class="ap-hero-photo" style="background-image:url('https://images.unsplash.com/photo-1744551154623-4b5336e95c28?q=80&w=900&auto=format&fit=crop');"></div></div>
+        <div class="ap-hero-img"><div class="ap-hero-photo" style="background-image:url('images/fondo-defecto.jpg');"></div></div>
         <div class="ap-hero-copy">
           <div class="ap-eyebrow">C&amp;Y FITNESS GYM</div>
           <h3 class="ap-h1">Todo lo que necesitas para alcanzar <em>tus objetivos</em></h3>
@@ -961,11 +961,11 @@ function fondoEsValido(url) {
 }
 
 function fondoPintar(url, esRespaldo) {
-  const el = document.querySelector('.cy-bg-photo');
-  if (!el || !url || url === _fondoPortadaAplicado) return;
+  const els = document.querySelectorAll('.cy-bg-photo, .ap-hero-photo'); // portada y pantalla "Conocer el gym"
+  if (!els.length || !url || url === _fondoPortadaAplicado) return;
   _fondoPortadaAplicado = url;
   const img = new Image();
-  img.onload = () => { if (_fondoPortadaAplicado === url) el.style.backgroundImage = 'url("' + url + '")'; };
+  img.onload = () => { if (_fondoPortadaAplicado === url) els.forEach(el => { el.style.backgroundImage = 'url("' + url + '")'; }); };
   img.onerror = () => {
     // Si la foto subida no carga (p. ej. bucket borrado), se usa la foto por defecto
     if (!esRespaldo && url !== FONDO_POR_DEFECTO) fondoPintar(FONDO_POR_DEFECTO, true);

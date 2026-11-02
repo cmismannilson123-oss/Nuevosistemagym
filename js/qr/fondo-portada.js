@@ -16,11 +16,11 @@ function fondoEsValido(url) {
 }
 
 function fondoPintar(url, esRespaldo) {
-  const el = document.querySelector('.cy-bg-photo');
-  if (!el || !url || url === _fondoPortadaAplicado) return;
+  const els = document.querySelectorAll('.cy-bg-photo, .ap-hero-photo'); // portada y pantalla "Conocer el gym"
+  if (!els.length || !url || url === _fondoPortadaAplicado) return;
   _fondoPortadaAplicado = url;
   const img = new Image();
-  img.onload = () => { if (_fondoPortadaAplicado === url) el.style.backgroundImage = 'url("' + url + '")'; };
+  img.onload = () => { if (_fondoPortadaAplicado === url) els.forEach(el => { el.style.backgroundImage = 'url("' + url + '")'; }); };
   img.onerror = () => {
     // Si la foto subida no carga (p. ej. bucket borrado), se usa la foto por defecto
     if (!esRespaldo && url !== FONDO_POR_DEFECTO) fondoPintar(FONDO_POR_DEFECTO, true);

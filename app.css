@@ -1134,7 +1134,13 @@ input:focus, select:focus, textarea:focus{
   font-weight:800 !important;
   letter-spacing:.5px;
 }
-.qr-hero-content .qr-titulo .accent{ font-size:1.16em !important; letter-spacing:2px; color:#E8C77F; }
+.qr-hero-content .qr-titulo .accent{ font-size:1.16em !important; letter-spacing:2px; color:#E8C77F;
+  background:linear-gradient(100deg,#A9823F 0%,#A9823F 38%,#FFF1C9 50%,#A9823F 62%,#A9823F 100%) 0 0 / 260% 100%;
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+}
+.qr-hero-content .qr-titulo .tl2.accent{ animation:cyTitleIn .38s cubic-bezier(.2,.7,.2,1) .75s backwards, cyShimmerTitulo 5s linear 2.2s infinite; }
+@keyframes cyShimmerTitulo{ from{ background-position:130% 0; } to{ background-position:-130% 0; } }
+@media (prefers-reduced-motion: reduce){ .qr-hero-content .qr-titulo .tl2.accent{ animation:cyTitleIn .38s cubic-bezier(.2,.7,.2,1) .75s backwards; -webkit-text-fill-color:#E8C77F; background:none; } }
 .qr-hero-content .qr-sub{ font-size:14px !important; font-weight:600 !important; letter-spacing:.2px; }
 
 @keyframes cyFadeIn{ from{ opacity:0; } to{ opacity:1; } }

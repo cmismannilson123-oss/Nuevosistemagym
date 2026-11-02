@@ -11,9 +11,12 @@ function rgValidar(d){
     if (otro) err.push({ id: 'dni', msg: 'Ya existe un socio con este DNI: ' + (otro.nombre || '') + '. Búscalo en Lista para renovarlo.' });
   }
   if (d.nombre.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/g, '').length < 2) err.push({ id: 'nombre', msg: 'Escribe el nombre del socio.' });
-  if (d.telCrudo.trim()) {
+  if (!d.telCrudo.trim() && !d.sinWhatsapp) err.push({ id: 'telefono', msg: 'Escribe el celular del socio o marca «No tiene WhatsApp».' });
+  if (d.telCrudo.trim() && !d.sinWhatsapp) {
     if (/[^\d\s+()-]/.test(d.telCrudo)) err.push({ id: 'telefono', msg: 'El celular solo lleva números.' });
-    else if (!/^9\d{8}$/.test(d.telefono)) err.push({ id: 'telefono', msg: 'El celular debe tener 9 dígitos y empezar con 9. Tiene ' + d.telefono.length + '.' });
+    else if (!/^9\d{8}$/.test(d.telefono)) err.push({ id: 'telefono', msg: d.telefono.length === 9
+      ? 'El celular debe empezar con 9 (ej. 927885791).'
+      : 'El celular debe tener 9 dígitos y empezar con 9. Tiene ' + d.telefono.length + '.' });
     else {
       const otro = lista.find(s => cyLimpiarTelefono(s.telefono) === d.telefono);
       if (otro) err.push({ id: 'telefono', msg: 'Este celular ya lo tiene ' + (otro.nombre || 'otro socio') + '. Cada socio necesita su propio número para el QR.' });
@@ -32,12 +35,29 @@ function rgValidar(d){
 }
 
 let _guardando = false;
-window.guardar = async function(){
+
+// Texto del botón combinado según si el socio tiene WhatsApp
+window.cyCambiarSinWhatsapp = function(){
+  const sin = document.getElementById("sinWhatsapp").checked;
+  const t = document.getElementById("textoBotonCombo");
+  if (t) t.textContent = sin ? "Guardar y descargar comprobante" : "Guardar y enviar comprobante";
+  if (sin) document.getElementById("telefono").value = "";
+  rgLimpiarErrores();
+};
+
+// Botón combinado: guarda al socio y, si se guardó, genera el comprobante
+window.guardarConComprobante = function(){
+  return guardar({ conComprobante: true });
+};
+
+window.guardar = async function(opts){
   if (_guardando) return;
   _guardando = true;
+  const conComprobante = !!(opts && opts.conComprobante);
   try{
     const dniCrudo = document.getElementById("dni").value;
-    const telCrudo = document.getElementById("telefono").value;
+    const sinWhatsapp = document.getElementById("sinWhatsapp").checked;
+    const telCrudo = sinWhatsapp ? "" : document.getElementById("telefono").value;
     let dni = cyLimpiarDni(dniCrudo);
     let nombre = document.getElementById("nombre").value.trim().replace(/\s+/g, " ");
     let telefono = cyLimpiarTelefono(telCrudo);
@@ -48,7 +68,7 @@ window.guardar = async function(){
     let deuda = document.getElementById("deuda").value || "0";
 
     rgLimpiarErrores();
-    const errores = rgValidar({ dniCrudo, dni, nombre, telCrudo, telefono, tipo, inicio, fin, precio, deuda: document.getElementById("deuda").value });
+    const errores = rgValidar({ dniCrudo, dni, nombre, telCrudo, telefono, tipo, inicio, fin, precio, deuda: document.getElementById("deuda").value, sinWhatsapp });
     if (errores.length) { rgMostrarErrores(errores); return; }
 
     // FIX: Cálculo preciso basado en fechas locales evitando desvíos por zona horaria
@@ -96,6 +116,11 @@ window.guardar = async function(){
 
     mostrarToast("✅ Socio registrado correctamente", "#10b981");
     try{ if(window.cyProspectoProcesado) cyProspectoProcesado(dni); }catch(e){}
+    // Comprobante: se genera con los datos del formulario antes de limpiarlo
+    if (conComprobante) {
+      try { await enviarReciboPremium({ soloDescarga: sinWhatsapp }); }
+      catch (eComp) { console.error("Comprobante no generado:", eComp); }
+    }
     await render();
     // 📖 REGISTRAR INSCRIPCIÓN EN EL CUADERNO EN VIVO (HOY)
     try {
@@ -129,6 +154,8 @@ window.guardar = async function(){
     document.getElementById("inicio").value = "";
     document.getElementById("fin").value = "";
     document.getElementById("deuda").value = "";
+    document.getElementById("sinWhatsapp").checked = false;
+    window.cyCambiarSinWhatsapp();
   }catch(e){
     alert("Error inesperado");
   } finally {

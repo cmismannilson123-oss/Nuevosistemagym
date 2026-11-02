@@ -4173,3 +4173,11 @@ html[data-rol="admin"] #btnCerrarSesion{ display:none !important; }
 .estado-cta-txt small{ font-size:12.5px; line-height:1.35; color:#94a3b8; }
 .estado-cta-flecha{ flex:none; color:#fca5a5; font-size:14px; }
 @media (prefers-reduced-motion: reduce){ .estado-cta{ transition:none; } }
+
+/* Registro: un solo botón "Guardar y enviar comprobante" (guarda al socio y genera su comprobante) */
+#tab2 .card .cy-action-row.rg-acc{grid-template-columns:1fr}
+#tab2 .card .cy-action-row button.cy-act-combo{background:linear-gradient(135deg,#00e0a4 0%,#2be36f 55%,#12a84a 100%) !important;box-shadow:0 12px 26px -10px rgba(37,211,102,.75) !important;min-height:58px}
+#tab2 .card .cy-action-row button.cy-act-combo i{color:#fff !important}
+#tab2 .card .cy-action-row button.cy-act-combo i + i{margin-left:-2px}
+.rg-sinwsp{display:flex;align-items:center;gap:8px;margin:-4px 0 12px 2px;font-size:13px;font-weight:600;color:#9fb2ab;cursor:pointer;user-select:none}
+.rg-sinwsp input{width:18px;height:18px;margin:0;accent-color:#2be36f;cursor:pointer}

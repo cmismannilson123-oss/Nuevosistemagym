@@ -678,6 +678,7 @@
         <label class="rg-f"><span>DNI</span><input id="dni" inputmode="numeric" autocomplete="off" placeholder="8 dígitos"></label>
         <label class="rg-f"><span>Nombre completo</span><input id="nombre" autocomplete="off" placeholder="Nombres y apellidos"></label>
         <label class="rg-f"><span>WhatsApp</span><div class="rg-pre"><b>+51</b><input id="telefono" type="tel" inputmode="numeric" autocomplete="off" placeholder="927885791"></div></label>
+        <label class="rg-sinwsp"><input type="checkbox" id="sinWhatsapp" onchange="cyCambiarSinWhatsapp()"><span>No tiene WhatsApp</span></label>
       </section>
 
       <section class="rg-sec">
@@ -712,8 +713,7 @@
       </section>
 
       <div class="cy-action-row rg-acc">
-        <button class="qr-btn-principal cy-act-save" onclick="guardar()"><i class="fa-solid fa-floppy-disk"></i><span>Guardar socio</span></button>
-        <button class="btn-whatsapp cy-act-wa" onclick="enviarReciboPremium()" title="Enviar comprobante por WhatsApp" aria-label="Enviar comprobante por WhatsApp"><i class="fa-brands fa-whatsapp"></i><span>Comprobante</span></button>
+        <button class="cy-act-combo" onclick="guardarConComprobante()" aria-label="Guardar socio y enviar comprobante"><i class="fa-solid fa-floppy-disk"></i><i class="fa-brands fa-whatsapp"></i><span id="textoBotonCombo">Guardar y enviar comprobante</span></button>
       </div>
     </div>
   </div>

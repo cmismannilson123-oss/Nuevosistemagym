@@ -2255,7 +2255,7 @@ html.qr-mode .container{ padding-bottom:calc(24px + env(safe-area-inset-bottom,0
 
 /* Portada a pantalla completa con profundidad */
 .ap-hero{ --hp:0; position:relative; margin:0 -22px; height:92vh; height:92svh; min-height:540px; max-height:780px; overflow:hidden; isolation:isolate; border-radius:0 0 36px 36px; background:#070d14; }
-.ap-hero-img{ position:absolute; inset:-8% 0; transform:translate3d(0,calc(var(--hp) * 70px),0) scale(1.05); }
+.ap-hero-img{ position:absolute; inset:-8% 0; transform:translate3d(0,calc(var(--hp) * 70px),0) scale(1.05); will-change:transform; }
 @keyframes apKen{ from{ transform:scale(1) translate3d(0,0,0); } to{ transform:scale(1.1) translate3d(-2%,-1.5%,0); } }
 .ap-hero::after{ content:""; position:absolute; inset:0; z-index:1; background:radial-gradient(90% 60% at 50% 100%, rgba(16,185,129,.22), transparent 70%), linear-gradient(180deg, rgba(7,13,20,.35) 0%, rgba(7,13,20,.25) 30%, rgba(7,13,20,.78) 72%, #070d14 100%); }
 .ap-hero-copy{ position:absolute; left:22px; right:22px; bottom:96px; z-index:2; text-align:center; transform:translate3d(0,calc(var(--hp) * -46px),0); } /* sin opacidad variable: el texto no parpadea al deslizar */

@@ -13,8 +13,8 @@ App web del gimnasio: `gym.html` (panel de administración y check-in por QR con
   `registrar_asistencia_qr`, `registrar_prospecto_qr` y `premio_activo_qr`. El socio se
   identifica con **teléfono + DNI** (solo la primera vez en cada celular; queda guardado).
   Tras 8 intentos fallidos con un mismo teléfono, se bloquea 15 minutos.
-- Los avisos de ingreso al celular (ntfy) los manda la base de datos al guardarse cada
-  asistencia. El canal es aleatorio y está guardado en `admin_config`, no en la página.
+- Los avisos de ingreso al celular los manda la base de datos al guardarse cada asistencia
+  (Web Push / FCM, ver más abajo). ntfy ya no se usa.
 
 Migración: `supabase/migrations/20261006000000_seguridad_auth_rls.sql`.
 
@@ -38,10 +38,7 @@ Hay que hacerlo **todo junto**: en cuanto se aplica la migración, la versión v
    ```
 
 5. **Subir `gym.html` y `sw.js` nuevos** al hosting donde está la app.
-6. **Suscribirse al canal nuevo de avisos.** En el *SQL Editor*:
-   `select valor from public.admin_config where clave = 'ntfy_topic';`
-   En la app ntfy, suscríbete a ese nombre y borra la suscripción vieja
-   (`gym-clisman-alertas-2026`, que ya es público).
+6. **Activar las notificaciones del celular** con el botón de la campana del panel (ver *Notificaciones* más abajo).
 7. En cada celular o PC del gimnasio: abrir la app, **recargar una vez** (el service worker
    puede mostrar la versión anterior en la primera carga) e iniciar sesión con el correo y la
    contraseña.
@@ -63,10 +60,27 @@ el estado llega en la misma consulta del QR, así que no hace más lento el regi
 | **Pase de invitado** | Socios activos cuyo plan no es interdiario | 1 por mes calendario (no se acumula) |
 | **10% por pago anticipado** | Planes que mencionan "mes" o "personalizado", excepto interdiario | Hasta un día antes del vencimiento; una vez por periodo. Se reactiva al renovar |
 
-Cada uso queda guardado en `public.cupones_uso` y manda un aviso al canal de ntfy. En el panel:
+Cada uso queda guardado en `public.cupones_uso`. En el panel:
 - **Ingreso → "Cupones usados hoy"**: se actualiza en vivo cuando un socio usa un cupón.
 - **Invitar → Cupones**: historial por mes con totales (`listar_cupones_usados`,
   `supabase/migrations/20261007010000_cupones_panel.sql`).
+
+## Página del QR separada (qr.html)
+
+`qr.html` es solo la pantalla del socio (escanear, marcar asistencia, cupones, promociones).
+Pesa unos 115 KB frente a los ~300 KB del panel, y ambas páginas comparten `app.css`.
+Los enlaces que ya están impresos (`gym.html?qr=1`) siguen funcionando igual.
+
+`qr.html` es **generado**: no lo edites a mano. Edita `gym.html` y ejecuta:
+
+```
+ACORN_PATH=<carpeta con acorn> node tools/build-qr.js          # regenera qr.html
+ACORN_PATH=<carpeta con acorn> node tools/build-qr.js --check  # falla si qr.html quedó desactualizado
+```
+
+El script copia solo el JavaScript que usa la pantalla del socio. Las funciones del panel
+(`render`, `asistenciaNueva`, etc.) se reemplazan por stubs vacíos, y el marcado del panel se quita.
+Si cambias la pantalla del QR en `gym.html`, vuelve a generar `qr.html`.
 
 ## Cuaderno de caja
 
@@ -83,3 +97,27 @@ movimientos agrupados por día con su total.
 - **Ningún pago se pierde:** cada movimiento se guarda primero en el celular y luego se
   sube. Sin internet, aparece como "Por subir" y se sube solo al volver la conexión,
   sin duplicarse (`cliente_id`).
+
+## App instalable y notificaciones propias
+
+- **Instalar:** el panel y la pantalla del QR se instalan como apps separadas con el
+  logo (`manifest-panel.json`, `manifest-qr.json`, íconos en `images/icon-*`).
+- **Notificaciones (sin ntfy):** botón de la campana del panel → *Activar*. Al guardarse
+  cada asistencia, la base (`_notificar_asistencia` → `_enviar_push`) llama a la Edge
+  Function `cy-push` (`supabase/functions/cy-push`), que arma el mensaje con el estado del
+  socio y lo envía a los celulares suscritos (`push_suscripciones`). Llegan con la app
+  cerrada y el celular bloqueado. Migración: `supabase/migrations/20261010000000_push.sql`.
+  Las llaves VAPID y el secreto están en `admin_config` (no en el código).
+- **Voz en recepción:** con el panel abierto, anuncia los ingresos por QR.
+
+## Voz natural (IA) — gratis
+
+La voz de bienvenida y los anuncios usan voz neuronal de **Google Gemini TTS** (nivel
+gratuito, solo cuenta de Google) a través de la Edge Function `cy-voz` (solo personal).
+Cada frase se genera una vez y se guarda en el bucket privado `voz` y en el celular: lo que
+se repite suena al instante y no gasta cupo. Cada noche (`cy-voz-precalentar`, pg_cron) se
+usa el cupo sobrante para preparar las bienvenidas de los socios más frecuentes. Sin
+internet, sin clave o con el cupo agotado, se usa la voz del celular.
+
+Para activarla: crear una clave gratis en aistudio.google.com (Get API key) y guardarla en
+Supabase → Edge Functions → Secrets como `GEMINI_API_KEY`.

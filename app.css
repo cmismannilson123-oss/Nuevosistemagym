@@ -1254,7 +1254,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{ box-shadow:0 0 
 .cy-bg-par{ position:absolute; inset:0; transform:translate3d(0,var(--bgy,0px),0); }
 .cy-bg-photo{
   position:absolute; inset:-6%;
-  background:#0b0b0d center/cover no-repeat; /* la foto la pone js/qr/fondo-portada.js */
+  background:#0b0b0d center/cover no-repeat;
   animation:cyDrift 28s ease-in-out infinite alternate;
 }
 @keyframes cyDrift{
@@ -4141,52 +4141,12 @@ html[data-rol="admin"] #btnCerrarSesion{ display:none !important; }
 .estado-cta-flecha{ flex:none; color:#fca5a5; font-size:14px; }
 @media (prefers-reduced-motion: reduce){ .estado-cta{ transition:none; } }
 
-/* Portada: fotos que cambian solas, botón de galería, pantalla de galería y visor */
-.cy-slide{ position:absolute; inset:-6%; background-size:cover; background-position:center; opacity:0; transition:opacity 1.4s ease; will-change:opacity, transform; animation:cyZoomSlide 14s ease-in-out infinite alternate; }
-.cy-slide.on{ opacity:1; }
-.ap-hero-img .cy-slide{ inset:0; }
+/* Portada y "Conocer el gym": una foto fija cada una */
 .ap-hero-photo{ background-color:#070d14; }
-@keyframes cyZoomSlide{ from{ transform:scale(1.04); } to{ transform:scale(1.10); } }
-.cy-galeria-link{ align-self:center; width:auto; align-items:center; gap:8px; margin:14px auto 0; padding:9px 16px; border-radius:999px; border:1px solid rgba(232,199,127,.45); background:rgba(11,11,13,.55); color:#F3DFA2; font-size:13px; font-weight:600; letter-spacing:.4px; cursor:pointer; backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
-.cy-galeria{ position:fixed; inset:0; z-index:200; background:rgba(8,7,6,.97); flex-direction:column; padding:18px 14px; opacity:0; transition:opacity .3s ease; }
-.cy-galeria.on{ opacity:1; }
-.cy-galeria-top{ display:flex; align-items:center; justify-content:space-between; color:#F3DFA2; font-family:"Barlow Condensed","Arial Narrow",sans-serif; font-weight:800; font-size:22px; letter-spacing:.6px; text-transform:uppercase; padding:4px 4px 14px; }
-.cy-galeria-cerrar{ width:40px; height:40px; border-radius:50%; border:1px solid rgba(232,199,127,.4); background:transparent; color:#F3DFA2; cursor:pointer; }
-.cy-galeria-grid{ flex:1; overflow-y:auto; display:grid; grid-template-columns:1fr 1fr; gap:8px; align-content:start; padding-bottom:20px; -webkit-overflow-scrolling:touch; }
-.cy-gal-item{ position:relative; border:0; padding:0; border-radius:14px; overflow:hidden; aspect-ratio:4/5; background:#15130f; cursor:pointer; opacity:0; transform:translateY(14px) scale(.98); animation:cyGalIn .6s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--i,0) * 90ms); box-shadow:inset 0 0 0 1px rgba(232,199,127,.18); }
-.cy-gal-item--ancha{ grid-column:1 / -1; aspect-ratio:16/10; }
-.cy-gal-item img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .6s ease; }
-.cy-gal-item:active img{ transform:scale(1.05); }
-@keyframes cyGalIn{ to{ opacity:1; transform:none; } }
-.cy-visor{ position:fixed; inset:0; z-index:210; background:rgba(0,0,0,.94); align-items:center; justify-content:center; padding:14px; opacity:0; transition:opacity .3s ease; cursor:zoom-out; }
-.cy-visor.on{ opacity:1; }
-.cy-visor img{ max-width:100%; max-height:100%; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,.6); transform:scale(.97); transition:transform .35s ease; }
-.cy-visor.on img{ transform:none; }
-@media (prefers-reduced-motion: reduce){
-  .cy-slide{ animation:none; }
-  .cy-slide{ transition:none; }
-  .cy-gal-item{ animation:none; opacity:1; transform:none; }
-  .cy-galeria,.cy-visor,.cy-visor img{ transition:none; }
-}
-
-/* Panel: fotos de la portada en miniaturas ordenadas (3 por fila en celular) */
-.fp-cuenta{ font-size:13px; font-weight:700; letter-spacing:.3px; color:#9fe3c8; margin:0 0 10px; }
-.fp-lista{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
-.fp-item{ position:relative; aspect-ratio:1 / 1; border-radius:12px; overflow:hidden; background:#0b1410; box-shadow:inset 0 0 0 1px rgba(52,211,153,.22); }
-.fp-item img{ width:100%; height:100%; object-fit:cover; display:block; }
-.fp-num{ position:absolute; top:5px; left:5px; min-width:22px; height:22px; padding:0 6px; border-radius:999px; background:rgba(0,0,0,.7); color:#fff; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; }
-.fp-acc{ position:absolute; left:0; right:0; bottom:0; display:flex; justify-content:space-between; gap:4px; padding:4px; background:rgba(0,0,0,.62); }
-.fp-acc button{ flex:1; height:30px; border:0; border-radius:8px; background:rgba(255,255,255,.12); color:#fff; cursor:pointer; font-size:13px; }
-.fp-acc button:disabled{ opacity:.3; cursor:default; }
-.fp-acc button[title="Quitar"]{ background:rgba(239,68,68,.35); }
-@media (max-width:360px){ .fp-lista{ gap:6px; } }
 
 
 /* Mientras se desliza "Conocer el gym", las ilustraciones animadas se pausan (evita el parpadeo) */
 html.cy-moviendo [class*="ilu-"]{ animation-play-state:paused !important; }
-
-/* Con una pantalla encima, las fotos de la portada dejan de dibujarse (evita el parpadeo de "Conocer el gym") */
-html.cy-covered .cy-slide{ visibility:hidden !important; }
 
 /* Mientras otra pantalla cubre la portada, toda la portada deja de dibujarse (no solo sus fotos) */
 html.cy-covered #qrCardPrimeraVez{ visibility:hidden !important; }

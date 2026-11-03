@@ -106,7 +106,7 @@ function tarjetaPlanHTML(p, i){
   return `
   <article class="pp-card${p.destacado ? " pp-destacado" : ""}" style="--pc:${p.pc};--d:${(i * 0.07).toFixed(2)}s">
     <div class="pp-arte">
-      <img src="${p.img}" alt="" width="800" height="450" loading="lazy" decoding="async">
+      <img src="${p.img}" alt="" width="800" height="450" decoding="async">
       ${p.destacado ? `<span class="pp-cinta">Recomendado</span>` : ""}
     </div>
     <div class="pp-cuerpo">

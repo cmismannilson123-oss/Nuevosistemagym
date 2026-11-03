@@ -130,14 +130,9 @@
       </div>
     </div>
 
-  <div id="galeriaQR" class="cy-galeria" style="display:none;" role="dialog" aria-modal="true" aria-label="Galería del gimnasio">
-    <div class="cy-galeria-top"><span>Nuestro gimnasio</span><button type="button" class="cy-galeria-cerrar" onclick="cyCerrarGaleria()" aria-label="Cerrar galería"><i class="fa-solid fa-xmark"></i></button></div>
-    <div id="galeriaGrid" class="cy-galeria-grid"></div>
-    <div id="galeriaVisor" class="cy-visor" style="display:none;" onclick="cyCerrarVisor()"><img id="galeriaVisorImg" alt=""></div>
-  </div>
   <div class="qr-hero-fullbleed" id="qrCardPrimeraVez">
     <div class="cy-bg" aria-hidden="true">
-      <div class="cy-bg-par"><div class="cy-bg-photo"></div></div>
+      <div class="cy-bg-par"><div class="cy-bg-photo" style="background-image:url('images/portada.jpg');"></div></div>
       <div class="cy-glow"></div>
       <i class="cy-p" style="--x:12%;--s:3px;--t:14s;--d:-2s"></i><i class="cy-p" style="--x:26%;--s:2px;--t:11s;--d:-7s"></i>
       <i class="cy-p" style="--x:38%;--s:4px;--t:17s;--d:-4s"></i><i class="cy-p" style="--x:51%;--s:2px;--t:12s;--d:-9s"></i>
@@ -229,7 +224,6 @@
         </div>
       </div>
 
-      <button type="button" id="btnGaleriaQR" class="cy-galeria-link" style="display:none;" onclick="cyAbrirGaleria()"><i class="fa-solid fa-images"></i><span>Ver galería</span></button>
       <button type="button" id="promoTeaser" class="promo-teaser" style="display:none;" onclick="cyAbrirInscripcion()">
         <span class="pt-em" id="ptEm" aria-hidden="true">🔥</span>
         <span class="pt-tx"><b>PROMO ACTIVA</b><small id="ptTx"></small></span>
@@ -761,18 +755,6 @@
       </button>
     </div>
 
-    <div class="card" id="cardFondoPortada">
-      <h3><i class="fa-solid fa-images"></i> Fotos de la portada y la galería</h3>
-      <p style="color:#94a3b8; margin-bottom:12px; font-size:14px;">Sube hasta 8 fotos. La portada las muestra cambiando solas, y la galería las muestra en una cuadrícula. Elige fotos con zonas oscuras donde va el título.</p>
-      <p id="fpCuenta" class="fp-cuenta">0 de 8 fotos</p>
-      <div id="fpLista" class="fp-lista"></div>
-      <input id="fpFile" type="file" multiple accept="image/jpeg,image/png,image/webp" onchange="cyFondoElegido(this)" style="width:100%; margin:12px 0;">
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button type="button" id="fpGuardar" class="qr-btn-principal" disabled onclick="cyGuardarFondo()"><i class="fa-solid fa-floppy-disk"></i><span>Guardar fotos</span></button>
-        <button type="button" class="qr-btn-principal" onclick="cyQuitarFondo()"><i class="fa-solid fa-rotate-left"></i><span>Quitar todas las fotos</span></button>
-      </div>
-      <p id="fpEstado" style="margin-top:10px; font-size:13px; color:#94a3b8;"></p>
-    </div>
 
     <div class="card cy-qr-ingreso" style="text-align:center;">
       <h3 style="justify-content:center"><i class="fa-solid fa-qrcode"></i> QR de ingreso</h3>
@@ -986,7 +968,6 @@
 <script src="js/qr/catalogo-promos.js"></script>
 <script src="js/panel/acceso-y-sesion.js"></script>
 <script src="js/qr/arranque.js"></script>
-<script src="js/qr/fondo-portada.js"></script>
 <script src="js/core/supabase.js"></script>
 <script src="js/qr/rpc-seguro.js"></script>
 <script src="js/panel/caja-offline.js"></script>
@@ -1000,7 +981,6 @@
 <script src="js/qr/ingreso.js"></script>
 <script src="js/compartido/confirmar-asistencia-qr.js"></script>
 <script src="js/panel/comprobantes-whatsapp.js"></script>
-<script src="js/panel/fondo-portada.js"></script>
 <script src="js/qr/planes-bienvenida.js"></script>
 <script src="js/panel/invitaciones.js"></script>
 <!-- Modal Dinámico para Precios de Invitación -->

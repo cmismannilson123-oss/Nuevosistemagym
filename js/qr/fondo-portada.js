@@ -84,6 +84,8 @@ function programarCambio(p) {
 function siguienteFoto(p) {
   if (!p.activo) return;
   if (document.hidden) { p.timer = null; return; } // se reanuda al volver a la pestaña
+  // Con una pantalla encima (p. ej. Conocer el gym) la portada no cambia de foto: se reanuda al cerrarla
+  if (document.documentElement.classList.contains('cy-covered')) { p.timer = null; return; }
   p.i = (p.i + 1) % p.urls.length;
   const url = p.urls[p.i];
   const fundido = p.paso % 2 === 0 ? 1800 : 700;
@@ -94,6 +96,12 @@ function siguienteFoto(p) {
     programarCambio(p);
   });
 }
+
+// Al cerrar la pantalla que tapaba la portada, se reanuda el cambio de fotos
+new MutationObserver(() => {
+  if (document.documentElement.classList.contains('cy-covered')) return;
+  Object.values(_pases).forEach(p => { if (p.activo && !p.timer) programarCambio(p); });
+}).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) return;

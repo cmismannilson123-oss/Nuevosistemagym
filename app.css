@@ -4184,3 +4184,6 @@ html[data-rol="admin"] #btnCerrarSesion{ display:none !important; }
 
 /* Mientras se desliza "Conocer el gym", las ilustraciones animadas se pausan (evita el parpadeo) */
 html.cy-moviendo [class*="ilu-"]{ animation-play-state:paused !important; }
+
+/* Con una pantalla encima, las fotos de la portada dejan de dibujarse (evita el parpadeo de "Conocer el gym") */
+html.cy-covered .cy-slide{ visibility:hidden !important; }

@@ -30,7 +30,7 @@
 // vieja y toma la nueva automáticamente.
 // ============================================================
 
-const CACHE_NAME = 'cy-fitness-gym-v194';
+const CACHE_NAME = 'cy-fitness-gym-v195';
 
 // Dominios externos de los que es seguro guardar copia (son archivos estáticos:
 // librerías, íconos, fuentes, fotos — nunca datos de socios). Cualquier petición
@@ -193,7 +193,13 @@ self.addEventListener('fetch', (event) => {
     caches.match(peticion, { ignoreSearch: true }).then((guardada) => {
       if (guardada) return guardada;
       return fetch(peticion).then((respuesta) => {
-        if (respuesta && respuesta.status === 200 && respuesta.type === 'basic') {
+        // Solo se guarda una respuesta completa y válida. Una imagen se guarda solo si
+        // el servidor la envió como imagen (así una respuesta rara no queda en el teléfono).
+        const esImagen = peticion.destination === 'image';
+        const tipo = (respuesta && respuesta.headers.get('content-type')) || '';
+        const valida = respuesta && respuesta.status === 200 && respuesta.type === 'basic' &&
+          (!esImagen || tipo.startsWith('image/'));
+        if (valida) {
           const copia = respuesta.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(peticion, copia));
         }

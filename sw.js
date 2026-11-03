@@ -30,7 +30,7 @@
 // vieja y toma la nueva automáticamente.
 // ============================================================
 
-const CACHE_NAME = 'cy-fitness-gym-v187';
+const CACHE_NAME = 'cy-fitness-gym-v188';
 
 // Dominios externos de los que es seguro guardar copia (son archivos estáticos:
 // librerías, íconos, fuentes, fotos — nunca datos de socios). Cualquier petición
@@ -51,53 +51,7 @@ const HOSTS_EXTERNOS_CACHEABLES = [
 const ARCHIVOS_APP = [
   './',
   './gym.html',
-  './qr.html',
-  './app.css',
-  './tienda.css',
-  './tienda.js',
-  './personal.js',
-  './js/qr/pantalla-inicial.js',
-  './js/qr/inscripcion.js',
-  './js/qr/planes-scroll.js',
-  './js/qr/cupones-socio.js',
-  './js/qr/sesion-socio.js',
-  './js/qr/catalogo-promos.js',
-  './js/qr/arranque.js',
-  './js/qr/rpc-seguro.js',
-  './js/qr/bloqueo-envio.js',
-  './js/qr/tarjeta-bloqueo-tienda.js',
-  './js/panel/acceso-y-sesion.js',
-  './js/panel/caja-offline.js',
-  './js/panel/registro-socios.js',
-  './js/panel/invitaciones.js',
-  './js/panel/app-y-avisos.js',
-  './js/panel/confirmacion-ingreso.js',
-  './js/panel/premios-qr.js',
-  './js/panel/barra-y-pestanas.js',
-  './js/panel/cupones-usados.js',
-  './js/panel/atajos-registro.js',
-  './js/compartido/tarjeta-estado.js',
-  './js/compartido/confirmar-asistencia-qr.js',
-  './js/core/navegador-embebido.js',
-  './js/core/seguridad-inicial.js',
-  './js/core/service-worker.js',
-  './js/core/supabase.js',
-  './js/panel/comprobantes-whatsapp.js',
-  './js/panel/qr-invitacion.js',
-  './js/panel/recibos.js',
-  './js/ui/accesibilidad-v41.js',
-  './js/ui/capa-diseno-v33.js',
-  './js/ui/espaciador-cabecera.js',
-  './js/ui/feedback-marcaje.js',
-  './js/ui/tinte-ambiental.js',
-  './js/qr/entrada-campos.js',
-  './js/qr/ingreso.js',
-  './js/qr/planes-bienvenida.js',
-  './images/logo-cy.webp',
-  './images/icon-192.png',
-  './images/badge-96.png',
-  './manifest-panel.json',
-  './manifest-qr.json',
+  './images/logo-cy.png',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css',
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.2/dist/umd/supabase.js',
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
@@ -188,9 +142,7 @@ self.addEventListener('fetch', (event) => {
   // Tu propia página: responde al instante con la copia guardada (si existe),
   // y en paralelo va a buscar la versión más reciente para la próxima vez.
   event.respondWith(
-    // ignoreSearch: el QR abre gym.html?qr=1; sin esto esa dirección nunca
-    // estaba en caché y cada escaneo esperaba la red completa.
-    caches.match(peticion, { ignoreSearch: true }).then((respuestaGuardada) => {
+    caches.match(peticion).then((respuestaGuardada) => {
       const peticionRed = fetch(peticion)
         .then((respuestaFresca) => {
           if (respuestaFresca && respuestaFresca.status === 200) {
@@ -206,46 +158,4 @@ self.addEventListener('fetch', (event) => {
       return respuestaGuardada || peticionRed;
     })
   );
-});
-
-
-// ============================================================
-// NOTIFICACIONES PROPIAS (Web Push, sin ntfy)
-// Las envía la Edge Function "cy-push" cuando un socio ingresa. Llegan
-// aunque la app esté cerrada y el celular bloqueado.
-// ============================================================
-self.addEventListener('push', (event) => {
-  let d = {};
-  try { d = event.data ? event.data.json() : {}; }
-  catch (e) { d = { title: 'C&Y Fitness Gym', body: event.data ? event.data.text() : '' }; }
-  const titulo = d.title || 'C&Y Fitness Gym';
-  // Si el panel está abierto, se le avisa para que actualice la lista al
-  // instante (aunque su conexión en vivo se haya cortado) y, si la voz está
-  // activada, anuncie el ingreso.
-  event.waitUntil(clients.matchAll({ type: 'window', includeUncontrolled: true }).then((vs) => {
-    vs.forEach((v) => v.postMessage({ tipo: 'cy-push', evento: d.tipo || 'ingreso', motivo: d.motivo, dni: d.dni, nombre: d.nombre, metodo: d.metodo, tag: d.tag }));
-  }).catch(() => {}));
-  event.waitUntil(self.registration.showNotification(titulo, {
-    body: d.body || '',
-    icon: './images/icon-192.png',
-    badge: './images/badge-96.png',
-    tag: d.tag || 'cy-aviso',
-    renotify: true,
-    vibrate: [180, 90, 180],
-    timestamp: d.ts || Date.now(),   // hora real del ingreso, no la de llegada
-    data: { url: d.url || './?app=panel' }
-  }));
-});
-
-// Al tocar la notificación: abre el panel (o lo trae al frente si ya está abierto)
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  const destino = new URL((event.notification.data && event.notification.data.url) || './?app=panel', self.registration.scope).href;
-  event.waitUntil((async () => {
-    const ventanas = await clients.matchAll({ type: 'window', includeUncontrolled: true });
-    for (const v of ventanas) {
-      if (v.url.startsWith(self.registration.scope) && !v.url.includes('qr=1') && 'focus' in v) return v.focus();
-    }
-    if (clients.openWindow) return clients.openWindow(destino);
-  })());
 });

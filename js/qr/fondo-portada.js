@@ -28,7 +28,7 @@ function fondoMovimientoReducido() {
 
 // Una sola foto (sin cambios): portada y "Conocer el gym"
 function fondoPintarUnica(url, esRespaldo) {
-  const els = document.querySelectorAll('.cy-bg-photo, .ap-hero-photo');
+  const els = document.querySelectorAll('.cy-bg-photo');
   if (!els.length || !url || url === _fondoAplicado) return;
   _fondoAplicado = url;
   const img = new Image();
@@ -149,42 +149,10 @@ function fondoAplicarLista(lista) {
   window.cyFondoLista = lista;
   const boton = document.getElementById('btnGaleriaQR');
   if (boton) boton.style.display = lista.length ? 'inline-flex' : 'none';
-  if (lista.length === 1) { fondoQuitarColage(); fondoPintarUnica(lista[0].g); return; }
+  if (lista.length === 1) { fondoPintarUnica(lista[0].g); return; }
   if (lista.length > 1) {
     fondoPase('portada', document.querySelector('.cy-bg-par'), lista.map(f => f.g));
-    fondoColage(lista.map(f => f.t));
   }
-}
-
-// "Conocer el gym": collage FIJO, sin transiciones ni zoom, para que el scroll
-// y las animaciones del texto no compitan con las fotos.
-function fondoQuitarColage() {
-  document.querySelectorAll('.ap-hero-img .ap-collage').forEach(e => e.remove());
-}
-function fondoColage(urls) {
-  const cont = document.querySelector('.ap-hero-img');
-  if (!cont || urls.length < 2) return;
-  const clave = urls.join('|');
-  if (cont.dataset.colage === clave) return;
-  cont.dataset.colage = clave;
-  // Se espera a que carguen todas las miniaturas para no mostrar huecos
-  const cargas = urls.map(u => new Promise(res => { const im = new Image(); im.onload = im.onerror = res; im.src = u; }));
-  const limite = new Promise(res => setTimeout(res, 4000));
-  Promise.race([Promise.all(cargas), limite]).then(() => {
-    if (cont.dataset.colage !== clave) return; // llegó una lista más nueva
-    const n = urls.length;
-    const col = document.createElement('div');
-    col.className = 'ap-collage';
-    col.style.gridTemplateRows = 'repeat(' + Math.ceil(n / 2) + ', 1fr)';
-    urls.forEach((u, i) => {
-      const t = document.createElement('i');
-      t.style.backgroundImage = 'url("' + u + '")';
-      if (n % 2 === 1 && i === 0) t.classList.add('ap-collage-ancha');
-      col.appendChild(t);
-    });
-    fondoQuitarColage();
-    cont.appendChild(col);
-  });
 }
 
 // ---------- Galería (cuadrícula + visor) ----------

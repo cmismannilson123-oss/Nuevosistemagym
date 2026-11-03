@@ -4183,8 +4183,3 @@ html[data-rol="admin"] #btnCerrarSesion{ display:none !important; }
 .fp-acc button[title="Quitar"]{ background:rgba(239,68,68,.35); }
 @media (max-width:360px){ .fp-lista{ gap:6px; } }
 
-/* "Conocer el gym": collage fijo de fotos (sin transiciones ni zoom) */
-.ap-collage{ position:absolute; inset:0; display:grid; grid-template-columns:1fr 1fr; gap:3px; background:#070d14; }
-.ap-collage i{ display:block; min-height:0; background-size:cover; background-position:center; }
-.ap-collage .ap-collage-ancha{ grid-column:1 / -1; }
-.ap-collage::after{ content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(180deg, rgba(4,8,7,.55) 0%, rgba(4,8,7,.72) 45%, rgba(3,6,6,.94) 80%, rgba(2,4,4,.98) 100%); }

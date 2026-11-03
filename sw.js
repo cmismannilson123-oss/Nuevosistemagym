@@ -30,7 +30,7 @@
 // vieja y toma la nueva automáticamente.
 // ============================================================
 
-const CACHE_NAME = 'cy-fitness-gym-v191';
+const CACHE_NAME = 'cy-fitness-gym-v192';
 
 // Dominios externos de los que es seguro guardar copia (son archivos estáticos:
 // librerías, íconos, fuentes, fotos — nunca datos de socios). Cualquier petición
@@ -150,6 +150,34 @@ self.addEventListener('activate', (event) => {
 //   guardadas, se sirven directo desde el celular, sin tocar la red — dejando
 //   toda la conexión disponible para lo único que de verdad necesita internet
 //   en vivo: la consulta a Supabase.
+// Red primero con respaldo en caché (ver el manejador 'fetch').
+// ignoreSearch: el QR abre gym.html?qr=1 y debe encontrar su copia guardada.
+const ESPERA_RED_MS = 2500;
+function redPrimeroConRespaldo(peticion) {
+  return new Promise((resolver) => {
+    let resuelto = false;
+    const usarGuardada = () => caches.match(peticion, { ignoreSearch: true }).then((guardada) => {
+      if (guardada && !resuelto) { resuelto = true; resolver(guardada); }
+      return guardada;
+    });
+    const temporizador = setTimeout(usarGuardada, ESPERA_RED_MS);
+    fetch(peticion)
+      .then((fresca) => {
+        clearTimeout(temporizador);
+        if (fresca && fresca.status === 200 && fresca.type === 'basic') {
+          caches.open(CACHE_NAME).then((cache) => cache.put(peticion, fresca.clone())).catch(() => {});
+        }
+        if (!resuelto) { resuelto = true; resolver(fresca); }
+      })
+      .catch(() => {
+        clearTimeout(temporizador);
+        usarGuardada().then((guardada) => {
+          if (!guardada && !resuelto) { resuelto = true; resolver(Response.error()); }
+        });
+      });
+  });
+}
+
 self.addEventListener('fetch', (event) => {
   const peticion = event.request;
 
@@ -185,27 +213,10 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Tu propia página: responde al instante con la copia guardada (si existe),
-  // y en paralelo va a buscar la versión más reciente para la próxima vez.
-  event.respondWith(
-    // ignoreSearch: el QR abre gym.html?qr=1; sin esto esa dirección nunca
-    // estaba en caché y cada escaneo esperaba la red completa.
-    caches.match(peticion, { ignoreSearch: true }).then((respuestaGuardada) => {
-      const peticionRed = fetch(peticion)
-        .then((respuestaFresca) => {
-          if (respuestaFresca && respuestaFresca.status === 200) {
-            const copia = respuestaFresca.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(peticion, copia));
-          }
-          return respuestaFresca;
-        })
-        .catch(() => respuestaGuardada); // Sin internet: usamos lo último que quedó guardado
-
-      // Si ya hay una copia guardada, la mostramos YA (instantáneo).
-      // Si es la primerísima vez, esperamos la respuesta de internet.
-      return respuestaGuardada || peticionRed;
-    })
-  );
+  // Archivos propios (página, scripts, estilos, fotos): primero la red, para que el
+  // socio reciba la versión nueva desde la primera carga. Si la red tarda más de
+  // ESPERA_RED_MS o falla (sin internet), se usa la copia guardada.
+  event.respondWith(redPrimeroConRespaldo(peticion));
 });
 
 

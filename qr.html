@@ -245,7 +245,7 @@
       </div>
 
       <section class="ap-hero" id="apHero">
-        <div class="ap-hero-img"><div class="ap-hero-photo" style="background-image:url('images/conocer-gym.jpg');"></div></div>
+        <div class="ap-hero-img"><div class="ap-hero-photo"><i style="background-image:url('images/conocer-gym.jpg');"></i><i style="background-image:url('images/conocer-levantamiento.jpg');"></i></div></div>
         <div class="ap-hero-copy">
           <div class="ap-eyebrow">C&amp;Y FITNESS GYM</div>
           <h3 class="ap-h1">Todo lo que necesitas para alcanzar <em>tus objetivos</em></h3>
@@ -952,8 +952,6 @@ const SUPABASE_URL = "https://ygbiqnbygjbrmwyttkku.supabase.co";
 
 const SUPABASE_KEY = "sb_publishable_M9fPsgu2VkCyu9ro0ECx8A_no-0RLLt";
 
-const FONDO_POR_DEFECTO = 'images/fondo-defecto.jpg';
-
 const FONDO_CLAVE_FOTOS = 'cyFondoFotos';
 
 const FONDO_CLAVE_UNICA = 'cyFondoPortada';
@@ -992,7 +990,7 @@ function fondoPintarUnica(url, esRespaldo) {
   _fondoAplicado = url;
   const img = new Image();
   img.onload = () => { if (_fondoAplicado === url) els.forEach(el => { el.style.backgroundImage = 'url("' + url + '")'; }); };
-  img.onerror = () => { if (!esRespaldo && url !== FONDO_POR_DEFECTO) fondoPintarUnica(FONDO_POR_DEFECTO, true); };
+  img.onerror = () => { /* sin foto: la portada queda con su fondo oscuro */ };
   img.src = url;
 }
 
@@ -1075,7 +1073,7 @@ async function cyAplicarFondoPortada() {
   // 2) Lo que dice el servidor, con límite de espera
   let respondio = false;
   const temporizador = setTimeout(() => {
-    if (!respondio && !_fondoAplicado && !Object.keys(_pases).length) fondoPintarUnica(FONDO_POR_DEFECTO, true);
+    // Sin respuesta del servidor y sin nada conocido: la portada queda con su fondo oscuro
   }, FONDO_ESPERA_MAX);
   try {
     if (typeof supabaseClient === 'undefined') throw new Error('sin cliente');
@@ -1092,11 +1090,11 @@ async function cyAplicarFondoPortada() {
       // Compatibilidad: una sola foto guardada antes
       const { data: unica } = await supabaseClient.rpc('fondo_portada_url');
       if (fondoEsValido(unica)) { fondoGuardarLocal(FONDO_CLAVE_UNICA, unica); fondoPintarUnica(unica); }
-      else { fondoGuardarLocal(FONDO_CLAVE_UNICA, ''); fondoPintarUnica(FONDO_POR_DEFECTO, true); }
+      else { fondoGuardarLocal(FONDO_CLAVE_UNICA, ''); }
     }
   } catch (e) {
     respondio = true;
-    if (!_fondoAplicado && !Object.keys(_pases).length) fondoPintarUnica(FONDO_POR_DEFECTO, true);
+    // Error de conexión: la portada queda con su fondo oscuro
   } finally {
     clearTimeout(temporizador);
   }

@@ -34,7 +34,7 @@ function fondoPintarLista() {
   if (!cont) return;
   cont.innerHTML = '';
   if (!orden.length) {
-    cont.innerHTML = '<p style="color:#94a3b8; font-size:13px; margin:0;">Sin fotos: la portada usa la foto por defecto.</p>';
+    cont.innerHTML = '<p style="color:#94a3b8; font-size:13px; margin:0;">Sin fotos: la portada queda con fondo oscuro.</p>';
   }
   orden.forEach((it, pos) => {
     const url = it.tipo === 'g' ? it.foto.t : it.url;
@@ -157,7 +157,7 @@ window.cyGuardarFondo = async function () {
 };
 
 window.cyQuitarFondo = async function () {
-  if (!confirm('¿Quitar todas las fotos y volver a la foto por defecto?')) return;
+  if (!confirm('¿Quitar todas las fotos de la portada?')) return;
   try {
     const { error } = await supabaseClient.rpc('admin_set_fondo_fotos', { p_fotos: [] });
     if (error) throw error;
@@ -166,7 +166,7 @@ window.cyQuitarFondo = async function () {
     orden = [];
     fotosActivas = [];
     fondoPintarLista();
-    fondoEstado('Ahora la portada usa la foto por defecto.', '#10b981');
+    fondoEstado('La portada quedó sin fotos (fondo oscuro).', '#10b981');
   } catch (e) {
     console.error('No se pudo quitar las fotos:', e);
     fondoEstado('No se pudo quitar: ' + (e.message || e), '#ef4444');
@@ -181,7 +181,7 @@ async function fondoCargarActual() {
     fotosActivas = Array.isArray(data) ? data.filter(f => f && f.g && f.t) : [];
     orden = fotosActivas.map(foto => ({ tipo: 'g', foto }));
     fondoPintarLista();
-    fondoEstado(fotosActivas.length ? fotosActivas.length + ' foto(s) activa(s).' : 'Sin fotos: la portada usa la foto por defecto.');
+    fondoEstado(fotosActivas.length ? fotosActivas.length + ' foto(s) activa(s).' : 'Sin fotos: la portada queda con fondo oscuro.');
   } catch (e) {
     fondoEstado('No se pudo leer las fotos actuales.', '#f59e0b');
   }

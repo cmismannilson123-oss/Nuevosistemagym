@@ -1,9 +1,7 @@
 // Fotos de la portada del socio, de "Conocer el gym" y de la galería.
 // Orden: 1) la última lista conocida de este celular (aparece al instante),
-// 2) lo que diga el servidor, 3) la foto sola subida antes, 4) la foto por defecto.
-// Si el servidor tarda más de 4 s y no hay nada conocido, se muestra la foto por defecto.
+// 2) lo que diga el servidor, 3) la foto sola subida antes. Si no hay ninguna, la portada queda oscura.
 // Una sola lectura por carga. No bloquea el flujo (ver arranque.js).
-const FONDO_POR_DEFECTO = 'images/fondo-defecto.jpg';
 const FONDO_CLAVE_FOTOS = 'cyFondoFotos';
 const FONDO_CLAVE_UNICA = 'cyFondoPortada';
 const FONDO_ESPERA_MAX = 4000;
@@ -33,7 +31,7 @@ function fondoPintarUnica(url, esRespaldo) {
   _fondoAplicado = url;
   const img = new Image();
   img.onload = () => { if (_fondoAplicado === url) els.forEach(el => { el.style.backgroundImage = 'url("' + url + '")'; }); };
-  img.onerror = () => { if (!esRespaldo && url !== FONDO_POR_DEFECTO) fondoPintarUnica(FONDO_POR_DEFECTO, true); };
+  img.onerror = () => { /* sin foto: la portada queda con su fondo oscuro */ };
   img.src = url;
 }
 
@@ -118,7 +116,7 @@ async function cyAplicarFondoPortada() {
   // 2) Lo que dice el servidor, con límite de espera
   let respondio = false;
   const temporizador = setTimeout(() => {
-    if (!respondio && !_fondoAplicado && !Object.keys(_pases).length) fondoPintarUnica(FONDO_POR_DEFECTO, true);
+    // Sin respuesta del servidor y sin nada conocido: la portada queda con su fondo oscuro
   }, FONDO_ESPERA_MAX);
   try {
     if (typeof supabaseClient === 'undefined') throw new Error('sin cliente');
@@ -135,11 +133,11 @@ async function cyAplicarFondoPortada() {
       // Compatibilidad: una sola foto guardada antes
       const { data: unica } = await supabaseClient.rpc('fondo_portada_url');
       if (fondoEsValido(unica)) { fondoGuardarLocal(FONDO_CLAVE_UNICA, unica); fondoPintarUnica(unica); }
-      else { fondoGuardarLocal(FONDO_CLAVE_UNICA, ''); fondoPintarUnica(FONDO_POR_DEFECTO, true); }
+      else { fondoGuardarLocal(FONDO_CLAVE_UNICA, ''); }
     }
   } catch (e) {
     respondio = true;
-    if (!_fondoAplicado && !Object.keys(_pases).length) fondoPintarUnica(FONDO_POR_DEFECTO, true);
+    // Error de conexión: la portada queda con su fondo oscuro
   } finally {
     clearTimeout(temporizador);
   }

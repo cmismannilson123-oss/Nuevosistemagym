@@ -49,8 +49,7 @@ html.qr-mode, html.qr-mode body {
 body{
   margin:0;
   font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background: linear-gradient(135deg, rgba(10, 15, 30, 0.97), rgba(17, 24, 39, 0.98)),
-              url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1400&auto=format&fit=crop');
+  background: linear-gradient(135deg, rgba(10, 15, 30, 0.97), rgba(17, 24, 39, 0.98));
   background-size:cover;
   background-position:center;
   background-attachment:scroll;
@@ -460,8 +459,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, .tabbtn:focus-v
   overscroll-behavior: contain;
   padding: 34px 24px 30px;
   background:
-    linear-gradient(180deg, rgba(4,8,7,.55) 0%, rgba(4,8,7,.65) 45%, rgba(3,6,6,.92) 78%, rgba(2,4,4,.98) 100%),
-    url('https://images.unsplash.com/photo-1744551154623-4b5336e95c28?q=80&w=1400&auto=format&fit=crop') center/cover no-repeat;
+    linear-gradient(180deg, rgba(4,8,7,.55) 0%, rgba(4,8,7,.65) 45%, rgba(3,6,6,.92) 78%, rgba(2,4,4,.98) 100%);
 }
 .qr-hero-content{ max-width: 420px; margin: 0 auto; text-align:center; padding-top: 8vh; }
 .qr-hero-divider{ width:60px; height:3px; background:linear-gradient(90deg,#A9823F,#F3DFA2,#A9823F); border-radius:3px; margin:16px auto 26px; }
@@ -1256,7 +1254,7 @@ input:focus-visible,select:focus-visible,textarea:focus-visible{ box-shadow:0 0 
 .cy-bg-par{ position:absolute; inset:0; transform:translate3d(0,var(--bgy,0px),0); }
 .cy-bg-photo{
   position:absolute; inset:-6%;
-  background:url('https://images.unsplash.com/photo-1744551154623-4b5336e95c28?q=80&w=1400&auto=format&fit=crop') center/cover no-repeat;
+  background:#0b0b0d center/cover no-repeat;
   animation:cyDrift 28s ease-in-out infinite alternate;
 }
 @keyframes cyDrift{
@@ -2389,7 +2387,7 @@ html.qr-mode .container{ padding-bottom:calc(24px + env(safe-area-inset-bottom,0
 }
 #wizConoce .wiz-feat-hero .ic{ animation:none !important; }
 .ap-state .w {
-  transition: color .3s ease;
+  transition: none; /* el color cambia al instante: sin transición que repinte la frase durante el scroll */
 }
 .ap-state .w.em.on {
   color: #34d399;
@@ -4142,3 +4140,13 @@ html[data-rol="admin"] #btnCerrarSesion{ display:none !important; }
 .estado-cta-txt small{ font-size:12.5px; line-height:1.35; color:#94a3b8; }
 .estado-cta-flecha{ flex:none; color:#fca5a5; font-size:14px; }
 @media (prefers-reduced-motion: reduce){ .estado-cta{ transition:none; } }
+
+/* Portada y "Conocer el gym": una foto fija cada una */
+.ap-hero-photo{ background-color:#070d14; }
+
+
+/* Mientras se desliza "Conocer el gym", las ilustraciones animadas se pausan (evita el parpadeo) */
+html.cy-moviendo [class*="ilu-"]{ animation-play-state:paused !important; }
+
+/* Mientras otra pantalla cubre la portada, toda la portada deja de dibujarse (no solo sus fotos) */
+html.cy-covered #qrCardPrimeraVez{ visibility:hidden !important; }

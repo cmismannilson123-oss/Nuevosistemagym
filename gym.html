@@ -132,7 +132,7 @@
 
   <div class="qr-hero-fullbleed" id="qrCardPrimeraVez">
     <div class="cy-bg" aria-hidden="true">
-      <div class="cy-bg-par"><div class="cy-bg-photo"></div></div>
+      <div class="cy-bg-par"><div class="cy-bg-photo" style="background-image:url('images/portada.jpg');"></div></div>
       <div class="cy-glow"></div>
       <i class="cy-p" style="--x:12%;--s:3px;--t:14s;--d:-2s"></i><i class="cy-p" style="--x:26%;--s:2px;--t:11s;--d:-7s"></i>
       <i class="cy-p" style="--x:38%;--s:4px;--t:17s;--d:-4s"></i><i class="cy-p" style="--x:51%;--s:2px;--t:12s;--d:-9s"></i>
@@ -259,7 +259,7 @@
            el propio sistema del celular. No se ve, no interrumpe la búsqueda, y solo
            se activa después de encontrar al socio (ver guardarCredencialNavegador). -->
       <iframe name="credSaveFrame" style="display:none;" tabindex="-1" aria-hidden="true"></iframe>
-      <form id="credSaveForm" target="credSaveFrame" style="display:none;" autocomplete="on">
+      <form id="credSaveForm" method="post" action="guardar-acceso.html" target="credSaveFrame" style="display:none;" autocomplete="on">
         <input type="text" name="username" id="credSaveUser" autocomplete="username">
         <input type="password" name="password" id="credSavePass" autocomplete="new-password">
       </form>
@@ -283,7 +283,7 @@
       </div>
 
       <section class="ap-hero" id="apHero">
-        <div class="ap-hero-img"><div class="ap-hero-photo" style="background-image:url('https://images.unsplash.com/photo-1744551154623-4b5336e95c28?q=80&w=900&auto=format&fit=crop');"></div></div>
+        <div class="ap-hero-img"><div class="ap-hero-photo" style="background-image:url('images/conocer-gym.jpg');"></div></div>
         <div class="ap-hero-copy">
           <div class="ap-eyebrow">C&amp;Y FITNESS GYM</div>
           <h3 class="ap-h1">Todo lo que necesitas para alcanzar <em>tus objetivos</em></h3>
@@ -754,6 +754,7 @@
         <i class="fa-brands fa-whatsapp"></i> Enviar Información Completa por WhatsApp
       </button>
     </div>
+
 
     <div class="card cy-qr-ingreso" style="text-align:center;">
       <h3 style="justify-content:center"><i class="fa-solid fa-qrcode"></i> QR de ingreso</h3>

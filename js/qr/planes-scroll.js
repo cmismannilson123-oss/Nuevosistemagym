@@ -28,13 +28,17 @@
 
     var hero = document.getElementById('apHero'), conoce = document.getElementById('wizConoce');
     var tick = false, lastN = -1, lastHp = -1, lastT = null, heroH = 0, topbars = ov.querySelectorAll('.wiz-topbar');
+    var stateDocY = null, cacheVh = 0;
     function medirHero(){ heroH = hero ? hero.offsetHeight : 0; }
     function frame(){
       tick = false;
       /* 1) todas las lecturas juntas */
-      var y = ov.scrollTop, vh = ov.clientHeight;
+      var y = ov.scrollTop, vh = cacheVh || (cacheVh = ov.clientHeight);
       var enConoce = conoce && conoce.style.display !== 'none';
-      var rTop = (enConoce && state && words.length && !reduce) ? state.getBoundingClientRect().top : null;
+      if(!enConoce){ stateDocY = null; }
+      /* La posición de la frase se mide una vez (no en cada cuadro): medir fuerza un recálculo de diseño */
+      var rTop = null;
+      if(enConoce && state && words.length && !reduce){ if(stateDocY === null) stateDocY = state.getBoundingClientRect().top + y; rTop = stateDocY - y; }
       /* 2) escrituras, solo si cambia algo */
       var t = y > (enConoce ? vh * 0.5 : 56);
       if(t !== lastT){ lastT = t; topbars.forEach(function(b){ b.classList.toggle('t-in', t); }); }
@@ -51,8 +55,16 @@
         if(n !== lastN){ lastN = n; words.forEach(function(w, i){ w.classList.toggle('on', i < n); }); }
       }
     }
-    ov.addEventListener('scroll', function(){ if(!tick){ tick = true; requestAnimationFrame(frame); } }, {passive:true});
-    window.addEventListener('resize', function(){ heroH = 0; if(!tick){ tick = true; requestAnimationFrame(frame); } });
+    // Mientras se desliza, las ilustraciones animadas se pausan: cada cuadro del scroll
+    // las redibujaba junto con el texto y la foto (causa del parpadeo). Al parar, siguen.
+    var finScroll = null;
+    ov.addEventListener('scroll', function(){
+      document.documentElement.classList.add('cy-moviendo');
+      clearTimeout(finScroll);
+      finScroll = setTimeout(function(){ document.documentElement.classList.remove('cy-moviendo'); }, 160);
+      if(!tick){ tick = true; requestAnimationFrame(frame); }
+    }, {passive:true});
+    window.addEventListener('resize', function(){ heroH = 0; cacheVh = 0; stateDocY = null; if(!tick){ tick = true; requestAnimationFrame(frame); } });
 
     /* Aparición escalonada de las piezas nuevas */
     var io = null;

@@ -27,7 +27,14 @@
     return d + " " + MESES[m - 1];
   };
   const dniValido = (dni) => /^\d{8}$/.test(dni || "");
-  const mensajeError = (e) => (e && e.message) || "Ocurrió un error. Inténtalo de nuevo.";
+  const mensajeError = (e) => {
+    const m = (e && e.message) || "";
+    // Sin señal o respuesta perdida: la operación pudo guardarse igual
+    if (/Failed to fetch|NetworkError|Load failed|network|TypeError/i.test(m)) {
+      return "Sin conexión. Revise Ventas de hoy antes de volver a intentar, por si ya se guardó.";
+    }
+    return m || "Ocurrió un error. Inténtalo de nuevo.";
+  };
 
   // ---------- Datos ----------
 

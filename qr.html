@@ -88,7 +88,7 @@
 
   <div class="qr-hero-fullbleed" id="qrCardPrimeraVez">
     <div class="cy-bg" aria-hidden="true">
-      <div class="cy-bg-par"><div class="cy-bg-photo"></div></div>
+      <div class="cy-bg-par"><div class="cy-bg-photo" style="background-image:url('images/portada.jpg');"></div></div>
       <div class="cy-glow"></div>
       <i class="cy-p" style="--x:12%;--s:3px;--t:14s;--d:-2s"></i><i class="cy-p" style="--x:26%;--s:2px;--t:11s;--d:-7s"></i>
       <i class="cy-p" style="--x:38%;--s:4px;--t:17s;--d:-4s"></i><i class="cy-p" style="--x:51%;--s:2px;--t:12s;--d:-9s"></i>
@@ -215,7 +215,7 @@
            el propio sistema del celular. No se ve, no interrumpe la búsqueda, y solo
            se activa después de encontrar al socio (ver guardarCredencialNavegador). -->
       <iframe name="credSaveFrame" style="display:none;" tabindex="-1" aria-hidden="true"></iframe>
-      <form id="credSaveForm" target="credSaveFrame" style="display:none;" autocomplete="on">
+      <form id="credSaveForm" method="post" action="guardar-acceso.html" target="credSaveFrame" style="display:none;" autocomplete="on">
         <input type="text" name="username" id="credSaveUser" autocomplete="username">
         <input type="password" name="password" id="credSavePass" autocomplete="new-password">
       </form>
@@ -239,7 +239,7 @@
       </div>
 
       <section class="ap-hero" id="apHero">
-        <div class="ap-hero-img"><div class="ap-hero-photo" style="background-image:url('https://images.unsplash.com/photo-1744551154623-4b5336e95c28?q=80&w=900&auto=format&fit=crop');"></div></div>
+        <div class="ap-hero-img"><div class="ap-hero-photo" style="background-image:url('images/conocer-gym.jpg');"></div></div>
         <div class="ap-hero-copy">
           <div class="ap-eyebrow">C&amp;Y FITNESS GYM</div>
           <h3 class="ap-h1">Todo lo que necesitas para alcanzar <em>tus objetivos</em></h3>
@@ -1560,7 +1560,7 @@ function tarjetaPlanHTML(p, i){
   return `
   <article class="pp-card${p.destacado ? " pp-destacado" : ""}" style="--pc:${p.pc};--d:${(i * 0.07).toFixed(2)}s">
     <div class="pp-arte">
-      <img src="${p.img}" alt="" width="800" height="450" loading="lazy" decoding="async">
+      <img src="${p.img}" alt="" width="800" height="450" decoding="async">
       ${p.destacado ? `<span class="pp-cinta">Recomendado</span>` : ""}
     </div>
     <div class="pp-cuerpo">
@@ -2173,13 +2173,17 @@ if ('serviceWorker' in navigator) {
 
     var hero = document.getElementById('apHero'), conoce = document.getElementById('wizConoce');
     var tick = false, lastN = -1, lastHp = -1, lastT = null, heroH = 0, topbars = ov.querySelectorAll('.wiz-topbar');
+    var stateDocY = null, cacheVh = 0;
     function medirHero(){ heroH = hero ? hero.offsetHeight : 0; }
     function frame(){
       tick = false;
       /* 1) todas las lecturas juntas */
-      var y = ov.scrollTop, vh = ov.clientHeight;
+      var y = ov.scrollTop, vh = cacheVh || (cacheVh = ov.clientHeight);
       var enConoce = conoce && conoce.style.display !== 'none';
-      var rTop = (enConoce && state && words.length && !reduce) ? state.getBoundingClientRect().top : null;
+      if(!enConoce){ stateDocY = null; }
+      /* La posición de la frase se mide una vez (no en cada cuadro): medir fuerza un recálculo de diseño */
+      var rTop = null;
+      if(enConoce && state && words.length && !reduce){ if(stateDocY === null) stateDocY = state.getBoundingClientRect().top + y; rTop = stateDocY - y; }
       /* 2) escrituras, solo si cambia algo */
       var t = y > (enConoce ? vh * 0.5 : 56);
       if(t !== lastT){ lastT = t; topbars.forEach(function(b){ b.classList.toggle('t-in', t); }); }
@@ -2196,8 +2200,16 @@ if ('serviceWorker' in navigator) {
         if(n !== lastN){ lastN = n; words.forEach(function(w, i){ w.classList.toggle('on', i < n); }); }
       }
     }
-    ov.addEventListener('scroll', function(){ if(!tick){ tick = true; requestAnimationFrame(frame); } }, {passive:true});
-    window.addEventListener('resize', function(){ heroH = 0; if(!tick){ tick = true; requestAnimationFrame(frame); } });
+    // Mientras se desliza, las ilustraciones animadas se pausan: cada cuadro del scroll
+    // las redibujaba junto con el texto y la foto (causa del parpadeo). Al parar, siguen.
+    var finScroll = null;
+    ov.addEventListener('scroll', function(){
+      document.documentElement.classList.add('cy-moviendo');
+      clearTimeout(finScroll);
+      finScroll = setTimeout(function(){ document.documentElement.classList.remove('cy-moviendo'); }, 160);
+      if(!tick){ tick = true; requestAnimationFrame(frame); }
+    }, {passive:true});
+    window.addEventListener('resize', function(){ heroH = 0; cacheVh = 0; stateDocY = null; if(!tick){ tick = true; requestAnimationFrame(frame); } });
 
     /* Aparición escalonada de las piezas nuevas */
     var io = null;

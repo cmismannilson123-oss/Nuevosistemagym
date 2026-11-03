@@ -2260,7 +2260,7 @@ html.qr-mode .container{ padding-bottom:calc(24px + env(safe-area-inset-bottom,0
 .ap-hero::after{ content:""; position:absolute; inset:0; z-index:1; background:radial-gradient(90% 60% at 50% 100%, rgba(16,185,129,.22), transparent 70%), linear-gradient(180deg, rgba(7,13,20,.35) 0%, rgba(7,13,20,.25) 30%, rgba(7,13,20,.78) 72%, #070d14 100%); }
 .ap-hero-copy{ position:absolute; left:22px; right:22px; bottom:96px; z-index:2; text-align:center; transform:translate3d(0,calc(var(--hp) * -46px),0); } /* sin opacidad variable: el texto no parpadea al deslizar */
 .ap-h1{ margin:0; font-family:var(--cy-display); font-weight:800; font-size:clamp(40px,12.5vw,58px); line-height:.94; letter-spacing:-.4px; color:#fff; text-align:center; text-wrap:balance; }
-.ap-h1 em{ font-style:normal; background:linear-gradient(100deg,#34d399,#a7f3d0 55%,#34d399); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.ap-h1 em{ font-style:normal; color:#34d399; } /* color sólido: el texto con degradado recortado parpadea en Chrome para Android */
 .ap-eyebrow,.ap-h1,.ap-sub{ animation:apUp .9s var(--cy-ease) backwards; }
 .ap-eyebrow {
   display: inline-block;

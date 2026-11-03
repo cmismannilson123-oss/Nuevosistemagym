@@ -55,7 +55,15 @@
         if(n !== lastN){ lastN = n; words.forEach(function(w, i){ w.classList.toggle('on', i < n); }); }
       }
     }
-    ov.addEventListener('scroll', function(){ if(!tick){ tick = true; requestAnimationFrame(frame); } }, {passive:true});
+    // Mientras se desliza, las ilustraciones animadas se pausan: cada cuadro del scroll
+    // las redibujaba junto con el texto y la foto (causa del parpadeo). Al parar, siguen.
+    var finScroll = null;
+    ov.addEventListener('scroll', function(){
+      document.documentElement.classList.add('cy-moviendo');
+      clearTimeout(finScroll);
+      finScroll = setTimeout(function(){ document.documentElement.classList.remove('cy-moviendo'); }, 160);
+      if(!tick){ tick = true; requestAnimationFrame(frame); }
+    }, {passive:true});
     window.addEventListener('resize', function(){ heroH = 0; cacheVh = 0; stateDocY = null; if(!tick){ tick = true; requestAnimationFrame(frame); } });
 
     /* Aparición escalonada de las piezas nuevas */

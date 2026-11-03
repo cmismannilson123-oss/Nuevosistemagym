@@ -4187,3 +4187,6 @@ html.cy-moviendo [class*="ilu-"]{ animation-play-state:paused !important; }
 
 /* Con una pantalla encima, las fotos de la portada dejan de dibujarse (evita el parpadeo de "Conocer el gym") */
 html.cy-covered .cy-slide{ visibility:hidden !important; }
+
+/* Mientras otra pantalla cubre la portada, toda la portada deja de dibujarse (no solo sus fotos) */
+html.cy-covered #qrCardPrimeraVez{ visibility:hidden !important; }

@@ -30,7 +30,7 @@
 // vieja y toma la nueva automáticamente.
 // ============================================================
 
-const CACHE_NAME = 'cy-fitness-gym-v193';
+const CACHE_NAME = 'cy-fitness-gym-v194';
 
 // Dominios externos de los que es seguro guardar copia (son archivos estáticos:
 // librerías, íconos, fuentes, fotos — nunca datos de socios). Cualquier petición
@@ -185,25 +185,20 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Tu propia página: responde al instante con la copia guardada (si existe),
-  // y en paralelo va a buscar la versión más reciente para la próxima vez.
+  // Archivos propios (página, scripts, estilos, imágenes): se usan desde la caché sin
+  // revisar internet (cero datos en cada apertura). Solo se descargan la primera vez
+  // que faltan; las versiones nuevas llegan al cambiar CACHE_NAME (cada zip).
   event.respondWith(
-    // ignoreSearch: el QR abre gym.html?qr=1; sin esto esa dirección nunca
-    // estaba en caché y cada escaneo esperaba la red completa.
-    caches.match(peticion, { ignoreSearch: true }).then((respuestaGuardada) => {
-      const peticionRed = fetch(peticion)
-        .then((respuestaFresca) => {
-          if (respuestaFresca && respuestaFresca.status === 200) {
-            const copia = respuestaFresca.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(peticion, copia));
-          }
-          return respuestaFresca;
-        })
-        .catch(() => respuestaGuardada); // Sin internet: usamos lo último que quedó guardado
-
-      // Si ya hay una copia guardada, la mostramos YA (instantáneo).
-      // Si es la primerísima vez, esperamos la respuesta de internet.
-      return respuestaGuardada || peticionRed;
+    // ignoreSearch: el QR abre gym.html?qr=1 y debe encontrar su copia guardada.
+    caches.match(peticion, { ignoreSearch: true }).then((guardada) => {
+      if (guardada) return guardada;
+      return fetch(peticion).then((respuesta) => {
+        if (respuesta && respuesta.status === 200 && respuesta.type === 'basic') {
+          const copia = respuesta.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(peticion, copia));
+        }
+        return respuesta;
+      });
     })
   );
 });

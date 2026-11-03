@@ -161,7 +161,7 @@ window.cyQuitarFondo = async function () {
   try {
     const { error } = await supabaseClient.rpc('admin_set_fondo_fotos', { p_fotos: [] });
     if (error) throw error;
-    await supabaseClient.rpc('admin_set_fondo_portada', { p_url: null }).catch(() => {});
+    try { await supabaseClient.rpc('admin_set_fondo_portada', { p_url: null }); } catch (e) { /* la lista ya quedó vacía */ }
     orden.forEach(it => { if (it.tipo === 'n') URL.revokeObjectURL(it.url); });
     orden = [];
     fotosActivas = [];

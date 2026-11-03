@@ -2381,14 +2381,10 @@ html.qr-mode .container{ padding-bottom:calc(24px + env(safe-area-inset-bottom,0
 .ap-hero-photo {
   position: absolute;
   inset: 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3px;
-  background: #070d14;
+  background: center/cover no-repeat;
   animation: none !important;
   transform: scale(1.04);
 }
-.ap-hero-photo i { display: block; min-height: 0; background-size: cover; background-position: center; }
 #wizConoce .wiz-feat-hero .ic{ animation:none !important; }
 .ap-state .w {
   transition: none; /* el color cambia al instante: sin transición que repinte la frase durante el scroll */

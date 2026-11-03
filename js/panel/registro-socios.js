@@ -358,7 +358,9 @@ window.asistenciaNueva = async function(dni, diasRestantesPasados, socioConocido
     return false;
   }
   if (!resInsert.error) {
-    await supabaseClient.from("socios").update({ dias_restantes: nuevosDias }).eq("dni", dni);
+    // Descontar el día va en segundo plano: no retrasa la confirmación en pantalla
+    supabaseClient.from("socios").update({ dias_restantes: nuevosDias }).eq("dni", dni)
+      .then(function(r){ if (r.error) console.error("No se descontó el día:", r.error); });
   }
 
   // Si el insert falló (ya sea por doble escaneo casi simultáneo, o porque
@@ -395,8 +397,8 @@ window.asistenciaNueva = async function(dni, diasRestantesPasados, socioConocido
   // tengas. Solo lo hacemos si de verdad estamos en el panel de admin.
   if (!document.documentElement.classList.contains("qr-mode")) {
     if (window.cyConfirmarIngreso) window.cyConfirmarIngreso(socio.nombre);
-    mostrarHistorial();
-    render();
+    // Redibujar las listas en segundo plano, después de que la animación ya empezó
+    setTimeout(function(){ mostrarHistorial(); render(); }, 450);
   }
 
   // La confirmación es la pantalla animada de cyConfirmarIngreso (arriba). Aquí solo se

@@ -1,6 +1,8 @@
 -- Historial de asistencia: se guardan los últimos 3 meses (antes eran 2).
 -- La limpieza corre todos los días a las 03:00 (UTC) y usa la fecha de Lima.
 -- Solo compara fechas con formato AAAA-MM-DD, que es el que guarda la app.
+--
+-- APLICADA en producción el 2026-11-04 (desde el SQL Editor de Supabase).
 
 select cron.schedule(
   'limpiar-historial-asistencia',

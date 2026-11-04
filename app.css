@@ -2401,6 +2401,11 @@ html.cy-covered #publicCheckin > :not(.wiz-overlay):not(.cy-ov):not(#wizOverlay)
 html.cy-covered #publicCheckin > :not(.wiz-overlay):not(.cy-ov):not(#wizOverlay) *::before,
 html.cy-covered #publicCheckin > :not(.wiz-overlay):not(.cy-ov):not(#wizOverlay) *::after{ animation-play-state:paused !important; }
 
+/* Con la hoja del pase abierta, lo que queda debajo deja de animarse y de dibujarse (evita el parpadeo) */
+html.cy-hoja-abierta #publicCheckin > :not(.wiz-overlay):not(.cy-ov):not(#wizOverlay) *,
+html.cy-hoja-abierta #publicCheckin > :not(.wiz-overlay):not(.cy-ov):not(#wizOverlay) *::before,
+html.cy-hoja-abierta #publicCheckin > :not(.wiz-overlay):not(.cy-ov):not(#wizOverlay) *::after{ animation-play-state:paused !important; }
+
 /* -- Brillos de la tarjeta de asistencia: capa fija que solo cambia de opacidad (antes repintaba sombras enormes en cada cuadro) -- */
 .qr-hero-card{ animation:qrSuccessEntranceV2 .5s cubic-bezier(.175,.885,.32,1.275) both !important; box-shadow:0 0 28px rgba(16,185,129,.3), 0 0 70px rgba(16,185,129,.1), inset 0 0 30px rgba(16,185,129,.05); }
 .qr-hero-card::after{ content:""; position:absolute; inset:-1px; border-radius:inherit; pointer-events:none; opacity:0; box-shadow:0 0 38px rgba(16,185,129,.42), 0 0 90px rgba(16,185,129,.16); animation:cyGlowOp 3.6s ease-in-out infinite; }
@@ -2833,7 +2838,6 @@ html.cy-covered .qr-hero-card .qr-logo-ring::before,html.cy-covered .qr-hero-car
 .cup-hoja-fondo{
   position:fixed; inset:0; z-index:10040; display:flex; align-items:flex-end; justify-content:center;
   background:rgba(2,6,8,.6); opacity:0; pointer-events:none; transition:opacity .22s ease;
-  -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
 }
 .cup-hoja-fondo.abierta{ opacity:1; pointer-events:auto; }
 .cup-hoja{
@@ -4149,4 +4153,4 @@ html[data-rol="admin"] #btnCerrarSesion{ display:none !important; }
 html.cy-moviendo [class*="ilu-"]{ animation-play-state:paused !important; }
 
 /* Mientras otra pantalla cubre la portada, toda la portada deja de dibujarse (no solo sus fotos) */
-html.cy-covered #qrCardPrimeraVez{ visibility:hidden !important; }
+html.cy-covered #qrCardPrimeraVez, html.cy-hoja-abierta #qrCardPrimeraVez{ visibility:hidden !important; }

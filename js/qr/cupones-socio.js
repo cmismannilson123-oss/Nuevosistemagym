@@ -80,12 +80,14 @@
     si.textContent = o.si; no.textContent = o.no || ''; no.style.display = o.no ? '' : 'none';
     hoja.className = 'cup-hoja-fondo ' + (o.clase || '');
     hoja.offsetWidth; hoja.classList.add('abierta');
+    document.documentElement.classList.add('cy-hoja-abierta');
     setTimeout(function(){ try { si.focus({ preventScroll:true }); } catch(e){} }, 50);
     return new Promise(function(r){ resolver = r; });
   }
   function cerrar(v){
     if (!hoja) return;
     hoja.classList.remove('abierta');
+    document.documentElement.classList.remove('cy-hoja-abierta');
     var r = resolver; resolver = null; if (r) r(v);
   }
   document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && hoja && hoja.classList.contains('abierta')) cerrar(false); });

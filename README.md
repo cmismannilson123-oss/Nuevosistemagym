@@ -121,3 +121,22 @@ internet, sin clave o con el cupo agotado, se usa la voz del celular.
 
 Para activarla: crear una clave gratis en aistudio.google.com (Get API key) y guardarla en
 Supabase → Edge Functions → Secrets como `GEMINI_API_KEY`.
+
+## Asistente de fitness (IA) para los socios
+
+Botón "Coach" en la pantalla del socio (QR). Responde dudas de ejercicios, rutinas,
+recuperación y nutrición general con Google Gemini (nivel gratuito, el mismo `GEMINI_API_KEY`
+que usa `cy-voz`).
+
+- El botón aparece solo cuando el celular ya tiene teléfono + DNI guardados.
+- El servidor verifica al socio con el mismo control del QR (con el bloqueo por intentos) y
+  limita el uso: 25 mensajes por socio al día y 400 en total (se cambian en
+  `supabase/functions/cy-asistente/index.ts`: `LIMITE_SOCIO` y `LIMITE_GLOBAL`).
+- No se guardan las conversaciones. A la IA solo llegan los últimos mensajes y el primer nombre.
+
+Puesta en marcha (una sola vez, antes de subir el sitio):
+
+1. Aplicar `supabase/migrations/20261110000000_asistente_ia.sql` (SQL Editor de Supabase).
+2. Crear la Edge Function `cy-asistente` con el contenido de `supabase/functions/cy-asistente/index.ts`
+   y desplegarla. El secreto `GEMINI_API_KEY` ya existe si la voz funciona.
+3. Subir el zip nuevo del sitio.

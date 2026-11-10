@@ -4154,3 +4154,51 @@ html.cy-moviendo [class*="ilu-"]{ animation-play-state:paused !important; }
 
 /* Mientras otra pantalla cubre la portada, toda la portada deja de dibujarse (no solo sus fotos) */
 html.cy-covered #qrCardPrimeraVez, html.cy-hoja-abierta #qrCardPrimeraVez{ visibility:hidden !important; }
+
+/* ==========================================
+   ASISTENTE DE FITNESS (IA) — "Coach C&Y"
+   Solo en la pantalla del socio (modo QR)
+   ========================================== */
+.cy-asi-fab{ display:none; position:fixed; right:16px; bottom:calc(18px + env(safe-area-inset-bottom, 0px)); z-index:9000;
+  align-items:center; gap:8px; height:52px; padding:0 18px 0 16px; border:0; border-radius:26px; cursor:pointer;
+  background:linear-gradient(180deg,#22d99a,#13a874); color:#04130d; font:700 15px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  box-shadow:0 8px 24px rgba(0,0,0,.45), 0 0 0 1px rgba(255,255,255,.08) inset; -webkit-tap-highlight-color:transparent; }
+.cy-asi-fab i{ font-size:18px; }
+.cy-asi-fab:active{ transform:scale(.96); }
+html.qr-mode .cy-asi-fab.cy-asi-fab--visible{ display:flex; }
+html.cy-asi-abierto .cy-asi-fab, html.cy-covered .cy-asi-fab, html.cy-hoja-abierta .cy-asi-fab{ display:none !important; }
+html.cy-asi-abierto, html.cy-asi-abierto body{ overflow:hidden; }
+
+.cy-asi{ display:none; position:fixed; inset:0; z-index:100002; background:rgba(0,0,0,.6); align-items:flex-end; justify-content:center;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+.cy-asi.cy-asi--abierto{ display:flex; }
+.cy-asi-panel{ display:flex; flex-direction:column; width:100%; max-width:520px; height:min(88dvh,680px); background:#0b1512; color:#e8f5f0;
+  border:1px solid rgba(34,217,154,.25); border-bottom:0; border-radius:22px 22px 0 0; overflow:hidden;
+  padding-bottom:env(safe-area-inset-bottom, 0px); box-shadow:0 -10px 40px rgba(0,0,0,.5); }
+.cy-asi-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.08); }
+.cy-asi-titulo{ display:flex; align-items:center; gap:12px; min-width:0; }
+.cy-asi-titulo > i{ display:grid; place-items:center; width:40px; height:40px; border-radius:50%; background:rgba(34,217,154,.14); color:#22d99a; font-size:18px; flex:none; }
+.cy-asi-titulo strong{ display:block; font-size:16px; line-height:1.2; }
+.cy-asi-titulo small{ display:block; font-size:12px; color:#8fb3a6; }
+.cy-asi-cerrar{ flex:none; width:40px; height:40px; border:0; border-radius:50%; background:rgba(255,255,255,.07); color:#cfe6dd; font-size:16px; cursor:pointer; }
+.cy-asi-chat{ flex:1; overflow-y:auto; overscroll-behavior:contain; padding:16px; display:flex; flex-direction:column; gap:10px; -webkit-overflow-scrolling:touch; }
+.cy-asi-msg{ max-width:86%; padding:10px 14px; border-radius:16px; font-size:15px; line-height:1.45; overflow-wrap:anywhere; }
+.cy-asi-msg p{ margin:0 0 8px; } .cy-asi-msg p:last-child{ margin-bottom:0; }
+.cy-asi-msg ul{ margin:4px 0 8px; padding-left:20px; } .cy-asi-msg ul:last-child{ margin-bottom:0; } .cy-asi-msg li{ margin:3px 0; }
+.cy-asi-msg--coach{ align-self:flex-start; background:#13231d; border:1px solid rgba(255,255,255,.07); border-bottom-left-radius:5px; }
+.cy-asi-msg--yo{ align-self:flex-end; background:#1bbf88; color:#04130d; font-weight:500; border-bottom-right-radius:5px; white-space:pre-wrap; }
+.cy-asi-msg--error{ border-color:rgba(255,180,90,.45); color:#ffd9a8; }
+.cy-asi-escribiendo{ display:flex; gap:5px; align-items:center; padding:14px 16px; }
+.cy-asi-escribiendo span{ width:7px; height:7px; border-radius:50%; background:#6fb59d; animation:cyAsiPunto 1.2s infinite ease-in-out; }
+.cy-asi-escribiendo span:nth-child(2){ animation-delay:.15s; } .cy-asi-escribiendo span:nth-child(3){ animation-delay:.3s; }
+@keyframes cyAsiPunto{ 0%,80%,100%{ opacity:.3; transform:translateY(0); } 40%{ opacity:1; transform:translateY(-3px); } }
+.cy-asi-sugs{ display:flex; flex-wrap:wrap; gap:8px; padding:0 16px 10px; }
+.cy-asi-sug{ border:1px solid rgba(34,217,154,.35); background:rgba(34,217,154,.08); color:#bff0dd; border-radius:18px; padding:8px 13px; font-size:13.5px; cursor:pointer; text-align:left; }
+.cy-asi-form{ display:flex; gap:8px; padding:10px 16px 6px; }
+.cy-asi-form input{ flex:1; min-width:0; height:46px; padding:0 16px; border-radius:23px; border:1px solid rgba(255,255,255,.14); background:#07100d; color:#e8f5f0; font-size:16px; outline:none; }
+.cy-asi-form input:focus{ border-color:#22d99a; }
+.cy-asi-form button{ flex:none; width:46px; height:46px; border:0; border-radius:50%; background:#22d99a; color:#04130d; font-size:17px; cursor:pointer; }
+.cy-asi-form button:disabled, .cy-asi-form input:disabled{ opacity:.55; }
+.cy-asi-aviso{ margin:0; padding:2px 16px 12px; font-size:11.5px; color:#78998d; text-align:center; }
+@media (min-width:640px){ .cy-asi{ align-items:center; } .cy-asi-panel{ border-radius:22px; border-bottom:1px solid rgba(34,217,154,.25); height:min(80dvh,680px); } }
+@media (prefers-reduced-motion:reduce){ .cy-asi-escribiendo span{ animation:none; opacity:.7; } }
